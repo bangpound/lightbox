@@ -13,6 +13,7 @@
 (function ($) {
   $(document).ready(function () {
     $('#gallery').lightbox();
+    $('#youtube').lightbox({ type: 'dom', selector: 'a' });
   });
 })(jQuery);
 // ]]>
@@ -42,6 +43,10 @@
 					</a>
 				</li>
 			</ul>
+		</div>
+		<div id="youtube">
+		<a href="#youtube-movie">a movie</a>
+<object id="youtube-movie" width="425" height="344" style="display: none;"><param name="movie" value="http://www.youtube.com/v/bnMIHpdYwX8&hl=en_US&fs=1&"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/bnMIHpdYwX8&hl=en_US&fs=1&" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="425" height="344"></embed></object>
 		</div>
 	</body>
 </html>

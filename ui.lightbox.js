@@ -185,7 +185,7 @@
         break;
       case "html":
       case "dom":
-        var reference = $(anchor.href),
+        var reference = $($(anchor).attr('href')),
           id = "",
           counter = 0,
           marker = $("<div></div>").attr({
@@ -193,14 +193,14 @@
             style  : "display: none"
           });
 
-          if (!anchor.is("[id]")) {
+          if (!$(anchor).is("[id]")) {
             do {
               id = "element_" + counter++;
             } while ($("#" + id).length);
-            anchor.attr('id', id);
+            $(anchor).attr('id', id);
           }
 
-          marker.attr('id', "_" + anchor.attr('id') + "_marker");
+          marker.attr('id', "_" + $(anchor).attr('id') + "_marker");
 
           content = $("<div></div>").append(reference.before(marker).addClass("marked"));
           reference.show();
@@ -225,6 +225,7 @@
 
       return content;
     },
+
     _deriveType: function (anchor) {
       var reference = anchor.href;
       if (reference.toLowerCase().match(/\.(gif|jpg|jpeg|png)(\?[0123456789]+)?$/)) {
@@ -247,6 +248,7 @@
       }
       return "ajax";
     },
+
     _preloadNeighbours: function () {
       var anchors = this._anchors(),
         index = anchors.index(this.currentAnchor);
@@ -276,16 +278,12 @@
       $.extend(size, {
         width: Math.round(ratio * outerWidth),
         height: Math.round(ratio * outerHeight)
-        //maxWidth: outerWidth,
-        //maxHeight: outerHeight
       });
       elem.css('width', size.width);
       elem.css('height', size.height);
       this._viewer()
-        .dialog('disable')
         .dialog('option', 'width', elem.parent().outerWidth())
         .dialog('option', 'height', elem.parent().outerHeight())
-        .dialog('enable');
     },
 
     _rotate: function (selectorA, selectorB, direction) {
@@ -301,16 +299,16 @@
     },
 
     _viewer: function (create) {
-      if (create || !this.viewerElement) {
+      if (create || !this._getData('_viewer')) {
         var self = this;
-        this.viewerElement = $('<div/>')
+        this._setData('_viewer', $('<div/>')
           .appendTo(document.body)
           .dialog({
             width: 'auto',
             height: 'auto',
             autoOpen: false,
-            draggable: true,
-            resizable: true,
+            draggable: false,
+            resizable: false,
             modal: true,
             open: function (event, ui) {
               $('.ui-dialog-buttonpane button', $(this).parents('.ui-dialog')).each(function (index, domElement) {
@@ -320,15 +318,14 @@
             },
             close: function (event, ui) {
             }
-          });
+          }));
       }
-      return this.viewerElement;
+      return this._getData('_viewer');
     },
 
     _element: function (type, clazz) {
       return $("<" + type + "/>").addClass(clazz).hide();
     }
-
   });
 
   $.extend($.ui.lightbox, {
