@@ -23,11 +23,9 @@
       var self = this;
       // consider event delegation to make this more dynamic
       $(this.options.selector, this.element).click(function (event) {
+        var content = self._content(this);
         event.preventDefault();
-        if (self.overlayElement || self.viewerElement) {
-          return;
-        }
-        self._display(self._content(this));
+        self._display(content);
         return false;
       });
       $(document).click(function (event) {
@@ -65,6 +63,7 @@
         if (!self.currentAnchor) {
           return;
         }
+        self._resize(self._content(self.currentAnchor));
       });
       if ($.fn.mousewheel) {
         $(document).mousewheel(function (event, delta) {
@@ -113,7 +112,6 @@
 
       this.currentAnchor = null;
       this.viewerElement = null;
-      this.overlayElement = null;
     },
 
     next: function (direction) {
@@ -135,27 +133,17 @@
       }
 
       var self = this,
-        visible = this.viewerElement && this.viewerElement.is(":visible"),
+        visible = this._viewer().dialog('isOpen'),
         viewer = this._viewer();
 
       if (direction) {
-        this.options.rotateOut.call(viewer.parents('.ui-dialog')[0], direction, function () {
-          viewer.empty();
-        });
+        viewer.empty();
       }
 
       content.appendTo(viewer);
 
       if (!visible) {
         viewer.dialog('open');
-      }
-      else {
-        this.options.rotateIn.call($(viewer).parents('.ui-dialog')[0], {
-          up: "down",
-          down: "up",
-          left: "right",
-          right: "left"
-        }[direction]);
       }
     },
 
@@ -171,78 +159,71 @@
 
       this.currentAnchor = anchor;
 
-      if (!cache[anchor]) {
-        this._showLoadingIndicator();
+      this._showLoadingIndicator();
 
-        switch (type) {
-        case "image":
-          content = $('<img/>').load(function (event) {
-            self._resize(content);
-            self._position();
-          }).attr("src", anchor.href);
-          break;
-        case "flash":
-        case "flashvideo":
-        case "quicktime":
-        case "realplayer":
-        case "windowsmedia":
-          content = $("<div/>").media({
-            width: this.options.width,
-            height: this.options.height,
-            src: anchor.href,
-            autoplay: 1
+      switch (type) {
+      case "image":
+        content = $('<img/>').load(function (event) {
+          self._resize(content);
+          self._position();
+        }).attr("src", anchor.href).appendTo(document.body);
+        break;
+      case "flash":
+      case "flashvideo":
+      case "quicktime":
+      case "realplayer":
+      case "windowsmedia":
+        content = $("<div/>").media({
+          width: this.options.width,
+          height: this.options.height,
+          src: anchor.href,
+          autoplay: 1
+        });
+        break;
+      case "iframe":
+        content = $('<iframe/>').attr('src', anchor.href).attr('frameborder', 0).attr('border', 0);
+        break;
+      case "html":
+      case "dom":
+        var reference = $(anchor.href),
+          id = "",
+          counter = 0,
+          marker = $("<div></div>").attr({
+            "class": (reference.is(":hidden") ? "hidden" : ""),
+            style  : "display: none"
           });
-          break;
-        case "iframe":
-          content = $('<iframe/>').attr('src', anchor.href).attr('frameborder', 0).attr('border', 0);
-          break;
-        case "html":
-        case "dom":
-          var reference = $(anchor.href),
-            id = "",
-            counter = 0,
-            marker = $("<div></div>").attr({
-              "class": (reference.is(":hidden") ? "hidden" : ""),
-              style  : "display: none"
-            });
 
-            if (!anchor.is("[id]")) {
-              do {
-                id = "element_" + counter++;
-              } while ($("#" + id).length);
-              anchor.attr('id', id);
-            }
+          if (!anchor.is("[id]")) {
+            do {
+              id = "element_" + counter++;
+            } while ($("#" + id).length);
+            anchor.attr('id', id);
+          }
 
-            marker.attr('id', "_" + anchor.attr('id') + "_marker");
+          marker.attr('id', "_" + anchor.attr('id') + "_marker");
 
-            content = $("<div></div>").append(reference.before(marker).addClass("marked"));
-            reference.show();
-          break;
-        case "ajax":
-        case "script":
-          $.ajax({
-            url: anchor.href,
-            type: (parseInt(this.options.post, 10) === 1) ? "POST" : "GET",
-            cache: false,
-            async: false,
-            //data: options.parameters,
-            dataType: (this.options.type === "ajax") ? "html" : "script",
-            success: function (data, textStatus) {
-              content = $(data);
-              self._contentReady(content);
-            }
-          });
-        }
-
-        if ($.inArray(this.options.type, ["html", "dom", "iframe"]) !== -1) {
-          self._contentReady(content);
-        }
-        this._hideLoadingIndicator();
+          content = $("<div></div>").append(reference.before(marker).addClass("marked"));
+          reference.show();
+        break;
+      case "ajax":
+      case "script":
+        $.ajax({
+          url: anchor.href,
+          type: (parseInt(this.options.post, 10) === 1) ? "POST" : "GET",
+          cache: false,
+          async: false,
+          //data: options.parameters,
+          dataType: (this.options.type === "ajax") ? "html" : "script",
+          success: function (data, textStatus) {
+            content = $(data);
+            self._contentReady(content);
+          }
+        });
       }
 
-      cache[anchor] = content;
+      this._hideLoadingIndicator();
 
-      return cache[anchor];
+      return content;
     },
     _deriveType: function (anchor) {
       var reference = anchor.href;
@@ -289,7 +270,7 @@
         ratio = Math.min(
           Math.min(
             Math.min($(window).width(), outerWidth) / outerWidth,
-            Math.min($(window).height() - 36, outerHeight) / outerHeight), 1),
+            Math.min($(window).height(), outerHeight) / outerHeight), 1),
         size = (this.size = {});
 
       $.extend(size, {
@@ -300,8 +281,11 @@
       });
       elem.css('width', size.width);
       elem.css('height', size.height);
-      this._viewer().css('width', size.width).dialog('option', 'width', size.width);
-      this._viewer().css('height', size.height).dialog('option', 'height', size.height);
+      this._viewer()
+        .dialog('disable')
+        .dialog('option', 'width', elem.parent().outerWidth())
+        .dialog('option', 'height', elem.parent().outerHeight())
+        .dialog('enable');
     },
 
     _rotate: function (selectorA, selectorB, direction) {
@@ -322,9 +306,11 @@
         this.viewerElement = $('<div/>')
           .appendTo(document.body)
           .dialog({
+            width: 'auto',
+            height: 'auto',
             autoOpen: false,
-            draggable: false,
-            resizable: false,
+            draggable: true,
+            resizable: true,
             modal: true,
             open: function (event, ui) {
               $('.ui-dialog-buttonpane button', $(this).parents('.ui-dialog')).each(function (index, domElement) {
@@ -350,52 +336,7 @@
       loop: true,
       overlay: true,
       selector: "a[href]:has(img[src])",
-      titleSuffix: " - Click anywhere to close (or press Escape), use keyboard arrows or mousewheel to rotate images",
-      rotateIn: function (direction) {
-        $(this).effect("drop", {
-          direction: direction,
-          mode: "show"
-        });
-      },
-      rotateOut: function (direction, finished) {
-        $(this).effect("drop", {
-          direction: direction
-        }, "normal", finished);
-      },
-      show: function (anchor, dialog) {
-        var thumb = $(anchor),
-          lightbox = $(dialog),
-          offset = thumb.offset();
-        // TODO refactor
-        var start = {
-          left: offset.left,
-          top: offset.top,
-          width: thumb.width(),
-          height: thumb.height(),
-          opacity: 0
-        }
-        var stop = {
-          left: lightbox.css("left"),
-          top: lightbox.css("top"),
-          width: lightbox.width(),
-          height: lightbox.height(),
-          opacity: 1
-        }
-        lightbox.data('dialog').uiDialog.css(start).show().animate(stop);
-      },
-      hide: function (anchor, finished) {
-        var thumb = $(anchor),
-          offset = thumb.offset();
-        // TODO refactor (see above)
-        var stop = {
-          left: offset.left,
-          top: offset.top,
-          width: thumb.width(),
-          height: thumb.height(),
-          opacity: 0
-        }
-        $(this).animate(stop, finished);
-      }
+      titleSuffix: " - Click anywhere to close (or press Escape), use keyboard arrows or mousewheel to rotate images"
     }
   });
 
