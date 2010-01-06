@@ -47,7 +47,9 @@
                 $(this).dialog('option', 'position', self.options.position);
               }
             },
-            close: function (event, ui) {
+            beforeclose: function (event, ui) {
+              self.options.hide.call($(this).data('dialog').uiDialog, self.getCurrentAnchor(), function() {
+              });
             }
           }));
 
@@ -185,9 +187,30 @@
       viewer.dialog('option', 'title', $(anchor).attr('title') + this.options.titleSuffix);
 
       if (visible) {
+        if (direction) {
+          this.options.rotateOut.call(viewer.data('dialog').uiDialog, direction, function() {
+            viewer.empty();
+            viewer.append(content.show());
+            self._resize();
+          });
+          viewer.dialog('option', 'position', self.options.position);
+          this.options.rotateIn.call(viewer.data('dialog').uiDialog, {
+            up: "down",
+            down: "up",
+            left: "right",
+            right: "left"
+          }[direction], function () {
+            viewer.dialog('option', 'position', self.options.position);
+            self._hideLoadingIndicator();
+          });
+        }
       }
       else {
+        viewer.empty();
+        viewer.append(content.show());
+        this._resize();
         viewer.dialog('open');
+        self.options.show.call(viewer.data('dialog').uiDialog, anchor);
       }
     },
 
@@ -201,7 +224,6 @@
         content = this._element('img')
           .attr("src", anchor.href)
           .load(function (event) {
-            self._resize();
             self.lightbox.dialog('option', 'position', self.options.position);
           });
         break;
@@ -396,7 +418,59 @@
       titleSuffix: " - Click anywhere to close (or press Escape), use keyboard arrows or mousewheel to rotate images",
       position: 'center',
       width: 300,
-      height: 200
+      height: 200,
+      parameters: {},
+      rotateIn: function(direction, finished) {
+        $(this).effect("drop", {
+          direction: direction,
+          mode: "show"
+        }, "normal", finished);
+      },
+      rotateOut: function(direction, finished) {
+        $(this).effect("drop", {
+          direction: direction
+        }, "normal", finished);
+      },
+      show: function(anchor) {
+        var thumb = $(anchor),
+          offset = thumb.offset();
+        // TODO refactor
+        var start = {
+          left: offset.left,
+          top: offset.top,
+          width: thumb.width(),
+          height: thumb.height(),
+          opacity: 0
+        }
+        var img = $(this);
+        var stop = {
+          left: img.css("left"),
+          top: img.css("top"),
+          width: img.width(),
+          height: img.height(),
+          opacity: 1
+        }
+        $(this).css(start).show().animate(stop);
+      },
+      hide: function (anchor, finished) {
+        var thumb = $(anchor),
+          offset = thumb.offset();
+        // TODO refactor (see above)
+        var stop = {
+          left: offset.left,
+          top: offset.top,
+          width: thumb.width(),
+          height: thumb.height(),
+          opacity: 0
+        }
+        $(this).animate(stop, finished);
+      },
+      showOverlay: function() {
+        $(this).fadeIn();
+      },
+      hideOverlay: function(finished) {
+        $(this).fadeOut(finished);
+      }
     }
   });
 
