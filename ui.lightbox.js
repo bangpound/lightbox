@@ -169,10 +169,10 @@
       var visible = this.lightbox.dialog('isOpen'),
         anchor = this.getCurrentAnchor(),
         type = this._deriveType(this.getCurrentAnchor()),
-        content = this.getContent(),
+        content = this.getContent().show(),
         viewer = this.lightbox;
 
-      viewer.empty().append(content.show());
+      viewer.empty().append(content);
       viewer.dialog('option', 'title', $(anchor).attr('title') + this.options.titleSuffix);
 
       if (visible) {
