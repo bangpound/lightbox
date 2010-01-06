@@ -12,8 +12,9 @@
 // <![CDATA[
 (function ($) {
   $(document).ready(function () {
-    $('#gallery').lightbox({ dialogClass: 'gallery' });
-    $('#youtube').lightbox({ dialogClass: 'youtube', type: 'dom', selector: 'a' });
+    $('#gallery').lightbox({ });
+    $('#youtube').lightbox({ type: 'dom', selector: 'a' });
+    $('#quicktime').lightbox({ selector: 'a', width: 480, height: 260 });
   });
 })(jQuery);
 // ]]>
@@ -47,6 +48,9 @@
 		<div id="youtube">
 		<a href="#youtube-movie">a movie</a>
 <object id="youtube-movie" width="425" height="344" style="display: none;"><param name="movie" value="http://www.youtube.com/v/bnMIHpdYwX8&hl=en_US&fs=1&"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/bnMIHpdYwX8&hl=en_US&fs=1&" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="425" height="344"></embed></object>
+		</div>
+		<div id="quicktime">
+		<a href="http://malsup.com/jquery/media/video/simpsons.mov">simpsons</a>
 		</div>
 	</body>
 </html>
