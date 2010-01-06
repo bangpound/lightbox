@@ -28,6 +28,8 @@
             position: this.options.position,
             resizable: this.options.resizable,
             draggable: this.options.draggable,
+            height: this.options.height,
+            width: this.options.width,
             open: function (event, ui) {
               var type = self._deriveType(self.getCurrentAnchor());
 
@@ -392,7 +394,9 @@
       draggable: false,
       selector: "a[href]:has(img[src])",
       titleSuffix: " - Click anywhere to close (or press Escape), use keyboard arrows or mousewheel to rotate images",
-      position: 'center'
+      position: 'center',
+      width: 300,
+      height: 200
     }
   });
 
