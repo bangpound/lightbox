@@ -170,7 +170,9 @@ h3 { text-align: center; }
 
 p { font-family: "Lucida Sans", "Lucida Grande"; }
 
-.description { clear: left; font-style: italic; }
+.description { clear: left; overflow: hidden; display: inline-block; font-style: italic; }
+.description { display: block; }
+.description p { margin-top: 1.5em; }
 
 .download { display: inline; float: right; }
 .download a { display: inline; float: left; margin-right: 10px; width: 90px; }
