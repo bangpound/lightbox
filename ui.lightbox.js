@@ -176,15 +176,10 @@
       viewer.dialog('option', 'title', $(anchor).attr('title') + this.options.titleSuffix);
 
       if (visible) {
-        if (type === 'image') {
-          //this._resize();
-          viewer.dialog('option', 'position', 'center');
-        }
       }
       else {
         viewer.dialog('open');
       }
-      this._resize();
     },
 
     _loadContent: function (anchor) {
@@ -194,10 +189,12 @@
 
       switch (type) {
       case "image":
-        content = this._element('img').attr("src", anchor.href).load(function (event) {
-          //self._resize();
-          self.lightbox.dialog('option', 'position', 'center');
-        }).show();
+        content = this._element('img')
+          .attr("src", anchor.href)
+          .load(function (event) {
+            self._resize();
+            self.lightbox.dialog('option', 'position', 'center');
+          });
         break;
       case "flash":
       case "flashvideo":
