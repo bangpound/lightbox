@@ -12,8 +12,8 @@
 // <![CDATA[
 (function ($) {
   $(document).ready(function () {
-    $('#gallery').lightbox();
-    $('#youtube').lightbox({ type: 'dom', selector: 'a' });
+    $('#gallery').lightbox({ dialogClass: 'gallery' });
+    $('#youtube').lightbox({ dialogClass: 'youtube', type: 'dom', selector: 'a' });
   });
 })(jQuery);
 // ]]>
