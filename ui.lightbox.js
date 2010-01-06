@@ -26,6 +26,8 @@
             modal: this.options.overlay,
             dialogClass: this.options.dialogClass,
             position: this.options.position,
+            resizable: this.options.resizable,
+            draggable: this.options.draggable,
             open: function (event, ui) {
               var type = self._deriveType(self.getCurrentAnchor());
 
@@ -382,6 +384,8 @@
       loop: true,
       overlay: true,
       dialogClass: 'ui-lightbox',
+      resizable: false,
+      draggable: false,
       selector: "a[href]:has(img[src])",
       titleSuffix: " - Click anywhere to close (or press Escape), use keyboard arrows or mousewheel to rotate images",
       position: 'center'
