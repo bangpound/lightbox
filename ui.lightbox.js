@@ -396,7 +396,7 @@
         target = anchors.filter(selectorB)[0];
       }
       this.setCurrentAnchor(target);
-      this.setContent(this._loadContent(target))
+      this.setContent(this._loadContent(target));
       this._display(direction);
     },
 
