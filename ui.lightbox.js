@@ -166,11 +166,13 @@
       }
 
       var visible = this.lightbox.dialog('isOpen'),
+        anchor = this.getCurrentAnchor(),
         type = this._deriveType(this.getCurrentAnchor()),
         content = this.getContent(),
         viewer = this.lightbox;
 
       viewer.empty().append(content.show());
+      viewer.dialog('option', 'title', $(anchor).attr('title') + this.options.titleSuffix);
 
       if (visible) {
         if (type === 'image') {
