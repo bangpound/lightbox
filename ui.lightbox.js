@@ -313,18 +313,8 @@
         viewer = this.lightbox,
         dialog = this.lightbox.data('dialog'),
         offset = 20,
-        type = this._deriveType(this.getCurrentAnchor());
-
-      if (type == 'image') {
-        content.css({
-          width: 'auto',
-          height: 'auto'
-        });
-      }
-
-      var cWidth = content.attr('width') || content.width(),
-        cHeight = content.attr('height') || content.height(),
-
+        type = this._deriveType(this.getCurrentAnchor()),
+        cWidth,cHeight,finalWidth,finalHeight,
         // difference
         deltaContentWidth = viewer.outerWidth() - viewer.width(),
         deltaContentHeight = viewer.outerHeight() - viewer.height(),
@@ -332,21 +322,30 @@
         dialogTitlebarWidth = dialog.uiDialogTitlebar.outerWidth(),
         dialogTitlebarHeight = dialog.uiDialogTitlebar.outerHeight(),
 
-
         // Window
         wWidth = $(window).width(),
         wHeight = $(window).height(),
 
-        // Desired width
-        finalWidth = cWidth + deltaContentWidth,
-        finalHeight = cHeight + deltaContentHeight + dialogTitlebarHeight,
-
-
-        ratio = Math.min(
-          Math.min(
-            Math.min(wWidth - deltaContentWidth - offset, cWidth) / cWidth,
-            Math.min(wHeight - deltaContentHeight - dialogTitlebarHeight - offset, cHeight) / cHeight, 1)),
         size = (this.size = {});
+
+      $.swap(content[0], {
+        position: "absolute",
+        visibility: "hidden",
+        display: "block"
+      }, function () {
+        cWidth = content.attr('width') || content.width(),
+        cHeight = content.attr('height') || content.height();
+      });
+
+      // Desired width
+      finalWidth = cWidth + deltaContentWidth,
+      finalHeight = cHeight + deltaContentHeight + dialogTitlebarHeight,
+
+      ratio = Math.min(
+        Math.min(
+          Math.min(wWidth - deltaContentWidth - offset, cWidth) / cWidth,
+          Math.min(wHeight - deltaContentHeight - dialogTitlebarHeight - offset, cHeight) / cHeight, 1)),
+
 
       $.extend(size, {
         width: Math.round(ratio * cWidth),
