@@ -1,0 +1,104 @@
+// This import applies a global reset to any page that imports this stylesheet.
+@import blueprint/reset.sass
+// To configure blueprint, edit the partials/base.sass file.
+@import partials/base.sass
+// Import all the default blueprint modules so that we can access their mixins.
+@import blueprint
+// Import the non-default scaffolding module.
+@import blueprint/scaffolding.sass
+@import compass
+
+// To generate css equivalent to the blueprint css but with your configuration applied, uncomment:
+// +blueprint
+
++global-reset
++blueprint-typography
++blueprint-scaffolding
+
+//Recommended Blueprint configuration with scoping and semantic layout:
++blueprint-scaffolding("body.bp")
+body.bp
+  +blueprint-utilities
+  +blueprint-interaction
+  // Remove the scaffolding when you're ready to start doing visual design.
+  // Or leave it in if you're happy with how blueprint looks out-of-the-box
+
+form
+  +blueprint-form
+
+
+body
+  margin-top: 36px
+  margin-bottom: 36px
+  background-color: #eee
+
+#container-wrapper
+
+#container
+  +container
+  +border-radius
+  +box-shadow
+  background-color: white
+  padding: 18px
+  .section
+    +showgrid
+
+
+h1
+  +column(8)
+  font-size: 6em
+  line-height: 1.25em
+  height: 1.25em
+  margin-bottom: 0
+  .small
+    font-size: 12px
+    line-height: 90px
+
+
+  a
+    +hover-link
+
+
+h2
+
+
+h3
+  text-align: center
+
+
+a
+
+p
+  font-family: "Lucida Sans", "Lucida Grande"
+
+
+.description
+  clear: left
+  font-style: italic
+
+
+.download
+  +float-right
+  a
+    +column(2)
+    &:last-child
+      +last
+  img
+    display: block
+
+
+
+pre
+  font-size: 12px
+  +box
+  background-color: rgba(78,135,236,.25)
+
+
+hr
+  +colborder
+
+
+.footer
+  text-align: center
+  padding-top: 36px
+  font-style: italic
