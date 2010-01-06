@@ -200,15 +200,15 @@
       case "quicktime":
       case "realplayer":
       case "windowsmedia":
-        $(anchor).clone().media({
+        $(anchor).media({
           width: this.options.width,
           height: this.options.height,
           src: anchor.href,
           autoplay: 1
         }, function (element, options) {
-          $(element).appendTo(document.body);
-        }, function (anchor, data, options, playerName) {
-          content = $(data);
+        }, function (element, data, options, playerName) {
+          content = $(data).clone();
+          $(data).media('undo');
         });
         break;
       case "iframe":
