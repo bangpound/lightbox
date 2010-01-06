@@ -25,6 +25,7 @@
           .dialog({
             autoOpen: false,
             resizable: false,
+            modal: this.options.overlay,
             dialogClass: this.options.dialogClass,
             open: function (event, ui) {
               var type = self._deriveType(self.getCurrentAnchor());
@@ -376,6 +377,7 @@
     defaults: {
       loop: true,
       overlay: true,
+      dialogClass: 'ui-lightbox',
       selector: "a[href]:has(img[src])",
       titleSuffix: " - Click anywhere to close (or press Escape), use keyboard arrows or mousewheel to rotate images"
     }
