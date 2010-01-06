@@ -47,17 +47,19 @@
                 $(this).dialog('option', 'position', self.options.position);
               }
             },
-            close: function (event, ui) {
+            beforeclose: function (event, ui) {
+              self.options.hide.call($(this).data('dialog').uiDialog, self.getCurrentAnchor(), function() {
+              });
             }
           }));
 
       // consider event delegation to make this more dynamic
       $(this.options.selector, this.element).click(function (event) {
+        self._showLoadingIndicator();
+
         var content = self._loadContent(this);
 
         event.preventDefault();
-        self._showLoadingIndicator();
-
         self.setCurrentAnchor(this);
         self.setContent(content);
         self._display();
@@ -72,6 +74,7 @@
         if (!self.getCurrentAnchor()) {
           return;
         }
+        self._showLoadingIndicator();
         switch (event.keyCode) {
         case $.ui.keyCode.ESCAPE:
           self.close();
@@ -173,19 +176,40 @@
         return;
       }
 
-      var visible = this.lightbox.dialog('isOpen'),
+      var self = this,
+        visible = this.lightbox.dialog('isOpen'),
         anchor = this.getCurrentAnchor(),
         type = this._deriveType(this.getCurrentAnchor()),
-        content = this.getContent().show(),
+        content = this.getContent(),
         viewer = this.lightbox;
 
-      viewer.empty().append(content);
       viewer.dialog('option', 'title', $(anchor).attr('title') + this.options.titleSuffix);
 
       if (visible) {
+        if (direction) {
+          this.options.rotateOut.call(viewer.data('dialog').uiDialog, direction, function() {
+            viewer.empty();
+            viewer.append(content.show());
+            self._resize();
+          });
+          viewer.dialog('option', 'position', self.options.position);
+          this.options.rotateIn.call(viewer.data('dialog').uiDialog, {
+            up: "down",
+            down: "up",
+            left: "right",
+            right: "left"
+          }[direction], function () {
+            viewer.dialog('option', 'position', self.options.position);
+            self._hideLoadingIndicator();
+          });
+        }
       }
       else {
+        viewer.empty();
+        viewer.append(content.show());
+        this._resize();
         viewer.dialog('open');
+        self.options.show.call(viewer.data('dialog').uiDialog, anchor);
       }
     },
 
@@ -199,7 +223,6 @@
         content = this._element('img')
           .attr("src", anchor.href)
           .load(function (event) {
-            self._resize();
             self.lightbox.dialog('option', 'position', self.options.position);
           });
         break;
@@ -232,19 +255,17 @@
       case "script":
         $.ajax({
           url: anchor.href,
-          type: (parseInt(this.options.post, 10) === 1) ? "POST" : "GET",
+          type: (parseInt(self.options.post, 10) === 1) ? "POST" : "GET",
           cache: false,
           async: false,
-          data: this.options.parameters,
-          dataType: (this.options.type === "ajax") ? "html" : "script",
+          data: self.options.parameters,
+          dataType: (type === "ajax") ? "html" : "script",
           success: function (data, textStatus) {
             content = $(data);
           }
         });
         break;
       }
-
-      this._hideLoadingIndicator();
 
       return content;
     },
@@ -292,18 +313,8 @@
         viewer = this.lightbox,
         dialog = this.lightbox.data('dialog'),
         offset = 20,
-        type = this._deriveType(this.getCurrentAnchor());
-
-      if (type == 'image') {
-        content.css({
-          width: 'auto',
-          height: 'auto'
-        });
-      }
-
-      var cWidth = content.attr('width') || content.width(),
-        cHeight = content.attr('height') || content.height(),
-
+        type = this._deriveType(this.getCurrentAnchor()),
+        cWidth,cHeight,finalWidth,finalHeight,
         // difference
         deltaContentWidth = viewer.outerWidth() - viewer.width(),
         deltaContentHeight = viewer.outerHeight() - viewer.height(),
@@ -311,21 +322,30 @@
         dialogTitlebarWidth = dialog.uiDialogTitlebar.outerWidth(),
         dialogTitlebarHeight = dialog.uiDialogTitlebar.outerHeight(),
 
-
         // Window
         wWidth = $(window).width(),
         wHeight = $(window).height(),
 
-        // Desired width
-        finalWidth = cWidth + deltaContentWidth,
-        finalHeight = cHeight + deltaContentHeight + dialogTitlebarHeight,
-
-
-        ratio = Math.min(
-          Math.min(
-            Math.min(wWidth - deltaContentWidth - offset, cWidth) / cWidth,
-            Math.min(wHeight - deltaContentHeight - dialogTitlebarHeight - offset, cHeight) / cHeight, 1)),
         size = (this.size = {});
+
+      $.swap(content[0], {
+        position: "absolute",
+        visibility: "hidden",
+        display: "block"
+      }, function () {
+        cWidth = content.attr('width') || content.width(),
+        cHeight = content.attr('height') || content.height();
+      });
+
+      // Desired width
+      finalWidth = cWidth + deltaContentWidth,
+      finalHeight = cHeight + deltaContentHeight + dialogTitlebarHeight,
+
+      ratio = Math.min(
+        Math.min(
+          Math.min(wWidth - deltaContentWidth - offset, cWidth) / cWidth,
+          Math.min(wHeight - deltaContentHeight - dialogTitlebarHeight - offset, cHeight) / cHeight, 1)),
+
 
       $.extend(size, {
         width: Math.round(ratio * cWidth),
@@ -376,7 +396,7 @@
         target = anchors.filter(selectorB)[0];
       }
       this.setCurrentAnchor(target);
-      this.setContent(this._loadContent(target))
+      this.setContent(this._loadContent(target));
       this._display(direction);
     },
 
@@ -389,6 +409,7 @@
     defaults: {
       loop: true,
       overlay: true,
+      post: 0,
       dialogClass: 'ui-lightbox',
       resizable: false,
       draggable: false,
@@ -396,7 +417,59 @@
       titleSuffix: " - Click anywhere to close (or press Escape), use keyboard arrows or mousewheel to rotate images",
       position: 'center',
       width: 300,
-      height: 200
+      height: 200,
+      parameters: {},
+      rotateIn: function(direction, finished) {
+        $(this).effect("drop", {
+          direction: direction,
+          mode: "show"
+        }, "normal", finished);
+      },
+      rotateOut: function(direction, finished) {
+        $(this).effect("drop", {
+          direction: direction
+        }, "normal", finished);
+      },
+      show: function(anchor) {
+        var thumb = $(anchor),
+          offset = thumb.offset();
+        // TODO refactor
+        var start = {
+          left: offset.left,
+          top: offset.top,
+          width: thumb.width(),
+          height: thumb.height(),
+          opacity: 0
+        }
+        var img = $(this);
+        var stop = {
+          left: img.css("left"),
+          top: img.css("top"),
+          width: img.width(),
+          height: img.height(),
+          opacity: 1
+        }
+        $(this).css(start).show().animate(stop);
+      },
+      hide: function (anchor, finished) {
+        var thumb = $(anchor),
+          offset = thumb.offset();
+        // TODO refactor (see above)
+        var stop = {
+          left: offset.left,
+          top: offset.top,
+          width: thumb.width(),
+          height: thumb.height(),
+          opacity: 0
+        }
+        $(this).animate(stop, finished);
+      },
+      showOverlay: function() {
+        $(this).fadeIn();
+      },
+      hideOverlay: function(finished) {
+        $(this).fadeOut(finished);
+      }
     }
   });
 
