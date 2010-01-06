@@ -1,39 +1,141 @@
-/* lightbox
-----------------------------------*/
-
 .ui-lightbox-container {
-	position: absolute;
-	z-index: 1000;
-}
-
-.ui-lightbox {
-	/* for IE7 */
-	-ms-interpolation-mode: bicubic;
-	z-index: 1002;
-	position: relative;
-	width: 100%;
-}
+  position: absolute;
+  z-index: 1000; }
 
 .ui-loading-indicator {
-	z-index: 1001;
-	position: absolute;
-	text-indent: -10000px;
-	width: 38px;
-	height: 38px;
-	background: white url(images/ajax-loader.gif) no-repeat 3px 3px;
-}
+  z-index: 1001;
+  position: absolute;
+  text-indent: -10000px;
+  width: 38px;
+  height: 38px;
+  background: white url(images/ajax-loader.gif) no-repeat 3px 3px; }
 
 .ui-lightbox-shadow {
-	position: absolute;
-	top: -15px;
-	left: -15px;
-}
+  position: absolute;
+  top: -15px;
+  left: -15px; }
 
-/* overlay
-----------------------------------*/
+.ui-lightbox .ui-dialog-titlebar {
+  font-size: 12px; }
+
 .ui-dialog-overlay {
   opacity: .5;
   filter: alpha(opacity=50);
   -moz-opacity: 0.5;
-  background: #000000;
-}
+  background: #000000; }
+
+.ui-lightbox {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  font-weight: inherit;
+  font-style: inherit;
+  font-size: 100%;
+  font-family: inherit;
+  vertical-align: baseline;
+  list-style: none;
+  /* Webkit (Safari, Chrome) */
+  -webkit-box-shadow: #333333 1px 1px 5px;
+  /* Gecko (Firefox, Camino) */
+  -moz-box-shadow: #333333 1px 1px 5px;
+  /* CSS3 */
+  box-shadow: #333333 1px 1px 5px;
+  -ms-interpolation-mode: bicubic;
+  position: relative;
+  background: none;
+  color: #222222;
+  position: relative; }
+  .ui-lightbox .ui-dialog-titlebar {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    font-weight: inherit;
+    font-style: inherit;
+    font-size: 100%;
+    font-family: inherit;
+    vertical-align: baseline;
+    list-style: none;
+    padding: 0 1ex;
+    background: none;
+    position: relative;
+    height: 0; }
+  .ui-lightbox .ui-dialog-title {
+    color: white;
+    font-weight: bold;
+    display: none; }
+  .ui-lightbox .ui-dialog-titlebar-close {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    font-weight: inherit;
+    font-style: inherit;
+    font-size: 100%;
+    font-family: inherit;
+    vertical-align: baseline;
+    list-style: none;
+    background: none;
+    position: absolute;
+    right: 1ex;
+    top: 0;
+    width: auto; }
+    .ui-lightbox .ui-dialog-titlebar-close:hover {
+      background: none; }
+    .ui-lightbox .ui-dialog-titlebar-close:active {
+      background: none; }
+    .ui-lightbox .ui-dialog-titlebar-close span {
+      display: inline; }
+  .ui-lightbox .ui-dialog-titlebar-close-hover {
+    background: none; }
+  .ui-lightbox .ui-dialog-content {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    font-weight: inherit;
+    font-style: inherit;
+    font-size: 100%;
+    font-family: inherit;
+    vertical-align: baseline;
+    list-style: none;
+    background: #ffffff;
+    color: #222222; }
+  .ui-lightbox .ui-dialog-buttonpane {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    text-align: left;
+    border-top: 1px solid #d3d3d3; }
+    .ui-lightbox .ui-dialog-buttonpane button {
+      margin: 0;
+      padding: 0;
+      border: 0;
+      outline: 0;
+      font-weight: inherit;
+      font-style: inherit;
+      font-size: 100%;
+      font-family: inherit;
+      vertical-align: baseline;
+      list-style: none;
+      color: #555555;
+      background: none;
+      cursor: pointer; }
+      .ui-lightbox .ui-dialog-buttonpane button:hover {
+        color: #212121;
+        background: none;
+        border: 1px solid #999999; }
+      .ui-lightbox .ui-dialog-buttonpane button:active {
+        color: #222222;
+        background: none;
+        border: 1px solid #dddddd; }
+
+.bold {
+  color: red !important; }
+
+.ui-hidden {
+  left: -10000px;
+  position: absolute;
+  top: -10000px;
+  visibility: hidden; }

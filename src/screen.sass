@@ -41,6 +41,7 @@ body
   background-color: white
   padding: 18px
   .section
+    +clearfix
     +showgrid
 
 
@@ -105,3 +106,36 @@ hr
   text-align: center
   padding-top: 36px
   font-style: italic
+
+
+#gallery,#youtube,#quicktime
+  +column(8, true)
+  +prepend(4)
+  +append-bottom
+  h2,p.usage
+    +pull(4)
+  h2
+    margin:
+      top: 18px
+      bottom: 0
+  p.usage
+    padding:
+      top: 54px
+    margin:
+      bottom: 0
+    white-space: pre
+  ul
+    +reset-box-model
+    li
+      +column(2)
+      line-height: 90px
+      text-align: center
+      &:nth-child(4n)
+        +last
+      img
+        vertical-align: middle
+
+#youtube,#quicktime
+  a
+    +column(2)
+    line-height: 90px
