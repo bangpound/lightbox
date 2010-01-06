@@ -255,11 +255,11 @@
       case "script":
         $.ajax({
           url: anchor.href,
-          type: (parseInt(this.options.post, 10) === 1) ? "POST" : "GET",
+          type: (parseInt(self.options.post, 10) === 1) ? "POST" : "GET",
           cache: false,
           async: false,
-          data: this.options.parameters,
-          dataType: (this.options.type === "ajax") ? "html" : "script",
+          data: self.options.parameters,
+          dataType: (type === "ajax") ? "html" : "script",
           success: function (data, textStatus) {
             content = $(data);
           }
@@ -410,6 +410,7 @@
     defaults: {
       loop: true,
       overlay: true,
+      post: 0,
       dialogClass: 'ui-lightbox',
       resizable: false,
       draggable: false,
