@@ -12,7 +12,7 @@
 (function ($) {
   $(document).ready(function () {
     $('#gallery').lightbox({ });
-    $('#youtube').lightbox({ type: 'dom', selector: 'a' });
+    $('#youtube').lightbox({ type: 'dom', selector: 'a', width: 425, height: 344 });
     $('#quicktime').lightbox({ selector: 'a', width: 480, height: 260 });
   });
 })(jQuery);
@@ -44,8 +44,9 @@
 			<div id="youtube">
         <h2>DOM</h2>
 			  <p class="usage">$('#youtube').lightbox({
-  type: 'dom', selector: 'a' });</p>
-				<a href="#youtube-movie">a movie</a>
+  type: 'dom', selector: 'a',
+  width: 425, height: 344 });</p>
+				<a href="#youtube-movie"><img src="http://img.youtube.com/vi/bnMIHpdYwX8/2.jpg" alt="Thumbnail from Pixar Birds" /></a>
 				<object id="youtube-movie" width="425" height="344" style="display: none;">
 					<param name="movie" value="http://www.youtube.com/v/bnMIHpdYwX8&hl=en_US&fs=1&">
 					</param>
