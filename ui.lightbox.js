@@ -12,8 +12,7 @@
  *
  * Depends:
  *  ui.core.js
- *  effects.core.js
- *  effects.drop.js
+ *  ui.dialog.js
  *  jquery.mousewheel.js (optional)
  */
 (function ($) {
@@ -24,8 +23,9 @@
         lightbox = (this.lightbox = $('<div/>')
           .dialog({
             autoOpen: false,
-            resizable: false,
+            modal: this.options.overlay,
             dialogClass: this.options.dialogClass,
+            position: this.options.position,
             open: function (event, ui) {
               var type = self._deriveType(self.getCurrentAnchor());
 
@@ -39,8 +39,8 @@
               var type = self._deriveType(self.getCurrentAnchor());
 
               if (type == 'image') {
-                //self._resize();
-                this.dialog('option', 'position', 'center');
+                self._resize();
+                $(this).dialog('option', 'position', self.options.position);
               }
             },
             close: function (event, ui) {
@@ -95,7 +95,7 @@
           return;
         }
         //self._resize();
-        self.lightbox.dialog('option', 'position', 'center');
+        self.lightbox.dialog('option', 'position', self.options.position);
       });
       if ($.fn.mousewheel) {
         $(document).mousewheel(function (event, delta) {
@@ -166,22 +166,19 @@
       }
 
       var visible = this.lightbox.dialog('isOpen'),
+        anchor = this.getCurrentAnchor(),
         type = this._deriveType(this.getCurrentAnchor()),
-        content = this.getContent(),
+        content = this.getContent().show(),
         viewer = this.lightbox;
 
-      viewer.empty().append(content.show());
+      viewer.empty().append(content);
+      viewer.dialog('option', 'title', $(anchor).attr('title') + this.options.titleSuffix);
 
       if (visible) {
-        if (type === 'image') {
-          //this._resize();
-          viewer.dialog('option', 'position', 'center');
-        }
       }
       else {
         viewer.dialog('open');
       }
-      this._resize();
     },
 
     _loadContent: function (anchor) {
@@ -191,21 +188,27 @@
 
       switch (type) {
       case "image":
-        content = this._element('img').attr("src", anchor.href).load(function (event) {
-          //self._resize();
-          self.lightbox.dialog('option', 'position', 'center');
-        }).show();
+        content = this._element('img')
+          .attr("src", anchor.href)
+          .load(function (event) {
+            self._resize();
+            self.lightbox.dialog('option', 'position', self.options.position);
+          });
         break;
       case "flash":
       case "flashvideo":
       case "quicktime":
       case "realplayer":
       case "windowsmedia":
-        content = this._element('div').media({
+        $(anchor).media({
           width: this.options.width,
           height: this.options.height,
           src: anchor.href,
           autoplay: 1
+        }, function (element, options) {
+        }, function (element, data, options, playerName) {
+          content = $(data).clone();
+          $(data).media('undo');
         });
         break;
       case "iframe":
@@ -374,8 +377,10 @@
     defaults: {
       loop: true,
       overlay: true,
+      dialogClass: 'ui-lightbox',
       selector: "a[href]:has(img[src])",
-      titleSuffix: " - Click anywhere to close (or press Escape), use keyboard arrows or mousewheel to rotate images"
+      titleSuffix: " - Click anywhere to close (or press Escape), use keyboard arrows or mousewheel to rotate images",
+      position: 'center'
     }
   });
 
