@@ -1,13 +1,12 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html lang="en" dir="ltr">
-	<head>
-		<title>
-			jQuery UI Lightbox demo
-		</title>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<link rel="stylesheet" type="text/css" href="http://jquery-ui.googlecode.com/svn/tags/1.6/themes/default/ui.all.css" />
-		<link rel="stylesheet" href="../ui.lightbox.css" type="text/css" />
+<head>
+	<title> jQuery UI Lightbox demo </title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<link rel="stylesheet" href="http://bangpound.github.com/lightbox/stylesheets/screen.css" type="text/css" />
+	<link rel="stylesheet" type="text/css" href="http://jquery-ui.googlecode.com/svn/tags/1.6/themes/default/ui.all.css" />
+	<link rel="stylesheet" href="../ui.lightbox.css" type="text/css" />
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.js" type="text/javascript"></script> <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.6/jquery-ui.js" type="text/javascript"></script> <script src="../ui.lightbox.js" type="text/javascript"></script> <script src="http://malsup.com/jquery/media/jquery.media.js?v.92" type="text/javascript"></script> <script type="text/javascript">
 // <![CDATA[
 (function ($) {
@@ -19,38 +18,45 @@
 })(jQuery);
 // ]]>
 </script>
-	</head>
-	<body>
-		<div id="gallery">
-			<ul>
-				<li>
-					<a href="birds/41311696_16ef86e2a7_b.jpg" title="Birds 1">
-						<img src="birds/41311696_16ef86e2a7_s.jpg" alt="" title="" width="75" height="75" />
-					</a>
-				</li>
-				<li>
-					<a href="birds/2119837461_fa703de311_b.jpg" title="Birds 2">
-						<img src="birds/2119837461_fa703de311_s.jpg" alt="" title="" width="75" height="75" />
-					</a>
-				</li>
-				<li>
-					<a href="birds/2702519132_19923b231b_b.jpg" title="Birds 3">
-						<img src="birds/2702519132_19923b231b_s.jpg" alt="" title="" width="75" height="75" />
-					</a>
-				</li>
-				<li>
-					<a href="birds/3012367534_c5870efc30_b.jpg" title="Birds 4">
-						<img src="birds/3012367534_c5870efc30_s.jpg" alt="" title="" width="75" height="75" />
-					</a>
-				</li>
-			</ul>
+</head>
+<body>
+<div id="container-wrapper">
+	<div id="container">
+		<div class="section">
+			<div id="gallery">
+				<ul>
+					<li>
+						<a href="birds/41311696_16ef86e2a7_b.jpg" title="Birds 1"> <img src="birds/41311696_16ef86e2a7_s.jpg" alt="" title="" width="75" height="75" /> </a>
+					</li>
+					<li>
+						<a href="birds/2119837461_fa703de311_b.jpg" title="Birds 2"> <img src="birds/2119837461_fa703de311_s.jpg" alt="" title="" width="75" height="75" /> </a>
+					</li>
+					<li>
+						<a href="birds/2702519132_19923b231b_b.jpg" title="Birds 3"> <img src="birds/2702519132_19923b231b_s.jpg" alt="" title="" width="75" height="75" /> </a>
+					</li>
+					<li>
+						<a href="birds/3012367534_c5870efc30_b.jpg" title="Birds 4"> <img src="birds/3012367534_c5870efc30_s.jpg" alt="" title="" width="75" height="75" /> </a>
+					</li>
+				</ul>
+			</div>
+			<div id="youtube">
+				<a href="#youtube-movie">a movie</a>
+				<object id="youtube-movie" width="425" height="344" style="display: none;">
+					<param name="movie" value="http://www.youtube.com/v/bnMIHpdYwX8&hl=en_US&fs=1&">
+					</param>
+					<param name="allowFullScreen" value="true">
+					</param>
+					<param name="allowscriptaccess" value="always">
+					</param>
+					<embed src="http://www.youtube.com/v/bnMIHpdYwX8&hl=en_US&fs=1&" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="425" height="344">
+					</embed>
+				</object>
+			</div>
+			<div id="quicktime">
+				<a href="http://malsup.com/jquery/media/video/simpsons.mov">simpsons</a>
+			</div>
 		</div>
-		<div id="youtube">
-		<a href="#youtube-movie">a movie</a>
-<object id="youtube-movie" width="425" height="344" style="display: none;"><param name="movie" value="http://www.youtube.com/v/bnMIHpdYwX8&hl=en_US&fs=1&"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/bnMIHpdYwX8&hl=en_US&fs=1&" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="425" height="344"></embed></object>
-		</div>
-		<div id="quicktime">
-		<a href="http://malsup.com/jquery/media/video/simpsons.mov">simpsons</a>
-		</div>
-	</body>
+	</div>
+</div>
+</body>
 </html>

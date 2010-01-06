@@ -331,6 +331,10 @@
 
       viewer.dialog('option', 'width', size.width + deltaContentWidth);
       viewer.dialog('option', 'height', size.height + deltaContentHeight + dialogTitlebarHeight);
+      viewer.css({
+        width: size.width + deltaContentWidth,
+        height: size.height + deltaContentHeight
+      });
     },
 
     setContent: function (content) {

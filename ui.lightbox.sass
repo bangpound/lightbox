@@ -1,0 +1,127 @@
+@import compass
+
+// Lightbox
+
+.ui-lightbox-container
+  position: absolute
+  z-index: 1000
+
+.ui-loading-indicator
+  z-index: 1001
+  position: absolute
+  text-indent: -10000px
+  width: 38px
+  height: 38px
+  background: white url(images/ajax-loader.gif) no-repeat 3px 3px
+
+
+.ui-lightbox-shadow
+  position: absolute
+  top: -15px
+  left: -15px
+
+
+.ui-lightbox .ui-dialog-titlebar
+  font-size: 12px
+
+.ui-dialog-overlay
+  opacity: .5
+  filter: alpha(opacity=50)
+  -moz-opacity: 0.5
+  background: #000000
+
+// Dialog
+
+.ui-lightbox
+  +reset-box-model
+  +reset-font
+  +reset-list-style
+  +box-shadow
+  -ms-interpolation-mode: bicubic
+  position: relative
+  background: none
+  color: #222222
+  position: relative
+
+  .ui-dialog-titlebar
+    +reset-box-model
+    +reset-font
+    +reset-list-style
+    padding: 0 1ex
+    background: none
+    position: relative
+    height: 0
+
+
+  .ui-dialog-title
+    color: white
+    font-weight: bold
+    display: none
+
+  .ui-dialog-titlebar-close
+    +reset-box-model
+    +reset-font
+    +reset-list-style
+    background: none
+    position: absolute
+    right: 1ex
+    top: 0
+    width: auto
+    &:hover
+      background: none
+
+    &:active
+      background: none
+
+    span
+      display: inline
+
+
+  .ui-dialog-titlebar-close-hover
+    background: none
+
+
+  .ui-dialog-content
+    +reset-box-model
+    +reset-font
+    +reset-list-style
+    background: #ffffff
+    color: #222222
+
+
+  .ui-dialog-buttonpane
+    position: absolute
+    bottom: 0
+    width: 100%
+    text-align: left
+    border-top: 1px solid #d3d3d3
+
+    button
+      +reset-box-model
+      +reset-font
+      +reset-list-style
+      color: #555555
+      background: none
+      cursor: pointer
+
+      &:hover
+        color: #212121
+        background: none
+        border: 1px solid #999999
+
+      &:active
+        color: #222222
+        background: none
+        border: 1px solid #dddddd
+
+  &.ui-draggable
+
+.bold
+  color: red !important
+
+
+.ui-hidden
+  left: -10000px
+  position: absolute
+  top: -10000px
+  visibility: hidden
