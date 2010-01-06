@@ -53,11 +53,11 @@
 
       // consider event delegation to make this more dynamic
       $(this.options.selector, this.element).click(function (event) {
+        self._showLoadingIndicator();
+
         var content = self._loadContent(this);
 
         event.preventDefault();
-        self._showLoadingIndicator();
-
         self.setCurrentAnchor(this);
         self.setContent(content);
         self._display();
@@ -72,6 +72,7 @@
         if (!self.getCurrentAnchor()) {
           return;
         }
+        self._showLoadingIndicator();
         switch (event.keyCode) {
         case $.ui.keyCode.ESCAPE:
           self.close();
@@ -173,7 +174,8 @@
         return;
       }
 
-      var visible = this.lightbox.dialog('isOpen'),
+      var self = this,
+        visible = this.lightbox.dialog('isOpen'),
         anchor = this.getCurrentAnchor(),
         type = this._deriveType(this.getCurrentAnchor()),
         content = this.getContent().show(),
@@ -243,8 +245,6 @@
         });
         break;
       }
-
-      this._hideLoadingIndicator();
 
       return content;
     },
