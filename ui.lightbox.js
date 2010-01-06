@@ -26,6 +26,10 @@
             modal: this.options.overlay,
             dialogClass: this.options.dialogClass,
             position: this.options.position,
+            resizable: this.options.resizable,
+            draggable: this.options.draggable,
+            height: this.options.height,
+            width: this.options.width,
             open: function (event, ui) {
               var type = self._deriveType(self.getCurrentAnchor());
 
@@ -94,7 +98,11 @@
         if (!self.getCurrentAnchor()) {
           return;
         }
-        //self._resize();
+        var type = self._deriveType(self.getCurrentAnchor());
+
+        if (type == 'image') {
+          self._resize();
+        }
         self.lightbox.dialog('option', 'position', self.options.position);
       });
       if ($.fn.mousewheel) {
@@ -382,9 +390,13 @@
       loop: true,
       overlay: true,
       dialogClass: 'ui-lightbox',
+      resizable: false,
+      draggable: false,
       selector: "a[href]:has(img[src])",
       titleSuffix: " - Click anywhere to close (or press Escape), use keyboard arrows or mousewheel to rotate images",
-      position: 'center'
+      position: 'center',
+      width: 300,
+      height: 200
     }
   });
 
