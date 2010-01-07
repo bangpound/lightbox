@@ -417,7 +417,7 @@
       resizable: false,
       draggable: false,
       selector: "a[href]:has(img[src])",
-      titleSuffix: " - Click anywhere to close (or press Escape), use keyboard arrows or mousewheel to rotate images",
+      titleSuffix: "",
       position: 'center',
       width: 300,
       height: 200,
