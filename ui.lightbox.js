@@ -62,8 +62,7 @@
 
         content = self._loadContent(this);
         self.setCurrentAnchor(this);
-        self.setContent(content);
-        self._display();
+        self._display(content);
         return false;
       });
       $(document).keydown(function (event) {
@@ -165,8 +164,8 @@
       return this.element.find(this.options.selector);
     },
 
-    _display: function (direction) {
-      if (!this.getContent()) {
+    _display: function (content) {
+      if (!content) {
         return;
       }
 
@@ -174,7 +173,6 @@
         visible = this.lightbox.dialog('isOpen'),
         anchor = this.getCurrentAnchor(),
         type = this._deriveType(this.getCurrentAnchor()),
-        content = this.getContent(),
         viewer = this.lightbox;
 
       viewer.dialog('option', 'title', $(anchor).attr('title') + this.options.titleSuffix);
@@ -184,7 +182,7 @@
       }
       viewer.empty();
       viewer.append(content.show());
-      this._resize();
+      this._resize(content);
       viewer.dialog('open');
       viewer.dialog('option', 'hide', self.options.hide);
     },
@@ -284,9 +282,8 @@
     _position: function (img) {
     },
 
-    _resize: function () {
-      var content = this.getContent(),
-        viewer = this.lightbox,
+    _resize: function (content) {
+      var viewer = this.lightbox,
         dialog = this.lightbox.data('dialog'),
         offset = 20,
         type = this._deriveType(this.getCurrentAnchor()),
@@ -341,13 +338,6 @@
       });
     },
 
-    setContent: function (content) {
-      this._setData('content', content);
-    },
-    getContent: function () {
-      return this._getData('content');
-    },
-
     setCurrentAnchor: function (anchor) {
       this._setData('currentAnchor', anchor);
     },
@@ -382,8 +372,7 @@
       viewer.dialog('option', 'show', this.options.rotateIn);
       this.setCurrentAnchor(target);
       content = this._loadContent(target);
-      this.setContent(content);
-      this._display(direction);
+      this._display(content);
     },
 
     _element: function (type, clazz) {
