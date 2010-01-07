@@ -192,8 +192,6 @@
       this._resize();
       viewer.dialog('open');
       viewer.dialog('option', 'hide', self.options.hide);
-      viewer.dialog('option', 'width', self.options.width);
-      viewer.dialog('option', 'height', self.options.height);
     },
 
     _loadContent: function (anchor) {
