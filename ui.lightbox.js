@@ -130,7 +130,7 @@
 
     _showLoadingIndicator: function () {
       var self = this;
-      this.loadingIndicatorTimeout = window.setTimeout(function () {
+      this.loadingIndicatorTimeout = setTimeout(function() {
         if (!self.loadingIndicator) {
           self.loadingIndicator = self._element("div", "ui-loading-indicator ui-corner-all").appendTo(document.body);
         }
@@ -140,7 +140,7 @@
     },
 
     _hideLoadingIndicator: function () {
-      window.clearTimeout(this.loadingIndicatorTimeout);
+      clearTimeout(this.loadingIndicatorTimeout);
       if (this.loadingIndicator) {
         this.loadingIndicator.hide();
       }
