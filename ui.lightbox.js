@@ -46,20 +46,20 @@
                 self._resize();
                 $(this).dialog('option', 'position', self.options.position);
               }
-            },
-            beforeclose: function (event, ui) {
-              self.options.hide.call($(this).data('dialog').uiDialog, self.getCurrentAnchor(), function() {
-              });
             }
           }));
 
       // consider event delegation to make this more dynamic
       $(this.options.selector, this.element).click(function (event) {
-        var content;
-
         event.preventDefault();
 
         self._showLoadingIndicator();
+
+        var content,
+          viewer = self.lightbox;
+
+        viewer.dialog('option', 'show', self.options.show);
+
         content = self._loadContent(this);
         self.setCurrentAnchor(this);
         self.setContent(content);
@@ -185,31 +185,15 @@
       viewer.dialog('option', 'title', $(anchor).attr('title') + this.options.titleSuffix);
 
       if (visible) {
-        if (direction) {
-          this.options.rotateOut.call(viewer.data('dialog').uiDialog, direction, function() {
-            viewer.empty();
-            viewer.append(content.show());
-            self._resize();
-          });
-          viewer.dialog('option', 'position', self.options.position);
-          this.options.rotateIn.call(viewer.data('dialog').uiDialog, {
-            up: "down",
-            down: "up",
-            left: "right",
-            right: "left"
-          }[direction], function () {
-            viewer.dialog('option', 'position', self.options.position);
-            self._hideLoadingIndicator();
-          });
-        }
+        viewer.dialog('close');
       }
-      else {
-        viewer.empty();
-        viewer.append(content.show());
-        this._resize();
-        viewer.dialog('open');
-        self.options.show.call(viewer.data('dialog').uiDialog, anchor);
-      }
+      viewer.empty();
+      viewer.append(content.show());
+      this._resize();
+      viewer.dialog('open');
+      viewer.dialog('option', 'hide', self.options.hide);
+      viewer.dialog('option', 'width', self.options.width);
+      viewer.dialog('option', 'height', self.options.height);
     },
 
     _loadContent: function (anchor) {
@@ -379,7 +363,8 @@
     },
 
     _rotate: function (selectorA, selectorB, direction) {
-      var content;
+      var content,
+        viewer = this.lightbox;
 
       if (!this.getCurrentAnchor()) {
         console.log('Called _rotate without an anchor');
@@ -398,6 +383,9 @@
       if (!target && this.options.loop && anchors.length > 1) {
         target = anchors.filter(selectorB)[0];
       }
+
+      viewer.dialog('option', 'hide', this.options.rotateOut);
+      viewer.dialog('option', 'show', this.options.rotateIn);
       this.setCurrentAnchor(target);
       content = this._loadContent(target);
       this.setContent(content);
@@ -423,51 +411,10 @@
       width: 300,
       height: 200,
       parameters: {},
-      rotateIn: function(direction, finished) {
-        $(this).effect("drop", {
-          direction: direction,
-          mode: "show"
-        }, "normal", finished);
-      },
-      rotateOut: function(direction, finished) {
-        $(this).effect("drop", {
-          direction: direction
-        }, "normal", finished);
-      },
-      show: function (anchor) {
-        var thumb = $(anchor),
-          offset = thumb.offset();
-        // TODO refactor
-        var start = {
-          left: offset.left,
-          top: offset.top,
-          width: thumb.width(),
-          height: thumb.height(),
-          opacity: 0
-        }
-        var img = $(this);
-        var stop = {
-          left: img.css("left"),
-          top: img.css("top"),
-          width: img.width(),
-          height: img.height(),
-          opacity: 1
-        }
-        $(this).css(start).show().animate(stop);
-      },
-      hide: function (anchor, finished) {
-        var thumb = $(anchor),
-          offset = thumb.offset();
-        // TODO refactor (see above)
-        var stop = {
-          left: offset.left,
-          top: offset.top,
-          width: thumb.width(),
-          height: thumb.height(),
-          opacity: 0
-        }
-        $(this).animate(stop, finished);
-      }
+      rotateIn: '',
+      rotateOut: '',
+      show: 'scale',
+      hide: 'scale'
     }
   });
 
