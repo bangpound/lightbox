@@ -23,6 +23,7 @@
         lightbox = (this.lightbox = $('<div/>')
           .dialog({
             autoOpen: false,
+            closeOnEscape: this.options.closeOnEscape,
             modal: this.options.overlay,
             dialogClass: this.options.dialogClass,
             position: this.options.position,
@@ -61,17 +62,11 @@
 
         content = self._loadContent(this);
         self.setCurrentAnchor(this);
-        self.setContent(content);
-        self._display();
+        self._display(content);
         return false;
       });
-      $(document).click(function (event) {
-        // ignore right click
-        if (event.button !== 2) {
-          self.close();
-        }
-      }).keydown(function (event) {
-        if (!self.getCurrentAnchor()) {
+      $(document).keydown(function (event) {
+        if (!self.lightbox.dialog('isOpen')) {
           return;
         }
         switch (event.keyCode) {
@@ -97,7 +92,7 @@
         }
       });
       $(window).resize(function () {
-        if (!self.getCurrentAnchor()) {
+        if (!self.lightbox.dialog('isOpen')) {
           return;
         }
         var type = self._deriveType(self.getCurrentAnchor());
@@ -109,11 +104,11 @@
       });
       if ($.fn.mousewheel) {
         $(document).mousewheel(function (event, delta) {
-          if (!self.getCurrentAnchor()) {
+          if (!self.lightbox.dialog('isOpen')) {
             return;
           }
           event.preventDefault();
-          if (self.viewerElement.is(":animated")) {
+          if (self.lightbox.is(":animated")) {
             return;
           }
           if (delta < 0) {
@@ -145,7 +140,7 @@
     },
 
     close: function () {
-      if (!this.getCurrentAnchor()) {
+      if (!this.lightbox.dialog('isOpen')) {
         return;
       }
       var self = this,
@@ -153,8 +148,7 @@
         viewer = this.lightbox;
 
       // TODO: these need to be destroyed with the widget.
-      // this.currentAnchor = null;
-      // this.viewerElement = null;
+      viewer.dialog('close');
     },
 
     next: function (direction) {
@@ -170,8 +164,8 @@
       return this.element.find(this.options.selector);
     },
 
-    _display: function (direction) {
-      if (!this.getContent()) {
+    _display: function (content) {
+      if (!content) {
         return;
       }
 
@@ -179,7 +173,6 @@
         visible = this.lightbox.dialog('isOpen'),
         anchor = this.getCurrentAnchor(),
         type = this._deriveType(this.getCurrentAnchor()),
-        content = this.getContent(),
         viewer = this.lightbox;
 
       viewer.dialog('option', 'title', $(anchor).attr('title') + this.options.titleSuffix);
@@ -189,7 +182,7 @@
       }
       viewer.empty();
       viewer.append(content.show());
-      this._resize();
+      this._resize(content);
       viewer.dialog('open');
       viewer.dialog('option', 'hide', self.options.hide);
     },
@@ -289,9 +282,8 @@
     _position: function (img) {
     },
 
-    _resize: function () {
-      var content = this.getContent(),
-        viewer = this.lightbox,
+    _resize: function (content) {
+      var viewer = this.lightbox,
         dialog = this.lightbox.data('dialog'),
         offset = 20,
         type = this._deriveType(this.getCurrentAnchor()),
@@ -346,13 +338,6 @@
       });
     },
 
-    setContent: function (content) {
-      this._setData('content', content);
-    },
-    getContent: function () {
-      return this._getData('content');
-    },
-
     setCurrentAnchor: function (anchor) {
       this._setData('currentAnchor', anchor);
     },
@@ -361,15 +346,16 @@
     },
 
     _rotate: function (selectorA, selectorB, direction) {
-      var content,
+      var self = this,
+        content,
+        anchors = this._anchors(),
+        target = current = this.getCurrentAnchor(),
         viewer = this.lightbox;
 
       if (!this.getCurrentAnchor()) {
         console.log('Called _rotate without an anchor');
         return;
       }
-      var anchors = this._anchors(),
-        target = current = this.getCurrentAnchor();
 
       if (anchors.length === 1) {
         return;
@@ -382,12 +368,11 @@
         target = anchors.filter(selectorB)[0];
       }
 
-      viewer.dialog('option', 'hide', this.options.rotateOut);
-      viewer.dialog('option', 'show', this.options.rotateIn);
+      viewer.dialog('option', 'hide', this.options.rotateOut(direction))
+        .dialog('option', 'show', this.options.rotateIn(direction));
       this.setCurrentAnchor(target);
       content = this._loadContent(target);
-      this.setContent(content);
-      this._display(direction);
+      this._display(content);
     },
 
     _element: function (type, clazz) {
@@ -401,6 +386,7 @@
       overlay: true,
       post: 0,
       dialogClass: 'ui-lightbox',
+      closeOnEscape: true,
       resizable: false,
       draggable: false,
       selector: "a[href]:has(img[src])",
@@ -409,11 +395,35 @@
       width: 'auto',
       height: 'auto',
       parameters: {},
-      rotateIn: '',
-      rotateOut: '',
+      rotateIn: function (direction) {
+        return 'slide' + { up: "down", down: "up", left: "right", right: "left" }[direction];
+      },
+      rotateOut: function (direction) {
+        return 'slide' + direction;
+      },
       show: '',
       hide: ''
     }
   });
+
+$.effects.slideup = function (o) {
+  o.options.direction = 'up';
+  return $(this).effect('slide', o.options, o.duration, o.callback);
+};
+
+$.effects.slidedown = function (o) {
+  o.options.direction = 'down';
+  return $(this).effect('slide', o.options, o.duration, o.callback);
+};
+
+$.effects.slideleft = function (o) {
+  o.options.direction = 'left';
+  return $(this).effect('slide', o.options, o.duration, o.callback);
+};
+
+$.effects.slideright = function (o) {
+  o.options.direction = 'right';
+  return $(this).effect('slide', o.options, o.duration, o.callback);
+};
 
 })(jQuery);
