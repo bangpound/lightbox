@@ -334,8 +334,8 @@
         visibility: "hidden",
         display: "block"
       }, function () {
-        cWidth = content.attr('width') || content.width(),
-        cHeight = content.attr('height') || content.height();
+        cWidth = $(this).attr('width') || $(this).width(),
+        cHeight = $(this).attr('height') || $(this).height();
       });
 
       // Desired width
