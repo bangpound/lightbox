@@ -67,7 +67,7 @@
         return false;
       });
       $(document).keydown(function (event) {
-        if (!self.getCurrentAnchor()) {
+        if (!self.lightbox.dialog('isOpen')) {
           return;
         }
         switch (event.keyCode) {
@@ -93,7 +93,7 @@
         }
       });
       $(window).resize(function () {
-        if (!self.getCurrentAnchor()) {
+        if (!self.lightbox.dialog('isOpen')) {
           return;
         }
         var type = self._deriveType(self.getCurrentAnchor());
@@ -105,7 +105,7 @@
       });
       if ($.fn.mousewheel) {
         $(document).mousewheel(function (event, delta) {
-          if (!self.getCurrentAnchor()) {
+          if (!self.lightbox.dialog('isOpen')) {
             return;
           }
           event.preventDefault();
@@ -141,7 +141,7 @@
     },
 
     close: function () {
-      if (!this.getCurrentAnchor()) {
+      if (!this.lightbox.dialog('isOpen')) {
         return;
       }
       var self = this,
