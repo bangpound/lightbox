@@ -356,15 +356,16 @@
     },
 
     _rotate: function (selectorA, selectorB, direction) {
-      var content,
+      var self = this,
+        content,
+        anchors = this._anchors(),
+        target = current = this.getCurrentAnchor(),
         viewer = this.lightbox;
 
       if (!this.getCurrentAnchor()) {
         console.log('Called _rotate without an anchor');
         return;
       }
-      var anchors = this._anchors(),
-        target = current = this.getCurrentAnchor();
 
       if (anchors.length === 1) {
         return;
