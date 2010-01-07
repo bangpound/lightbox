@@ -52,7 +52,6 @@
       // consider event delegation to make this more dynamic
       $(this.options.selector, this.element).click(function (event) {
         event.preventDefault();
-
         self._showLoadingIndicator();
 
         var content,
@@ -129,6 +128,7 @@
 
     _showLoadingIndicator: function () {
       var self = this;
+
       this.loadingIndicatorTimeout = setTimeout(function() {
         if (!self.loadingIndicator) {
           self.loadingIndicator = self._element("div", "ui-loading-indicator ui-corner-all").appendTo(document.body);
