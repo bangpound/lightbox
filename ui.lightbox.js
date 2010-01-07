@@ -75,7 +75,6 @@
         if (!self.getCurrentAnchor()) {
           return;
         }
-        self._showLoadingIndicator();
         switch (event.keyCode) {
         case $.ui.keyCode.ESCAPE:
           self.close();
@@ -392,6 +391,8 @@
       if (anchors.length === 1) {
         return;
       }
+
+      self._showLoadingIndicator();
 
       target = anchors.filter(selectorA + anchors.index(current) + ")" + selectorB)[0];
       if (!target && this.options.loop && anchors.length > 1) {
