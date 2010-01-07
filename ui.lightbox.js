@@ -109,7 +109,7 @@
             return;
           }
           event.preventDefault();
-          if (self.viewerElement.is(":animated")) {
+          if (self.lightbox.is(":animated")) {
             return;
           }
           if (delta < 0) {
