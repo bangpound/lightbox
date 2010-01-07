@@ -23,6 +23,7 @@
         lightbox = (this.lightbox = $('<div/>')
           .dialog({
             autoOpen: false,
+            closeOnEscape: this.options.closeOnEscape,
             modal: this.options.overlay,
             dialogClass: this.options.dialogClass,
             position: this.options.position,
@@ -65,12 +66,7 @@
         self._display();
         return false;
       });
-      $(document).click(function (event) {
-        // ignore right click
-        if (event.button !== 2) {
-          self.close();
-        }
-      }).keydown(function (event) {
+      $(document).keydown(function (event) {
         if (!self.getCurrentAnchor()) {
           return;
         }
@@ -401,6 +397,7 @@
       overlay: true,
       post: 0,
       dialogClass: 'ui-lightbox',
+      closeOnEscape: true,
       resizable: false,
       draggable: false,
       selector: "a[href]:has(img[src])",
