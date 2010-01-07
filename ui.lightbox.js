@@ -368,8 +368,8 @@
         target = anchors.filter(selectorB)[0];
       }
 
-      viewer.dialog('option', 'hide', this.options.rotateOut);
-      viewer.dialog('option', 'show', this.options.rotateIn);
+      viewer.dialog('option', 'hide', this.options.rotateOut(direction))
+        .dialog('option', 'show', this.options.rotateIn(direction));
       this.setCurrentAnchor(target);
       content = this._loadContent(target);
       this._display(content);
@@ -395,11 +395,35 @@
       width: 'auto',
       height: 'auto',
       parameters: {},
-      rotateIn: '',
-      rotateOut: '',
+      rotateIn: function (direction) {
+        return 'slide' + { up: "down", down: "up", left: "right", right: "left" }[direction];
+      },
+      rotateOut: function (direction) {
+        return 'slide' + direction;
+      },
       show: '',
       hide: ''
     }
   });
+
+$.effects.slideup = function (o) {
+  o.options.direction = 'up';
+  return $(this).effect('slide', o.options, o.duration, o.callback);
+};
+
+$.effects.slidedown = function (o) {
+  o.options.direction = 'down';
+  return $(this).effect('slide', o.options, o.duration, o.callback);
+};
+
+$.effects.slideleft = function (o) {
+  o.options.direction = 'left';
+  return $(this).effect('slide', o.options, o.duration, o.callback);
+};
+
+$.effects.slideright = function (o) {
+  o.options.direction = 'right';
+  return $(this).effect('slide', o.options, o.duration, o.callback);
+};
 
 })(jQuery);
