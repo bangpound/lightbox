@@ -134,7 +134,6 @@
         if (!self.loadingIndicator) {
           self.loadingIndicator = self._element("div", "ui-loading-indicator ui-corner-all").appendTo(document.body);
         }
-        self._position(self.loadingIndicator);
         self.loadingIndicator.fadeIn("slow");
       }, 250);
     },
