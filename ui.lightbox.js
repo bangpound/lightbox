@@ -433,7 +433,7 @@
           direction: direction
         }, "normal", finished);
       },
-      show: function(anchor) {
+      show: function (anchor) {
         var thumb = $(anchor),
           offset = thumb.offset();
         // TODO refactor
@@ -466,12 +466,6 @@
           opacity: 0
         }
         $(this).animate(stop, finished);
-      },
-      showOverlay: function() {
-        $(this).fadeIn();
-      },
-      hideOverlay: function(finished) {
-        $(this).fadeOut(finished);
       }
     }
   });
