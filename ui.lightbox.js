@@ -149,8 +149,7 @@
         viewer = this.lightbox;
 
       // TODO: these need to be destroyed with the widget.
-      // this.currentAnchor = null;
-      // this.viewerElement = null;
+      viewer.dialog('close');
     },
 
     next: function (direction) {
