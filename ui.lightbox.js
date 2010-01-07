@@ -55,11 +55,12 @@
 
       // consider event delegation to make this more dynamic
       $(this.options.selector, this.element).click(function (event) {
-        self._showLoadingIndicator();
-
-        var content = self._loadContent(this);
+        var content;
 
         event.preventDefault();
+
+        self._showLoadingIndicator();
+        content = self._loadContent(this);
         self.setCurrentAnchor(this);
         self.setContent(content);
         self._display();
@@ -129,17 +130,16 @@
 
     _showLoadingIndicator: function () {
       var self = this;
-      this.loadingIndicatorTimeout = window.setTimeout(function () {
+      this.loadingIndicatorTimeout = setTimeout(function() {
         if (!self.loadingIndicator) {
           self.loadingIndicator = self._element("div", "ui-loading-indicator ui-corner-all").appendTo(document.body);
         }
-        self._position(self.loadingIndicator);
         self.loadingIndicator.fadeIn("slow");
       }, 250);
     },
 
     _hideLoadingIndicator: function () {
-      window.clearTimeout(this.loadingIndicatorTimeout);
+      clearTimeout(this.loadingIndicatorTimeout);
       if (this.loadingIndicator) {
         this.loadingIndicator.hide();
       }
@@ -256,7 +256,7 @@
         $.ajax({
           url: anchor.href,
           type: (parseInt(self.options.post, 10) === 1) ? "POST" : "GET",
-          cache: false,
+          cache: true,
           async: false,
           data: self.options.parameters,
           dataType: (type === "ajax") ? "html" : "script",
@@ -333,8 +333,8 @@
         visibility: "hidden",
         display: "block"
       }, function () {
-        cWidth = content.attr('width') || content.width(),
-        cHeight = content.attr('height') || content.height();
+        cWidth = $(this).attr('width') || $(this).width(),
+        cHeight = $(this).attr('height') || $(this).height();
       });
 
       // Desired width
@@ -380,6 +380,8 @@
     },
 
     _rotate: function (selectorA, selectorB, direction) {
+      var content;
+
       if (!this.getCurrentAnchor()) {
         console.log('Called _rotate without an anchor');
         return;
@@ -396,7 +398,8 @@
         target = anchors.filter(selectorB)[0];
       }
       this.setCurrentAnchor(target);
-      this.setContent(this._loadContent(target));
+      content = this._loadContent(target);
+      this.setContent(content);
       this._display(direction);
     },
 
