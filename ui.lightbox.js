@@ -408,13 +408,13 @@
       selector: "a[href]:has(img[src])",
       titleSuffix: "",
       position: 'center',
-      width: 300,
-      height: 200,
+      width: 'auto',
+      height: 'auto',
       parameters: {},
       rotateIn: '',
       rotateOut: '',
-      show: 'scale',
-      hide: 'scale'
+      show: '',
+      hide: ''
     }
   });
 
