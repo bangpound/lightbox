@@ -55,11 +55,12 @@
 
       // consider event delegation to make this more dynamic
       $(this.options.selector, this.element).click(function (event) {
-        self._showLoadingIndicator();
-
-        var content = self._loadContent(this);
+        var content;
 
         event.preventDefault();
+
+        self._showLoadingIndicator();
+        content = self._loadContent(this);
         self.setCurrentAnchor(this);
         self.setContent(content);
         self._display();
@@ -380,6 +381,8 @@
     },
 
     _rotate: function (selectorA, selectorB, direction) {
+      var content;
+
       if (!this.getCurrentAnchor()) {
         console.log('Called _rotate without an anchor');
         return;
@@ -396,7 +399,8 @@
         target = anchors.filter(selectorB)[0];
       }
       this.setCurrentAnchor(target);
-      this.setContent(this._loadContent(target));
+      content = this._loadContent(target);
+      this.setContent(content);
       this._display(direction);
     },
 
