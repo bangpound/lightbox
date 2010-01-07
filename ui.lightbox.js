@@ -257,7 +257,7 @@
         $.ajax({
           url: anchor.href,
           type: (parseInt(self.options.post, 10) === 1) ? "POST" : "GET",
-          cache: false,
+          cache: true,
           async: false,
           data: self.options.parameters,
           dataType: (type === "ajax") ? "html" : "script",
