@@ -377,7 +377,7 @@
         return;
       }
 
-      self._showLoadingIndicator();
+      this._showLoadingIndicator();
 
       target = anchors.filter(selectorA + anchors.index(current) + ")" + selectorB)[0];
       if (!target && this.options.loop && anchors.length > 1) {
