@@ -166,12 +166,12 @@
 
     _display: function (content) {
       var anchor = this.getCurrentAnchor(),
-        viewer = this.lightbox;
+        viewer = this.lightbox,
+        size = this._calculateSize(content),
+        $el = $(content).css(size).appendTo(viewer);
 
       viewer.dialog('option', 'title', $(anchor).attr('title') + this.options.titleSuffix);
-      viewer.dialog('option', this._calculateSize(content));
-
-      viewer.html(content);
+      viewer.dialog('option', this._resize($el, size.width, size.height));
     },
 
     _loadContent: function (anchor) {
@@ -280,12 +280,12 @@
       return { width: width, height: height };
     },
 
-    _resize: function (content) {
+    _resize: function (elem, width, height) {
       var viewer = this.lightbox,
-        dialog = this.lightbox.data('dialog'),
+        dialog = viewer.data('dialog'),
         offset = 20,
-        type = this._deriveType(this.getCurrentAnchor()),
-        cWidth,cHeight,finalWidth,finalHeight,
+        finalWidth,finalHeight,
+
         // difference
         deltaContentWidth = viewer.outerWidth() - viewer.width(),
         deltaContentHeight = viewer.outerHeight() - viewer.height(),
@@ -297,7 +297,7 @@
         wWidth = $(window).width(),
         wHeight = $(window).height(),
 
-        size = _calculateSize(content);
+        size = {width: width, height: height};
 
       // Desired width
       finalWidth = size.width + deltaContentWidth,
@@ -314,17 +314,9 @@
         height: Math.round(ratio * size.height)
       });
 
-      if (type == 'image') {
-        content.css('width', size.width);
-        content.css('height', size.height);
-      }
+      elem.css(size);
 
-      viewer.dialog('option', 'width', size.width + deltaContentWidth);
-      viewer.dialog('option', 'height', size.height + deltaContentHeight + dialogTitlebarHeight);
-      viewer.css({
-        width: size.width + deltaContentWidth,
-        height: size.height + deltaContentHeight
-      });
+      return { width: size.width + deltaContentWidth, height: size.height + deltaContentHeight + dialogTitlebarHeight };
     },
 
     setCurrentAnchor: function (anchor) {
