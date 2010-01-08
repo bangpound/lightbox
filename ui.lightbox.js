@@ -90,9 +90,6 @@
             .each(function (index, domElement) {
               $(domElement).addClass('button-' + index);
             });
-        },
-        close: function (event, ui) {
-          $(this).empty();
         }
       });
     },
@@ -140,25 +137,27 @@
       viewer.dialog('option', 'show', this.options.show)
         .dialog('option', 'hide', this.options.hide)
         .dialog('option', 'buttons', this._buttons)
+        .dialog('option', 'close', self._dialogClose)
         .dialog('open');
 
       viewer.dialog('option', '_lightbox', this);
     },
 
     close: function () {
-      if (!this.lightbox.dialog('isOpen')) {
-        return;
-      }
       var self = this,
         anchor = this.getCurrentAnchor(),
         viewer = this.lightbox;
+
+      if (!this.lightbox.dialog('isOpen')) {
+        viewer.dialog('close');
+      }
 
       (this.overlay && this.overlay.destroy());
 
       $.ui.lightbox.overlay.resize();
 
       // TODO: these need to be destroyed with the widget.
-      viewer.dialog('close').dialog('destroy').remove();
+      viewer.dialog('destroy').remove();
     },
 
     next: function (direction) {
@@ -380,7 +379,7 @@
       dialog.hide(this.options.rotateOut, {
         direction: direction
       }, this.options.duration, function () {
-        viewer.dialog('close');
+        viewer.dialog('option', 'close', self._rotateClose).dialog('close');
         self.setCurrentAnchor(target);
         $(this).show(self.options.rotateIn, {
           direction: {
@@ -390,9 +389,20 @@
             right: "left"
           }[direction]
         }, self.options.duration, function () {
-          viewer.dialog('open');
+          viewer.dialog('open').dialog('option', 'close', self._dialogClose);
         });
       });
+    },
+
+
+    // Swappable dialog event handlers.
+
+    _rotateClose: function (event, ui) {
+      $(this).empty();
+    },
+
+    _dialogClose: function (event, ui) {
+      $(this).empty().dialog('_lightbox').close();
     },
 
     _element: function (type, clazz) {
