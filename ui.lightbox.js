@@ -440,7 +440,8 @@
             width: thumb.width(),
             height: thumb.height(),
           },
-          origin: [ offset.left, offset.top ]
+          origin: [ offset.top - thumb.height(), offset.left - thumb.width() ],
+          fade: true
         };
 
       $(dialog.uiDialog).hide('scale', options, lightbox.options.duration, function () {
