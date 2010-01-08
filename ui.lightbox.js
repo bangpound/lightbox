@@ -353,7 +353,8 @@
         content,
         anchors = this._anchors(),
         target = current = this.getCurrentAnchor(),
-        viewer = this.lightbox;
+        viewer = this.lightbox,
+        dialog = viewer.data('dialog').uiDialog;
 
       if (!this.getCurrentAnchor()) {
         console.log('Called _rotate without an anchor');
@@ -369,14 +370,22 @@
         target = anchors.filter(selectorB)[0];
       }
 
-      viewer.dialog('option', 'hide', this.options.rotateOut(direction))
-        .dialog('option', 'show', this.options.rotateIn(direction))
-        .dialog('close');
-
-      this.setCurrentAnchor(target);
-
-      viewer.dialog('option', 'hide', this.options.hide)
-        .dialog('open');
+      dialog.hide(this.options.rotateOut, {
+        direction: direction
+      }, this.options.duration, function () {
+        viewer.dialog('close');
+        self.setCurrentAnchor(target);
+        $(this).show(self.options.rotateIn, {
+          direction: {
+            up: "down",
+            down: "up",
+            left: "right",
+            right: "left"
+          }[direction]
+        }, self.options.duration, function () {
+          viewer.dialog('open');
+        });
+      });
     },
 
     _element: function (type, clazz) {
@@ -399,35 +408,11 @@
       width: 'auto',
       height: 'auto',
       parameters: {},
-      rotateIn: function (direction) {
-        return 'slide' + { up: "down", down: "up", left: "right", right: "left" }[direction];
-      },
-      rotateOut: function (direction) {
-        return 'slide' + direction;
-      },
+      duration: 1000,
+      rotateIn: 'slide',
+      rotateOut: 'slide',
       show: '',
       hide: ''
     }
   });
-
-$.effects.slideup = function (o) {
-  o.options.direction = 'up';
-  return $(this).effect('slide', o.options, o.duration, o.callback);
-};
-
-$.effects.slidedown = function (o) {
-  o.options.direction = 'down';
-  return $(this).effect('slide', o.options, o.duration, o.callback);
-};
-
-$.effects.slideleft = function (o) {
-  o.options.direction = 'left';
-  return $(this).effect('slide', o.options, o.duration, o.callback);
-};
-
-$.effects.slideright = function (o) {
-  o.options.direction = 'right';
-  return $(this).effect('slide', o.options, o.duration, o.callback);
-};
-
 })(jQuery);
