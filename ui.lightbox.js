@@ -121,6 +121,7 @@
       this.setCurrentAnchor(anchor);
 
       viewer.dialog('option', 'buttons', this._buttons)
+        .unbind('dialogclose.lightbox')
         .bind('dialogclose.lightbox', this._dialogClose)
         .dialog('open');
 
@@ -372,7 +373,9 @@
       dialog.hide(this.options.rotateOut, effectOut, this.options.duration, function () {
         viewer
           .unbind('dialogclose.lightbox')
-          .bind('dialogclose.lightbox', self._rotateClose).dialog('close');
+          .bind('dialogclose.lightbox', self._rotateClose)
+          .dialog('close')
+          .unbind('dialogclose.lightbox');
         self.setCurrentAnchor(target);
         self._preloadNeighbours();
         $(this).show(self.options.rotateIn, effectIn, self.options.duration, function () {
@@ -388,11 +391,31 @@
     // Swappable dialog event handlers.
 
     _rotateClose: function (event, ui) {
+      var lightbox = $(this).dialog('option', '_lightbox'),
+        dialog = $(lightbox.lightbox).data('dialog');
+
       $(this).empty();
+      $(dialog.uiDialog).hide();
     },
 
     _dialogClose: function (event, ui) {
-      $(this).empty().dialog('option', '_lightbox').close();
+      var self = this,
+        lightbox = $(this).dialog('option', '_lightbox'),
+        dialog = $(lightbox.lightbox).data('dialog'),
+
+        thumb = $(lightbox.getCurrentAnchor()),
+        offset = thumb.offset(),
+        stop = {
+          left: offset.left,
+          top: offset.top,
+          width: thumb.width(),
+          height: thumb.height(),
+          opacity: 0
+        };
+
+      $(dialog.uiDialog).hide('scale', { to: stop }, lightbox.options.duration, function () {
+        $(self).empty().dialog('option', '_lightbox').close();
+      });
     },
 
     _element: function (type, clazz) {
