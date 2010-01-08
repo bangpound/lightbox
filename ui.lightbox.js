@@ -229,8 +229,8 @@
           autoplay: 1
         }, function (element, options) {
         }, function (element, data, options, playerName) {
-          anchorData.content = this._jQueryToString(data);
-          $(this).media('undo');
+          anchorData.content = self._jQueryToString(data);
+          $(data).media('undo');
         });
         break;
       case "iframe":
