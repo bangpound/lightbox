@@ -206,8 +206,7 @@
       case "html":
       case "dom":
         var reference = $($(anchor).attr('href'));
-
-        content = $(reference).html();
+        content = $('<div>').append(reference.clone().show()).remove().html();
         break;
       case "ajax":
       case "script":
@@ -315,6 +314,10 @@
       });
 
       elem.css(size);
+
+      if (ratio !== 1) {
+        elem.attr('width', '').attr('height', '');
+      }
 
       return { width: size.width + deltaContentWidth, height: size.height + deltaContentHeight + dialogTitlebarHeight };
     },
