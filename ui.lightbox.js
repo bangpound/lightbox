@@ -274,23 +274,23 @@
     },
 
     _deriveType: function (anchor) {
-      var reference = anchor.href;
-      if (reference.toLowerCase().match(/\.(gif|jpg|jpeg|png)(\?[0123456789]+)?$/)) {
+      var reference = anchor.href.toLowerCase();
+      if (reference.match(/\.(gif|jpg|jpeg|png)(\?[0123456789]+)?$/)) {
         return "image";
       }
-      if (reference.toLowerCase().match(/\.(swf)(\?[0123456789]+)?$/)) {
+      if (reference.match(/\.(swf)(\?[0123456789]+)?$/)) {
         return "flash";
       }
-      if (reference.toLowerCase().match(/\.(flv)(\?[0123456789]+)?$/)) {
+      if (reference.match(/\.(flv)(\?[0123456789]+)?$/)) {
         return "flashvideo";
       }
-      if (reference.toLowerCase().match(/\.(aif|aiff|aac|au|bmp|gsm|mov|mid|midi|mpg|mpeg|m4a|m4v|mp4|psd|qt|qtif|qif|qti|snd|tif|tiff|wav|3g2|3gp|wbmp)(\?[0123456789]+)?$/)) {
+      if (reference.match(/\.(aif|aiff|aac|au|bmp|gsm|mov|mid|midi|mpg|mpeg|m4a|m4v|mp4|psd|qt|qtif|qif|qti|snd|tif|tiff|wav|3g2|3gp|wbmp)(\?[0123456789]+)?$/)) {
         return "quicktime";
       }
-      if (reference.toLowerCase().match(/\.(ra|ram|rm|rpm|rv|smi|smil)(\?[0123456789]+)?$/)) {
+      if (reference.match(/\.(ra|ram|rm|rpm|rv|smi|smil)(\?[0123456789]+)?$/)) {
         return "realplayer";
       }
-      if (reference.toLowerCase().match(/\.(asf|avi|wma|wmv)(\?[0123456789]+)?$/)) {
+      if (reference.match(/\.(asf|avi|wma|wmv)(\?[0123456789]+)?$/)) {
         return "windowsmedia";
       }
       return "ajax";
