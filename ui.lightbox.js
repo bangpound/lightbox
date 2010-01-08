@@ -77,13 +77,14 @@
       return $('<div/>').dialog({
         autoOpen: false,
         closeOnEscape: false,
-        modal: this.options.overlay,
+        modal: false,
         dialogClass: this.options.dialogClass,
         position: this.options.position,
         resizable: this.options.resizable,
         draggable: this.options.draggable,
         height: this.options.height,
         width: this.options.width,
+        // TODO: Support overlay by implementing focus,dragstop,resizestop
         open: function (event, ui) {
           $('.ui-dialog-buttonpane button', $(this).parents('.ui-dialog'))
             .each(function (index, domElement) {
@@ -124,6 +125,7 @@
     },
 
     destroy: function () {
+      (this.overlay && this.overlay.destroy());
       this.element
         .unbind('.lightbox')
         .removeData('lightbox');
@@ -132,6 +134,7 @@
     open: function (anchor) {
       var viewer = (this.lightbox = this._makeDialog());
 
+      this.overlay = this.options.modal ? new $.ui.lightbox.overlay(viewer.data('dialog')) : null;
       this.setCurrentAnchor(anchor);
 
       viewer.dialog('option', 'show', this.options.show)
@@ -149,6 +152,10 @@
       var self = this,
         anchor = this.getCurrentAnchor(),
         viewer = this.lightbox;
+
+      (this.overlay && this.overlay.destroy());
+
+      $.ui.lightbox.overlay.resize();
 
       // TODO: these need to be destroyed with the widget.
       viewer.dialog('close').dialog('destroy').remove();
@@ -396,7 +403,8 @@
   $.extend($.ui.lightbox, {
     defaults: {
       loop: true,
-      overlay: true,
+      modal: true,
+      overlay: {},
       post: 0,
       dialogClass: 'ui-lightbox',
       closeOnEscape: true,
@@ -413,6 +421,18 @@
       rotateOut: 'slide',
       show: '',
       hide: ''
+    },
+    uuid: 0,
+    overlay: function (dialog) {
+      this.$el = $.ui.lightbox.overlay.create(dialog);
+    }
+  });
+
+  $.extend($.ui.lightbox.overlay, $.ui.dialog.overlay, {});
+
+  $.extend($.ui.lightbox.overlay.prototype, $.ui.dialog.overlay.prototype, {
+    destroy: function() {
+      $.ui.lightbox.overlay.destroy(this.$el);
     }
   });
 })(jQuery);
