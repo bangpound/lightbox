@@ -101,7 +101,7 @@
         $(this).dialog('option', '_lightbox').prev("right");
       },
       'Next': function (eventObject) {
-        $(this).dialog('option', '_lightbox').next("right");
+        $(this).dialog('option', '_lightbox').next("left");
       }
     },
 
@@ -268,7 +268,7 @@
 
     _calculateSize: function (content) {
       var width,height;
-      $.swap($(content).appendTo(document.body)[0], {
+      $.swap($(content).appendTo('<div>').appendTo(document.body)[0], {
         position: "absolute",
         visibility: "hidden",
         display: "block"
