@@ -199,10 +199,7 @@
       switch (type) {
       case "image":
         content = this._element('img')
-          .attr("src", anchor.href)
-          .load(function (event) {
-            self.lightbox.dialog('option', 'position', self.options.position);
-          });
+          .attr("src", anchor.href);
         break;
       case "flash":
       case "flashvideo":
