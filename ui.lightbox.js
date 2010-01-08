@@ -435,15 +435,15 @@
 
         thumb = $(lightbox.getCurrentAnchor()),
         offset = thumb.offset(),
-        stop = {
-          left: offset.left,
-          top: offset.top,
-          width: thumb.width(),
-          height: thumb.height(),
-          opacity: 0
+        options = {
+          to: {
+            width: thumb.width(),
+            height: thumb.height(),
+          },
+          origin: [ offset.left, offset.top ]
         };
 
-      $(dialog.uiDialog).hide('scale', { to: stop }, lightbox.options.duration, function () {
+      $(dialog.uiDialog).hide('scale', options, lightbox.options.duration, function () {
         $(self).empty().dialog('option', '_lightbox').close();
       });
     },
