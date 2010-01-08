@@ -243,7 +243,7 @@
         });
         break;
       case "iframe":
-        anchorData.content = this._element('iframe').attr('src', anchor.href).attr('frameborder', 0).attr('border', 0).html();
+        anchorData.content = this.__jQueryToString($('iframe').attr('src', anchor.href).attr('frameborder', 0).attr('border', 0));
         break;
       case "html":
       case "dom":
@@ -436,10 +436,6 @@
       $(dialog.uiDialog).hide('scale', options, lightbox.options.duration, function () {
         $(self).empty().dialog('option', '_lightbox').close();
       });
-    },
-
-    _element: function (type, clazz) {
-      return $("<" + type + "/>").addClass(clazz).hide();
     }
   });
 
