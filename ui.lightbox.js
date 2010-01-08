@@ -342,6 +342,7 @@
     setCurrentAnchor: function (anchor) {
       this._setData('cursor', anchor);
     },
+
     getCurrentAnchor: function () {
       return this._getData('cursor');
     },
