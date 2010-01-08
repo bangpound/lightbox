@@ -18,6 +18,21 @@
 (function ($) {
 
   $.widget('ui.lightbox', {
+    /**
+     * Moving parts of jQuery UI Lightbox widget.
+     *
+     * lightbox = the widget object = this.element.data('lightbox')
+     *
+     *
+     * viewer = this.lightbox = the DOM element.
+     * dialog = this.lightbox.data('dialog')
+     *   dialog.uiDialog = the outermost div element of a ui.dialog widget.
+     *   dialog.uiDialogButtonPane = the container for the buttons.
+     *
+     * anchors = _anchors() = anchors in this lightbox collection.
+     * cursor = this.options.cursor = active item in lightbox.
+     * anchorData = $(anchor).data('lightbox') = cache.
+     */
     _init: function () {
       var self = this;
 
@@ -95,7 +110,8 @@
         width: this.options.width,
         // TODO: Support overlay by implementing focus,dragstop,resizestop
         open: function (event, ui) {
-          $('.ui-dialog-buttonpane button', $(this).parents('.ui-dialog'))
+          var buttonPane = $(this).data('dialog').uiDialogButtonPane;
+          $('button', buttonPane)
             .each(function (index, domElement) {
               $(domElement).addClass('button-' + index);
             });
@@ -103,25 +119,31 @@
       });
     },
 
+    _calculateOffset: function (anchor) {
+      var offset;
+      $.swap(anchor, { display: 'block' }, function () {
+        offset = $(this).offset();
+      });
+      return offset;
+    },
+
     _show: function (anchor) {
       var thumb = $(anchor),
-        offset = thumb.offset(),
+        offset = this._calculateOffset(anchor),
         dialog = this.lightbox.data('dialog'),
-        start = {
-          left: offset.left,
-          top: offset.top,
-          width: thumb.width(),
-          height: thumb.height(),
-          opacity: 0
-        },
-        stop = {
-          left: $(dialog.uiDialog).css("left"),
-          top: $(dialog.uiDialog).css("top"),
-          width: $(dialog.uiDialog).width(),
-          height: $(dialog.uiDialog).height(),
-          opacity: 1
+        options = {
+          from: {
+            width: thumb.width(),
+            height: thumb.height()
+          },
+          to: {
+            width: $(dialog.uiDialog).width(),
+            height: $(dialog.uiDialog).height()
+          },
+          origin: [ offset.top - thumb.height(), offset.left - thumb.width() ],
+          fade: true
         };
-      $(dialog.uiDialog).css(start).show('scale', { to: stop }, this.options.duration).animate(stop, this.options.duration);
+      $(dialog.uiDialog).show(this.options.show, options, this.options.duration);
     },
 
     _buttons: {
@@ -155,6 +177,8 @@
 
       this._show(anchor);
 
+      // The ui.dialog widget has a reference to the ui.lightbox widget that
+      // opened it in the dialog's options._lightbox property.
       viewer.dialog('option', '_lightbox', this);
       this._preloadNeighbours();
     },
@@ -272,24 +296,25 @@
       return anchorData.content;
     },
 
+    // todo: find better way to guess media type from filename.
     _deriveType: function (anchor) {
-      var reference = anchor.href;
-      if (reference.toLowerCase().match(/\.(gif|jpg|jpeg|png)(\?[0123456789]+)?$/)) {
+      var reference = anchor.href.toLowerCase();
+      if (reference.match(/\.(gif|jpg|jpeg|png)(\?[0123456789]+)?$/)) {
         return "image";
       }
-      if (reference.toLowerCase().match(/\.(swf)(\?[0123456789]+)?$/)) {
+      if (reference.match(/\.(swf)(\?[0123456789]+)?$/)) {
         return "flash";
       }
-      if (reference.toLowerCase().match(/\.(flv)(\?[0123456789]+)?$/)) {
+      if (reference.match(/\.(flv)(\?[0123456789]+)?$/)) {
         return "flashvideo";
       }
-      if (reference.toLowerCase().match(/\.(aif|aiff|aac|au|bmp|gsm|mov|mid|midi|mpg|mpeg|m4a|m4v|mp4|psd|qt|qtif|qif|qti|snd|tif|tiff|wav|3g2|3gp|wbmp)(\?[0123456789]+)?$/)) {
+      if (reference.match(/\.(aif|aiff|aac|au|bmp|gsm|mov|mid|midi|mpg|mpeg|m4a|m4v|mp4|psd|qt|qtif|qif|qti|snd|tif|tiff|wav|3g2|3gp|wbmp)(\?[0123456789]+)?$/)) {
         return "quicktime";
       }
-      if (reference.toLowerCase().match(/\.(ra|ram|rm|rpm|rv|smi|smil)(\?[0123456789]+)?$/)) {
+      if (reference.match(/\.(ra|ram|rm|rpm|rv|smi|smil)(\?[0123456789]+)?$/)) {
         return "realplayer";
       }
-      if (reference.toLowerCase().match(/\.(asf|avi|wma|wmv)(\?[0123456789]+)?$/)) {
+      if (reference.match(/\.(asf|avi|wma|wmv)(\?[0123456789]+)?$/)) {
         return "windowsmedia";
       }
       return "ajax";
@@ -371,7 +396,7 @@
         current = this.options.cursor,
         target = this.options.cursor,
         viewer = this.lightbox,
-        dialog = viewer.data('dialog').uiDialog,
+        dialog = viewer.data('dialog'),
 
         effectOut = {
           direction: direction
@@ -389,7 +414,7 @@
         target = anchors.filter(selectorB)[0];
       }
 
-      dialog.hide(this.options.rotateOut, effectOut, this.options.duration, function () {
+      $(dialog.uiDialog).hide(this.options.rotateOut, effectOut, this.options.duration, function () {
         viewer
           .unbind('dialogclose.lightbox')
           .bind('dialogclose.lightbox', self._rotateClose)
@@ -410,8 +435,7 @@
     // Swappable dialog event handlers.
 
     _rotateClose: function (event, ui) {
-      var lightbox = $(this).dialog('option', '_lightbox'),
-        dialog = $(lightbox.lightbox).data('dialog');
+      var dialog = $(this).data('dialog');
 
       $(this).empty();
       $(dialog.uiDialog).hide();
@@ -420,21 +444,26 @@
     _dialogClose: function (event, ui) {
       var self = this,
         lightbox = $(this).dialog('option', '_lightbox'),
-        dialog = $(lightbox.lightbox).data('dialog'),
+        dialog = $(this).data('dialog'),
 
         thumb = $(lightbox.options.cursor),
-        offset = thumb.offset(),
+        offset = lightbox._calculateOffset(lightbox.options.cursor),
         options = {
           to: {
             width: thumb.width(),
             height: thumb.height()
           },
+          from: {
+            width: $(dialog.uiDialog).width(),
+            height: $(dialog.uiDialog).height()
+          },
           origin: [ offset.top - thumb.height(), offset.left - thumb.width() ],
           fade: true
         };
 
-      $(dialog.uiDialog).hide('scale', options, lightbox.options.duration, function () {
-        $(self).empty().dialog('option', '_lightbox').close();
+      $(dialog.uiDialog).hide(lightbox.options.hide, options, lightbox.options.duration, function () {
+        $(self).empty();
+        lightbox.close();
       });
     }
   });
@@ -459,8 +488,8 @@
       duration: 400,
       rotateIn: 'drop',
       rotateOut: 'drop',
-      show: '',
-      hide: ''
+      show: 'scale',
+      hide: 'scale'
     },
     uuid: 0,
     overlay: function (dialog) {
