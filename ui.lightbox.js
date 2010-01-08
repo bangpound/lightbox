@@ -96,6 +96,15 @@
       });
     },
 
+    _buttons: {
+      'Previous': function (eventObject) {
+        $(this).dialog('option', '_lightbox').prev("right");
+      },
+      'Next': function (eventObject) {
+        $(this).dialog('option', '_lightbox').next("right");
+      }
+    },
+
     _showLoadingIndicator: function () {
       var self = this;
 
@@ -129,7 +138,10 @@
 
       viewer.dialog('option', 'show', this.options.show)
         .dialog('option', 'hide', this.options.hide)
+        .dialog('option', 'buttons', this._buttons)
         .dialog('open');
+
+      viewer.dialog('option', '_lightbox', this);
     },
 
     close: function () {
