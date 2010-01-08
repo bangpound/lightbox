@@ -308,9 +308,6 @@
       return ":eq(" + (index === 0 ? length - 1 : index - 1) + "), :eq(" + (index === length - 1 ? 0 : index + 1) + ")";
     },
 
-    _position: function (img) {
-    },
-
     _calculateSize: function (content) {
       var width, height;
       $.swap($(content).appendTo('<div>').appendTo(document.body)[0], {
