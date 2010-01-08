@@ -1,5 +1,5 @@
-/*globals document,window,$,jQuery */
-/*jslint white: true, onevar: true, undef: true, eqeqeq: true, plusplus: true, bitwise: true, regexp: true, strict: true, newcap: true, immed: true, indent: 2 */
+/*globals document,window,$,jQuery,Image */
+/*jslint white: true, browser: true, onevar: true, undef: true, eqeqeq: true, plusplus: true, bitwise: true, regexp: true, strict: true, newcap: true, immed: true, indent: 2 */
 
 "use strict";
 
@@ -37,7 +37,7 @@
           }
           break;
         case $.ui.keyCode.LEFT:
-          self.prev("left");
+          self.prev("right");
           event.preventDefault();
           break;
         case $.ui.keyCode.UP:
@@ -45,7 +45,7 @@
           event.preventDefault();
           break;
         case $.ui.keyCode.RIGHT:
-          self.next("right");
+          self.next("left");
           event.preventDefault();
           break;
         case $.ui.keyCode.DOWN:
@@ -96,6 +96,27 @@
       });
     },
 
+    _show: function (anchor) {
+      var thumb = $(anchor),
+        offset = thumb.offset(),
+        dialog = this.lightbox.data('dialog'),
+        start = {
+          left: offset.left,
+          top: offset.top,
+          width: thumb.width(),
+          height: thumb.height(),
+          opacity: 0
+        },
+        stop = {
+          left: $(dialog.uiDialog).css("left"),
+          top: $(dialog.uiDialog).css("top"),
+          width: $(dialog.uiDialog).width(),
+          height: $(dialog.uiDialog).height(),
+          opacity: 1
+        };
+      $(dialog.uiDialog).show('scale', { to: stop }, this.options.duration);
+    },
+
     _buttons: {
       'Previous': function (eventObject) {
         $(this).dialog('option', '_lightbox').prev("right");
@@ -110,6 +131,8 @@
       this.element
         .unbind('.lightbox')
         .removeData('lightbox');
+
+      this._anchors().removeData('lightbox');
     },
 
     open: function (anchor) {
@@ -119,16 +142,16 @@
       this.setCurrentAnchor(anchor);
 
       viewer.dialog('option', 'buttons', this._buttons)
+        .unbind('dialogclose.lightbox')
         .bind('dialogclose.lightbox', this._dialogClose)
         .dialog('open');
 
       viewer.dialog('option', '_lightbox', this);
+      this._preloadNeighbours();
     },
 
     close: function () {
-      var self = this,
-        anchor = this.getCurrentAnchor(),
-        viewer = this.lightbox;
+      var viewer = this.lightbox;
 
       (this.overlay && this.overlay.destroy());
 
@@ -152,13 +175,11 @@
     },
 
     _setData: function (key, value) {
-      switch (key) {
-      case "cursor":
+      if (key === 'cursor') {
         this.options[key] = value;
         this.spinner = new $.ui.lightbox.spinner(this);
         this._display(this._loadContent(value));
         this.spinner.destroy();
-        break;
       }
 
       $.widget.prototype._setData.apply(this, arguments);
@@ -174,15 +195,27 @@
       viewer.dialog('option', this._resize($el, size.width, size.height));
     },
 
+    _jQueryToString: function (input) {
+      return $('<div>').append($(input).clone().show()).remove().html();
+    },
+
     _loadContent: function (anchor) {
       var self = this,
-        content = 'BUG',
-        type = this.options.type ? this.options.type : this._deriveType(anchor);
+        anchorData = $(anchor).data('lightbox') || {};
 
-      switch (type) {
+      if (!this.options.reset && anchorData.content) {
+        return anchorData.content;
+      }
+      else {
+        anchorData = {
+          content: 'BUG',
+          type: this.options.type ? this.options.type : this._deriveType(anchor)
+        };
+      }
+
+      switch (anchorData.type) {
       case "image":
-        content = new Image();
-        content.src = anchor.href;
+        anchorData.content = this._jQueryToString($('<img/>').attr('src', anchor.href));
         break;
       case "flash":
       case "flashvideo":
@@ -196,17 +229,16 @@
           autoplay: 1
         }, function (element, options) {
         }, function (element, data, options, playerName) {
-          content = $(data).html();
-          $(data).media('undo');
+          anchorData.content = this._jQueryToString(data);
+          $(this).media('undo');
         });
         break;
       case "iframe":
-        content = this._element('iframe').attr('src', anchor.href).attr('frameborder', 0).attr('border', 0).html();
+        anchorData.content = this._element('iframe').attr('src', anchor.href).attr('frameborder', 0).attr('border', 0).html();
         break;
       case "html":
       case "dom":
-        var reference = $($(anchor).attr('href'));
-        content = $('<div>').append(reference.clone().show()).remove().html();
+        anchorData.content = this._jQueryToString(anchor.href);
         break;
       case "ajax":
       case "script":
@@ -216,15 +248,19 @@
           cache: true,
           async: false,
           data: self.options.parameters,
-          dataType: (type === "ajax") ? "html" : "script",
+          dataType: (anchorData.type === "ajax") ? "html" : "script",
           success: function (data, textStatus) {
-            content = data;
+            anchorData.content = data;
           }
         });
         break;
       }
 
-      return content;
+      if (this.options.cache) {
+        $(anchor).data('lightbox', anchorData);
+      }
+
+      return anchorData.content;
     },
 
     _deriveType: function (anchor) {
@@ -252,9 +288,10 @@
 
     _preloadNeighbours: function () {
       var anchors = this._anchors(),
-        index = anchors.index(this.getCurrentAnchor());
-      anchors.filter(this._neighbours(anchors.length, index)).each(function () {
-        //new Image().src = this.href;
+        index = anchors.index(this.getCurrentAnchor()),
+        self = this;
+      anchors.filter(this._neighbours(index, anchors.length)).each(function () {
+        self._loadContent(this);
       });
     },
 
@@ -266,13 +303,13 @@
     },
 
     _calculateSize: function (content) {
-      var width,height;
+      var width, height;
       $.swap($(content).appendTo('<div>').appendTo(document.body)[0], {
         position: "absolute",
         visibility: "hidden",
         display: "block"
       }, function () {
-        width = $(this).width(),
+        width = $(this).width();
         height = $(this).height();
         $(this).remove();
       });
@@ -283,30 +320,27 @@
       var viewer = this.lightbox,
         dialog = viewer.data('dialog'),
         offset = 20,
-        finalWidth,finalHeight,
 
         // difference
         deltaContentWidth = viewer.outerWidth() - viewer.width(),
         deltaContentHeight = viewer.outerHeight() - viewer.height(),
 
-        dialogTitlebarWidth = dialog.uiDialogTitlebar.outerWidth(),
         dialogTitlebarHeight = dialog.uiDialogTitlebar.outerHeight(),
 
         // Window
         wWidth = $(window).width(),
         wHeight = $(window).height(),
 
-        size = {width: width, height: height};
+        size = {width: width, height: height},
 
-      // Desired width
-      finalWidth = size.width + deltaContentWidth,
-      finalHeight = size.height + deltaContentHeight + dialogTitlebarHeight,
+        // Desired width
+        finalWidth = size.width + deltaContentWidth,
+        finalHeight = size.height + deltaContentHeight + dialogTitlebarHeight,
 
-      ratio = Math.min(
-        Math.min(
-          Math.min(wWidth - deltaContentWidth - offset, size.width) / size.width,
-          Math.min(wHeight - deltaContentHeight - dialogTitlebarHeight - offset, size.height) / size.height, 1)),
-
+        ratio = Math.min(
+          Math.min(
+            Math.min(wWidth - deltaContentWidth - offset, size.width) / size.width,
+            Math.min(wHeight - deltaContentHeight - dialogTitlebarHeight - offset, size.height) / size.height, 1));
 
       $.extend(size, {
         width: Math.round(ratio * size.width),
@@ -319,7 +353,10 @@
         elem.attr('width', '').attr('height', '');
       }
 
-      return { width: size.width + deltaContentWidth, height: size.height + deltaContentHeight + dialogTitlebarHeight };
+      finalWidth = size.width + deltaContentWidth;
+      finalHeight = size.height + deltaContentHeight + dialogTitlebarHeight;
+
+      return { width: finalWidth, height: finalHeight };
     },
 
     setCurrentAnchor: function (anchor) {
@@ -332,9 +369,9 @@
 
     _rotate: function (selectorA, selectorB, direction) {
       var self = this,
-        content,
         anchors = this._anchors(),
-        target = current = this.getCurrentAnchor(),
+        current = this.getCurrentAnchor(),
+        target = this.getCurrentAnchor(),
         viewer = this.lightbox,
         dialog = viewer.data('dialog').uiDialog,
 
@@ -342,13 +379,8 @@
           direction: direction
         },
         effectIn = {
-          direction: {up:"down",down:"up",left:"right",right:"left"}[direction]
+          direction: { up: "down", down: "up", left: "right", right: "left" }[direction]
         };
-
-      if (!this.getCurrentAnchor()) {
-        console.log('Called _rotate without an anchor');
-        return;
-      }
 
       if (anchors.length === 1) {
         return;
@@ -362,8 +394,11 @@
       dialog.hide(this.options.rotateOut, effectOut, this.options.duration, function () {
         viewer
           .unbind('dialogclose.lightbox')
-          .bind('dialogclose.lightbox', self._rotateClose).dialog('close');
+          .bind('dialogclose.lightbox', self._rotateClose)
+          .dialog('close')
+          .unbind('dialogclose.lightbox');
         self.setCurrentAnchor(target);
+        self._preloadNeighbours();
         $(this).show(self.options.rotateIn, effectIn, self.options.duration, function () {
           viewer
             .dialog('open')
@@ -377,11 +412,31 @@
     // Swappable dialog event handlers.
 
     _rotateClose: function (event, ui) {
+      var lightbox = $(this).dialog('option', '_lightbox'),
+        dialog = $(lightbox.lightbox).data('dialog');
+
       $(this).empty();
+      $(dialog.uiDialog).hide();
     },
 
     _dialogClose: function (event, ui) {
-      $(this).empty().dialog('option', '_lightbox').close();
+      var self = this,
+        lightbox = $(this).dialog('option', '_lightbox'),
+        dialog = $(lightbox.lightbox).data('dialog'),
+
+        thumb = $(lightbox.getCurrentAnchor()),
+        offset = thumb.offset(),
+        stop = {
+          left: offset.left,
+          top: offset.top,
+          width: thumb.width(),
+          height: thumb.height(),
+          opacity: 0
+        };
+
+      $(dialog.uiDialog).hide('scale', { to: stop }, lightbox.options.duration, function () {
+        $(self).empty().dialog('option', '_lightbox').close();
+      });
     },
 
     _element: function (type, clazz) {
@@ -394,6 +449,7 @@
       loop: true,
       modal: true,
       overlay: {},
+      cache: true,
       post: 0,
       dialogClass: 'ui-lightbox',
       closeOnEscape: true,
@@ -423,7 +479,7 @@
   $.extend($.ui.lightbox.overlay, $.ui.dialog.overlay, {});
 
   $.extend($.ui.lightbox.overlay.prototype, $.ui.dialog.overlay.prototype, {
-    destroy: function() {
+    destroy: function () {
       $.ui.lightbox.overlay.destroy(this.$el);
     }
   });
@@ -437,9 +493,9 @@
 
         this.instances.push($el);
         return $el;
-      };
+      }
     },
-    destroy: function($el) {
+    destroy: function ($el) {
       this.instances.splice($.inArray(this.instances, $el), 1);
 
       $el.remove();
@@ -447,7 +503,7 @@
   });
 
   $.extend($.ui.lightbox.spinner.prototype, {
-    destroy: function() {
+    destroy: function () {
       $.ui.lightbox.spinner.destroy(this.$el);
     }
   });
