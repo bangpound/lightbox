@@ -206,8 +206,7 @@
       case "html":
       case "dom":
         var reference = $($(anchor).attr('href'));
-
-        content = $(reference).html();
+        content = $('<div>').append(reference.clone().show()).remove().html();
         break;
       case "ajax":
       case "script":
