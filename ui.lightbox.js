@@ -96,6 +96,27 @@
       });
     },
 
+    _show: function (anchor) {
+      var thumb = $(anchor),
+        offset = thumb.offset(),
+        dialog = this.lightbox.data('dialog'),
+        start = {
+          left: offset.left,
+          top: offset.top,
+          width: thumb.width(),
+          height: thumb.height(),
+          opacity: 0
+        },
+        stop = {
+          left: $(dialog.uiDialog).css("left"),
+          top: $(dialog.uiDialog).css("top"),
+          width: $(dialog.uiDialog).width(),
+          height: $(dialog.uiDialog).height(),
+          opacity: 1
+        };
+      $(dialog.uiDialog).show('scale', { to: stop }, this.options.duration);
+    },
+
     _buttons: {
       'Previous': function (eventObject) {
         $(this).dialog('option', '_lightbox').prev("right");
