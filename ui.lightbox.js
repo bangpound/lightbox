@@ -21,7 +21,7 @@
     _init: function () {
       var self = this;
 
-      // consider event delegation to make this more dynamic
+      // todo: consider event delegation to make this more dynamic
       $(this.options.selector, this.element).click(function (event) {
         event.preventDefault();
         self.open(this);
@@ -39,7 +39,7 @@
             self.lightbox
               .unbind('dialogclose.lightbox')
               .bind('dialogclose.lightbox', self._dialogClose)
-              .dialog('close')
+              .dialog('close');
             event.preventDefault();
           }
           break;
@@ -243,7 +243,7 @@
         });
         break;
       case "iframe":
-        anchorData.content = this._element('iframe').attr('src', anchor.href).attr('frameborder', 0).attr('border', 0).html();
+        anchorData.content = this.__jQueryToString($('iframe').attr('src', anchor.href).attr('frameborder', 0).attr('border', 0));
         break;
       case "html":
       case "dom":
@@ -306,9 +306,6 @@
 
     _neighbours: function (index, length) {
       return ":eq(" + (index === 0 ? length - 1 : index - 1) + "), :eq(" + (index === length - 1 ? 0 : index + 1) + ")";
-    },
-
-    _position: function (img) {
     },
 
     _calculateSize: function (content) {
@@ -430,7 +427,7 @@
         options = {
           to: {
             width: thumb.width(),
-            height: thumb.height(),
+            height: thumb.height()
           },
           origin: [ offset.top - thumb.height(), offset.left - thumb.width() ],
           fade: true
@@ -439,10 +436,6 @@
       $(dialog.uiDialog).hide('scale', options, lightbox.options.duration, function () {
         $(self).empty().dialog('option', '_lightbox').close();
       });
-    },
-
-    _element: function (type, clazz) {
-      return $("<" + type + "/>").addClass(clazz).hide();
     }
   });
 
@@ -463,7 +456,7 @@
       width: 'auto',
       height: 'auto',
       parameters: {},
-      duration: 1000,
+      duration: 400,
       rotateIn: 'drop',
       rotateOut: 'drop',
       show: '',
@@ -478,6 +471,9 @@
     }
   });
 
+  /**
+   * Overlay
+   */
   $.extend($.ui.lightbox.overlay, $.ui.dialog.overlay, {});
 
   $.extend($.ui.lightbox.overlay.prototype, $.ui.dialog.overlay.prototype, {
@@ -486,6 +482,9 @@
     }
   });
 
+  /**
+   * Spinner
+   */
   $.extend($.ui.lightbox.spinner, {
     instances: [],
     create: function (lightbox) {
@@ -510,4 +509,4 @@
     }
   });
 
-})(jQuery);
+}(jQuery));
