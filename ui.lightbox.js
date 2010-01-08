@@ -146,7 +146,7 @@
       var viewer = (this.lightbox = this._makeDialog());
 
       this.overlay = this.options.modal ? new $.ui.lightbox.overlay(viewer.data('dialog')) : null;
-      this.setCurrentAnchor(anchor);
+      this._setData('cursor', anchor);
 
       viewer.dialog('option', 'buttons', this._buttons)
         .unbind('dialogclose.lightbox')
@@ -195,7 +195,7 @@
     },
 
     _display: function (content) {
-      var anchor = this.getCurrentAnchor(),
+      var anchor = this.options.cursor,
         viewer = this.lightbox,
         size = this._calculateSize(content),
         $el = $(content).css(size).appendTo(viewer);
@@ -297,7 +297,7 @@
 
     _preloadNeighbours: function () {
       var anchors = this._anchors(),
-        index = anchors.index(this.getCurrentAnchor()),
+        index = anchors.index(this.options.cursor),
         self = this;
       anchors.filter(this._neighbours(index, anchors.length)).each(function () {
         self._loadContent(this);
@@ -368,19 +368,11 @@
       return { width: finalWidth, height: finalHeight };
     },
 
-    setCurrentAnchor: function (anchor) {
-      this._setData('cursor', anchor);
-    },
-
-    getCurrentAnchor: function () {
-      return this._getData('cursor');
-    },
-
     _rotate: function (selectorA, selectorB, direction) {
       var self = this,
         anchors = this._anchors(),
-        current = this.getCurrentAnchor(),
-        target = this.getCurrentAnchor(),
+        current = this.options.cursor,
+        target = this.options.cursor,
         viewer = this.lightbox,
         dialog = viewer.data('dialog').uiDialog,
 
@@ -406,7 +398,7 @@
           .bind('dialogclose.lightbox', self._rotateClose)
           .dialog('close')
           .unbind('dialogclose.lightbox');
-        self.setCurrentAnchor(target);
+        self._setData('cursor', target);
         self._preloadNeighbours();
         $(this).show(self.options.rotateIn, effectIn, self.options.duration, function () {
           viewer
@@ -433,7 +425,7 @@
         lightbox = $(this).dialog('option', '_lightbox'),
         dialog = $(lightbox.lightbox).data('dialog'),
 
-        thumb = $(lightbox.getCurrentAnchor()),
+        thumb = $(lightbox.options.cursor),
         offset = thumb.offset(),
         options = {
           to: {
