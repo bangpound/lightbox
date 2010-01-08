@@ -188,7 +188,7 @@
 
       viewer.dialog('option', 'title', $(anchor).attr('title') + this.options.titleSuffix);
 
-      viewer.append(content.show());
+      viewer.html(content);
     },
 
     _loadContent: function (anchor) {
@@ -198,8 +198,7 @@
 
       switch (type) {
       case "image":
-        content = this._element('img')
-          .attr("src", anchor.href);
+        content = $('<img/>').attr("src", anchor.href)[0];
         break;
       case "flash":
       case "flashvideo":
@@ -213,18 +212,18 @@
           autoplay: 1
         }, function (element, options) {
         }, function (element, data, options, playerName) {
-          content = $(data).clone();
+          content = $(data).html();
           $(data).media('undo');
         });
         break;
       case "iframe":
-        content = this._element('iframe').attr('src', anchor.href).attr('frameborder', 0).attr('border', 0);
+        content = this._element('iframe').attr('src', anchor.href).attr('frameborder', 0).attr('border', 0).html();
         break;
       case "html":
       case "dom":
         var reference = $($(anchor).attr('href'));
 
-        content = $(reference).clone();
+        content = $(reference).html();
         break;
       case "ajax":
       case "script":
@@ -236,7 +235,7 @@
           data: self.options.parameters,
           dataType: (type === "ajax") ? "html" : "script",
           success: function (data, textStatus) {
-            content = $(data);
+            content = data;
           }
         });
         break;
