@@ -153,9 +153,6 @@
     },
 
     _setData: function (key, value) {
-      var anchorData = $(value).data('lightbox') || {},
-        content;
-
       if (key === 'cursor') {
         this.options[key] = value;
         this.spinner = new $.ui.lightbox.spinner(this);
