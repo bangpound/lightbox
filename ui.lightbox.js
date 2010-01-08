@@ -427,8 +427,8 @@
       height: 'auto',
       parameters: {},
       duration: 1000,
-      rotateIn: 'slide',
-      rotateOut: 'slide',
+      rotateIn: 'drop',
+      rotateOut: 'drop',
       show: '',
       hide: ''
     },
