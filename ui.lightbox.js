@@ -19,49 +19,12 @@
 
   $.widget('ui.lightbox', {
     _init: function () {
-      var self = this,
-        lightbox = (this.lightbox = $('<div/>')
-          .dialog({
-            autoOpen: false,
-            closeOnEscape: this.options.closeOnEscape,
-            modal: this.options.overlay,
-            dialogClass: this.options.dialogClass,
-            position: this.options.position,
-            resizable: this.options.resizable,
-            draggable: this.options.draggable,
-            height: this.options.height,
-            width: this.options.width,
-            open: function (event, ui) {
-              var type = self._deriveType(self.getCurrentAnchor());
-
-              $('.ui-dialog-buttonpane button', $(this).parents('.ui-dialog'))
-                .each(function (index, domElement) {
-                  $(domElement).addClass('button-' + index);
-                });
-              self._hideLoadingIndicator();
-            },
-            resize: function (event, ui) {
-              var type = self._deriveType(self.getCurrentAnchor());
-
-              if (type == 'image') {
-                self._resize();
-                $(this).dialog('option', 'position', self.options.position);
-              }
-            }
-          }));
+      var self = this;
 
       // consider event delegation to make this more dynamic
       $(this.options.selector, this.element).click(function (event) {
         event.preventDefault();
-        self._showLoadingIndicator();
-
-        var content,
-          viewer = self.lightbox;
-
-        viewer.dialog('option', 'show', self.options.show);
-
-        self.setCurrentAnchor(this);
-        return false;
+        self.open(this);
       });
       $(document).keydown(function (event) {
         if (!self.lightbox.dialog('isOpen')) {
@@ -119,6 +82,29 @@
       }
     },
 
+    _makeDialog: function () {
+      return $('<div/>').dialog({
+        autoOpen: false,
+        closeOnEscape: false,
+        modal: this.options.overlay,
+        dialogClass: this.options.dialogClass,
+        position: this.options.position,
+        resizable: this.options.resizable,
+        draggable: this.options.draggable,
+        height: this.options.height,
+        width: this.options.width,
+        open: function (event, ui) {
+          $('.ui-dialog-buttonpane button', $(this).parents('.ui-dialog'))
+            .each(function (index, domElement) {
+              $(domElement).addClass('button-' + index);
+            });
+        },
+        close: function (event, ui) {
+          $(this).empty();
+        }
+      });
+    },
+
     _showLoadingIndicator: function () {
       var self = this;
 
@@ -143,6 +129,18 @@
         .removeData('lightbox');
     },
 
+    open: function (anchor) {
+      var viewer = (this.lightbox = this._makeDialog());
+
+      this._showLoadingIndicator();
+      this.setCurrentAnchor(anchor);
+      this._hideLoadingIndicator();
+
+      viewer.dialog('option', 'show', this.options.show)
+        .dialog('option', 'hide', this.options.hide)
+        .dialog('open');
+    },
+
     close: function () {
       if (!this.lightbox.dialog('isOpen')) {
         return;
@@ -152,7 +150,7 @@
         viewer = this.lightbox;
 
       // TODO: these need to be destroyed with the widget.
-      viewer.dialog('close');
+      viewer.dialog('close').dialog('destroy').remove();
     },
 
     next: function (direction) {
@@ -181,26 +179,13 @@
     },
 
     _display: function (content) {
-      if (!content) {
-        return;
-      }
-
-      var self = this,
-        visible = this.lightbox.dialog('isOpen'),
-        anchor = this.getCurrentAnchor(),
-        type = this._deriveType(this.getCurrentAnchor()),
+      var anchor = this.getCurrentAnchor(),
         viewer = this.lightbox;
 
       viewer.dialog('option', 'title', $(anchor).attr('title') + this.options.titleSuffix);
 
-      if (visible) {
-        viewer.dialog('close');
-      }
       viewer.empty();
       viewer.append(content.show());
-      this._resize(content);
-      viewer.dialog('open');
-      viewer.dialog('option', 'hide', self.options.hide);
     },
 
     _loadContent: function (anchor) {
@@ -385,8 +370,14 @@
       }
 
       viewer.dialog('option', 'hide', this.options.rotateOut(direction))
-        .dialog('option', 'show', this.options.rotateIn(direction));
+        .dialog('option', 'show', this.options.rotateIn(direction))
+        .dialog('close');
+
       this.setCurrentAnchor(target);
+      this._hideLoadingIndicator();
+
+      viewer.dialog('option', 'hide', this.options.hide)
+        .dialog('open');
     },
 
     _element: function (type, clazz) {
