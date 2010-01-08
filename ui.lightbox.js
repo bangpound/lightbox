@@ -247,7 +247,7 @@
         break;
       case "html":
       case "dom":
-        anchorData.content = this._jQueryToString($(anchor).attr('src'));
+        anchorData.content = this._jQueryToString($(anchor).attr('href'));
         break;
       case "ajax":
       case "script":
