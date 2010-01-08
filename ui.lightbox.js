@@ -32,8 +32,15 @@
         }
         switch (event.keyCode) {
         case $.ui.keyCode.ESCAPE:
+          if (!self.lightbox.dialog('isOpen')) {
+            return;
+          }
           if (self.options.closeOnEscape) {
-            self.close();
+            self.lightbox
+              .unbind('dialogclose.lightbox')
+              .bind('dialogclose.lightbox', self._dialogClose)
+              .dialog('close')
+            event.preventDefault();
           }
           break;
         case $.ui.keyCode.LEFT:
@@ -114,7 +121,7 @@
           height: $(dialog.uiDialog).height(),
           opacity: 1
         };
-      $(dialog.uiDialog).show('scale', { to: stop }, this.options.duration);
+      $(dialog.uiDialog).css(start).show('scale', { to: stop }, this.options.duration).animate(stop, this.options.duration);
     },
 
     _buttons: {
@@ -145,6 +152,8 @@
         .unbind('dialogclose.lightbox')
         .bind('dialogclose.lightbox', this._dialogClose)
         .dialog('open');
+
+      this._show(anchor);
 
       viewer.dialog('option', '_lightbox', this);
       this._preloadNeighbours();
@@ -426,15 +435,15 @@
 
         thumb = $(lightbox.getCurrentAnchor()),
         offset = thumb.offset(),
-        stop = {
-          left: offset.left,
-          top: offset.top,
-          width: thumb.width(),
-          height: thumb.height(),
-          opacity: 0
+        options = {
+          to: {
+            width: thumb.width(),
+            height: thumb.height(),
+          },
+          origin: [ offset.left, offset.top ]
         };
 
-      $(dialog.uiDialog).hide('scale', { to: stop }, lightbox.options.duration, function () {
+      $(dialog.uiDialog).hide('scale', options, lightbox.options.duration, function () {
         $(self).empty().dialog('option', '_lightbox').close();
       });
     },
