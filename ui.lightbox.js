@@ -101,7 +101,7 @@
         $(this).dialog('option', '_lightbox').prev("right");
       },
       'Next': function (eventObject) {
-        $(this).dialog('option', '_lightbox').next("right");
+        $(this).dialog('option', '_lightbox').next("left");
       }
     },
 
