@@ -360,7 +360,7 @@
           direction: direction
         },
         effectIn = {
-          direction: {up: "down", down: "up", left: "right", right: "left" }[direction]
+          direction: { up: "down", down: "up", left: "right", right: "left" }[direction]
         };
 
       if (anchors.length === 1) {
