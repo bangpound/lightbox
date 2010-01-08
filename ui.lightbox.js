@@ -18,6 +18,21 @@
 (function ($) {
 
   $.widget('ui.lightbox', {
+    /**
+     * Moving parts of jQuery UI Lightbox widget.
+     *
+     * lightbox = the widget object = this.element.data('lightbox')
+     *
+     *
+     * viewer = this.lightbox = the DOM element.
+     * dialog = this.lightbox.data('dialog')
+     *   dialog.uiDialog = the outermost div element of a ui.dialog widget.
+     *   dialog.uiDialogButtonPane = the container for the buttons.
+     *
+     * anchors = _anchors() = anchors in this lightbox collection.
+     * cursor = this.options.cursor = active item in lightbox.
+     * anchorData = $(anchor).data('lightbox') = cache.
+     */
     _init: function () {
       var self = this;
 
@@ -156,6 +171,8 @@
 
       this._show(anchor);
 
+      // The ui.dialog widget has a reference to the ui.lightbox widget that
+      // opened it in the dialog's options._lightbox property.
       viewer.dialog('option', '_lightbox', this);
       this._preloadNeighbours();
     },
@@ -273,6 +290,7 @@
       return anchorData.content;
     },
 
+    // todo: find better way to guess media type from filename.
     _deriveType: function (anchor) {
       var reference = anchor.href.toLowerCase();
       if (reference.match(/\.(gif|jpg|jpeg|png)(\?[0123456789]+)?$/)) {
