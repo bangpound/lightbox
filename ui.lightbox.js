@@ -1,5 +1,5 @@
-/*globals document,window,$,jQuery */
-/*jslint white: true, onevar: true, undef: true, eqeqeq: true, plusplus: true, bitwise: true, regexp: true, strict: true, newcap: true, immed: true, indent: 2 */
+/*globals document,window,$,jQuery,Image */
+/*jslint white: true, browser: true, onevar: true, undef: true, eqeqeq: true, plusplus: true, bitwise: true, regexp: true, strict: true, newcap: true, immed: true, indent: 2 */
 
 "use strict";
 
@@ -126,9 +126,7 @@
     },
 
     close: function () {
-      var self = this,
-        anchor = this.getCurrentAnchor(),
-        viewer = this.lightbox;
+      var viewer = this.lightbox;
 
       (this.overlay && this.overlay.destroy());
 
@@ -152,13 +150,11 @@
     },
 
     _setData: function (key, value) {
-      switch (key) {
-      case "cursor":
+      if (key === 'cursor') {
         this.options[key] = value;
         this.spinner = new $.ui.lightbox.spinner(this);
         this._display(this._loadContent(value));
         this.spinner.destroy();
-        break;
       }
 
       $.widget.prototype._setData.apply(this, arguments);
@@ -205,8 +201,7 @@
         break;
       case "html":
       case "dom":
-        var reference = $($(anchor).attr('href'));
-        content = $('<div>').append(reference.clone().show()).remove().html();
+        content = $('<div>').append($(anchor.href).clone().show()).remove().html();
         break;
       case "ajax":
       case "script":
@@ -266,13 +261,13 @@
     },
 
     _calculateSize: function (content) {
-      var width,height;
+      var width, height;
       $.swap($(content).appendTo('<div>').appendTo(document.body)[0], {
         position: "absolute",
         visibility: "hidden",
         display: "block"
       }, function () {
-        width = $(this).width(),
+        width = $(this).width();
         height = $(this).height();
         $(this).remove();
       });
@@ -283,30 +278,27 @@
       var viewer = this.lightbox,
         dialog = viewer.data('dialog'),
         offset = 20,
-        finalWidth,finalHeight,
 
         // difference
         deltaContentWidth = viewer.outerWidth() - viewer.width(),
         deltaContentHeight = viewer.outerHeight() - viewer.height(),
 
-        dialogTitlebarWidth = dialog.uiDialogTitlebar.outerWidth(),
         dialogTitlebarHeight = dialog.uiDialogTitlebar.outerHeight(),
 
         // Window
         wWidth = $(window).width(),
         wHeight = $(window).height(),
 
-        size = {width: width, height: height};
+        size = {width: width, height: height},
 
-      // Desired width
-      finalWidth = size.width + deltaContentWidth,
-      finalHeight = size.height + deltaContentHeight + dialogTitlebarHeight,
+        // Desired width
+        finalWidth = size.width + deltaContentWidth,
+        finalHeight = size.height + deltaContentHeight + dialogTitlebarHeight,
 
-      ratio = Math.min(
-        Math.min(
-          Math.min(wWidth - deltaContentWidth - offset, size.width) / size.width,
-          Math.min(wHeight - deltaContentHeight - dialogTitlebarHeight - offset, size.height) / size.height, 1)),
-
+        ratio = Math.min(
+          Math.min(
+            Math.min(wWidth - deltaContentWidth - offset, size.width) / size.width,
+            Math.min(wHeight - deltaContentHeight - dialogTitlebarHeight - offset, size.height) / size.height, 1));
 
       $.extend(size, {
         width: Math.round(ratio * size.width),
@@ -319,7 +311,10 @@
         elem.attr('width', '').attr('height', '');
       }
 
-      return { width: size.width + deltaContentWidth, height: size.height + deltaContentHeight + dialogTitlebarHeight };
+      finalWidth = size.width + deltaContentWidth;
+      finalHeight = size.height + deltaContentHeight + dialogTitlebarHeight;
+
+      return { width: finalWidth, height: finalHeight };
     },
 
     setCurrentAnchor: function (anchor) {
@@ -332,9 +327,9 @@
 
     _rotate: function (selectorA, selectorB, direction) {
       var self = this,
-        content,
         anchors = this._anchors(),
-        target = current = this.getCurrentAnchor(),
+        current = this.getCurrentAnchor(),
+        target = this.getCurrentAnchor(),
         viewer = this.lightbox,
         dialog = viewer.data('dialog').uiDialog,
 
@@ -342,13 +337,8 @@
           direction: direction
         },
         effectIn = {
-          direction: {up:"down",down:"up",left:"right",right:"left"}[direction]
+          direction: {up: "down", down: "up", left: "right", right: "left" }[direction]
         };
-
-      if (!this.getCurrentAnchor()) {
-        console.log('Called _rotate without an anchor');
-        return;
-      }
 
       if (anchors.length === 1) {
         return;
@@ -423,7 +413,7 @@
   $.extend($.ui.lightbox.overlay, $.ui.dialog.overlay, {});
 
   $.extend($.ui.lightbox.overlay.prototype, $.ui.dialog.overlay.prototype, {
-    destroy: function() {
+    destroy: function () {
       $.ui.lightbox.overlay.destroy(this.$el);
     }
   });
@@ -437,9 +427,9 @@
 
         this.instances.push($el);
         return $el;
-      };
+      }
     },
-    destroy: function($el) {
+    destroy: function ($el) {
       this.instances.splice($.inArray(this.instances, $el), 1);
 
       $el.remove();
@@ -447,7 +437,7 @@
   });
 
   $.extend($.ui.lightbox.spinner.prototype, {
-    destroy: function() {
+    destroy: function () {
       $.ui.lightbox.spinner.destroy(this.$el);
     }
   });
