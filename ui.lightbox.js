@@ -198,7 +198,8 @@
 
       switch (type) {
       case "image":
-        content = $('<img/>').attr("src", anchor.href)[0];
+        content = new Image();
+        content.src = anchor.href;
         break;
       case "flash":
       case "flashvideo":
