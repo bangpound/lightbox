@@ -95,7 +95,8 @@
         width: this.options.width,
         // TODO: Support overlay by implementing focus,dragstop,resizestop
         open: function (event, ui) {
-          $('.ui-dialog-buttonpane button', $(this).parents('.ui-dialog'))
+          var buttonPane = $(this).data('dialog').uiDialogButtonPane;
+          $('button', buttonPane)
             .each(function (index, domElement) {
               $(domElement).addClass('button-' + index);
             });
@@ -371,7 +372,7 @@
         current = this.options.cursor,
         target = this.options.cursor,
         viewer = this.lightbox,
-        dialog = viewer.data('dialog').uiDialog,
+        dialog = viewer.data('dialog'),
 
         effectOut = {
           direction: direction
@@ -389,7 +390,7 @@
         target = anchors.filter(selectorB)[0];
       }
 
-      dialog.hide(this.options.rotateOut, effectOut, this.options.duration, function () {
+      $(dialog.uiDialog).hide(this.options.rotateOut, effectOut, this.options.duration, function () {
         viewer
           .unbind('dialogclose.lightbox')
           .bind('dialogclose.lightbox', self._rotateClose)
@@ -411,7 +412,7 @@
 
     _rotateClose: function (event, ui) {
       var lightbox = $(this).dialog('option', '_lightbox'),
-        dialog = $(lightbox.lightbox).data('dialog');
+        dialog = $(this).data('dialog');
 
       $(this).empty();
       $(dialog.uiDialog).hide();
@@ -420,7 +421,7 @@
     _dialogClose: function (event, ui) {
       var self = this,
         lightbox = $(this).dialog('option', '_lightbox'),
-        dialog = $(lightbox.lightbox).data('dialog'),
+        dialog = $(this).data('dialog'),
 
         thumb = $(lightbox.options.cursor),
         offset = thumb.offset(),
@@ -434,7 +435,8 @@
         };
 
       $(dialog.uiDialog).hide('scale', options, lightbox.options.duration, function () {
-        $(self).empty().dialog('option', '_lightbox').close();
+        $(self).empty()
+        lightbox.close();
       });
     }
   });
