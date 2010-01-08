@@ -134,10 +134,8 @@
       this.overlay = this.options.modal ? new $.ui.lightbox.overlay(viewer.data('dialog')) : null;
       this.setCurrentAnchor(anchor);
 
-      viewer.dialog('option', 'show', this.options.show)
-        .dialog('option', 'hide', this.options.hide)
-        .dialog('option', 'buttons', this._buttons)
-        .dialog('option', 'close', self._dialogClose)
+      viewer.dialog('option', 'buttons', this._buttons)
+        .bind('dialogclose.lightbox', this._dialogClose)
         .dialog('open');
 
       viewer.dialog('option', '_lightbox', this);
@@ -147,10 +145,6 @@
       var self = this,
         anchor = this.getCurrentAnchor(),
         viewer = this.lightbox;
-
-      if (!this.lightbox.dialog('isOpen')) {
-        viewer.dialog('close');
-      }
 
       (this.overlay && this.overlay.destroy());
 
@@ -192,7 +186,6 @@
 
       viewer.dialog('option', 'title', $(anchor).attr('title') + this.options.titleSuffix);
 
-      viewer.empty();
       viewer.append(content.show());
     },
 
@@ -360,7 +353,14 @@
         anchors = this._anchors(),
         target = current = this.getCurrentAnchor(),
         viewer = this.lightbox,
-        dialog = viewer.data('dialog').uiDialog;
+        dialog = viewer.data('dialog').uiDialog,
+
+        effectOut = {
+          direction: direction
+        },
+        effectIn = {
+          direction: {up:"down",down:"up",left:"right",right:"left"}[direction]
+        };
 
       if (!this.getCurrentAnchor()) {
         console.log('Called _rotate without an anchor');
@@ -376,20 +376,16 @@
         target = anchors.filter(selectorB)[0];
       }
 
-      dialog.hide(this.options.rotateOut, {
-        direction: direction
-      }, this.options.duration, function () {
-        viewer.dialog('option', 'close', self._rotateClose).dialog('close');
+      dialog.hide(this.options.rotateOut, effectOut, this.options.duration, function () {
+        viewer
+          .unbind('dialogclose.lightbox')
+          .bind('dialogclose.lightbox', self._rotateClose).dialog('close');
         self.setCurrentAnchor(target);
-        $(this).show(self.options.rotateIn, {
-          direction: {
-            up: "down",
-            down: "up",
-            left: "right",
-            right: "left"
-          }[direction]
-        }, self.options.duration, function () {
-          viewer.dialog('open').dialog('option', 'close', self._dialogClose);
+        $(this).show(self.options.rotateIn, effectIn, self.options.duration, function () {
+          viewer
+            .dialog('open')
+            .unbind('dialogclose.lightbox')
+            .bind('dialogclose.lightbox', self._dialogClose);
         });
       });
     },
@@ -402,7 +398,7 @@
     },
 
     _dialogClose: function (event, ui) {
-      $(this).empty().dialog('_lightbox').close();
+      $(this).empty().dialog('option', '_lightbox').close();
     },
 
     _element: function (type, clazz) {
