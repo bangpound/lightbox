@@ -60,9 +60,7 @@
 
         viewer.dialog('option', 'show', self.options.show);
 
-        content = self._loadContent(this);
         self.setCurrentAnchor(this);
-        self._display(content);
         return false;
       });
       $(document).keydown(function (event) {
@@ -162,6 +160,18 @@
     _anchors: function () {
       // if deemed necessary, cache selection here
       return this.element.find(this.options.selector);
+    },
+
+    _setData: function (key, value) {
+      switch (key) {
+      case "cursor":
+        this.options[key] = value;
+        content = this._loadContent(value);
+        this._display(content);
+        break;
+      }
+
+      $.widget.prototype._setData.apply(this, arguments);
     },
 
     _display: function (content) {
@@ -339,10 +349,10 @@
     },
 
     setCurrentAnchor: function (anchor) {
-      this._setData('currentAnchor', anchor);
+      this._setData('cursor', anchor);
     },
     getCurrentAnchor: function () {
-      return this._getData('currentAnchor');
+      return this._getData('cursor');
     },
 
     _rotate: function (selectorA, selectorB, direction) {
@@ -371,8 +381,6 @@
       viewer.dialog('option', 'hide', this.options.rotateOut(direction))
         .dialog('option', 'show', this.options.rotateIn(direction));
       this.setCurrentAnchor(target);
-      content = this._loadContent(target);
-      this._display(content);
     },
 
     _element: function (type, clazz) {
