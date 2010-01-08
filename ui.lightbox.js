@@ -27,7 +27,7 @@
         self.open(this);
       });
       $(document).keydown(function (event) {
-        if (!self.lightbox.dialog('isOpen')) {
+        if (!self.lightbox || !self.lightbox.dialog('isOpen')) {
           return;
         }
         switch (event.keyCode) {
