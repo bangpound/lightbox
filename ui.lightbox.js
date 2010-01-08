@@ -315,6 +315,10 @@
 
       elem.css(size);
 
+      if (ratio !== 1) {
+        elem.attr('width', '').attr('height', '');
+      }
+
       return { width: size.width + deltaContentWidth, height: size.height + deltaContentHeight + dialogTitlebarHeight };
     },
 
