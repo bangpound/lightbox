@@ -39,7 +39,7 @@
             self.lightbox
               .unbind('dialogclose.lightbox')
               .bind('dialogclose.lightbox', self._dialogClose)
-              .dialog('close')
+              .dialog('close');
             event.preventDefault();
           }
           break;
@@ -430,7 +430,7 @@
         options = {
           to: {
             width: thumb.width(),
-            height: thumb.height(),
+            height: thumb.height()
           },
           origin: [ offset.top - thumb.height(), offset.left - thumb.width() ],
           fade: true
