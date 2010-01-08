@@ -32,8 +32,15 @@
         }
         switch (event.keyCode) {
         case $.ui.keyCode.ESCAPE:
+          if (!self.lightbox.dialog('isOpen')) {
+            return;
+          }
           if (self.options.closeOnEscape) {
-            self.close();
+            self.lightbox
+              .unbind('dialogclose.lightbox')
+              .bind('dialogclose.lightbox', self._dialogClose)
+              .dialog('close')
+            event.preventDefault();
           }
           break;
         case $.ui.keyCode.LEFT:
