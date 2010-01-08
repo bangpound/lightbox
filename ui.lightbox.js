@@ -113,7 +113,8 @@
           var buttonPane = $(this).data('dialog').uiDialogButtonPane;
           $('button', buttonPane)
             .each(function (index, domElement) {
-              $(domElement).addClass('button-' + index);
+              var value = $(domElement).text().toLowerCase();
+              $(domElement).addClass('button-' + index +' button-' + value);
             });
         }
       });
