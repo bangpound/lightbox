@@ -132,9 +132,7 @@
     open: function (anchor) {
       var viewer = (this.lightbox = this._makeDialog());
 
-      this._showLoadingIndicator();
       this.setCurrentAnchor(anchor);
-      this._hideLoadingIndicator();
 
       viewer.dialog('option', 'show', this.options.show)
         .dialog('option', 'hide', this.options.hide)
@@ -173,8 +171,9 @@
       switch (key) {
       case "cursor":
         this.options[key] = value;
-        content = this._loadContent(value);
-        this._display(content);
+        this._showLoadingIndicator();
+        this._display(this._loadContent(value));
+        this._hideLoadingIndicator();
         break;
       }
 
@@ -365,8 +364,6 @@
         return;
       }
 
-      this._showLoadingIndicator();
-
       target = anchors.filter(selectorA + anchors.index(current) + ")" + selectorB)[0];
       if (!target && this.options.loop && anchors.length > 1) {
         target = anchors.filter(selectorB)[0];
@@ -377,7 +374,6 @@
         .dialog('close');
 
       this.setCurrentAnchor(target);
-      this._hideLoadingIndicator();
 
       viewer.dialog('option', 'hide', this.options.hide)
         .dialog('open');
