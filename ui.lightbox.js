@@ -32,7 +32,9 @@
         }
         switch (event.keyCode) {
         case $.ui.keyCode.ESCAPE:
-          self.close();
+          if (self.options.closeOnEscape) {
+            self.close();
+          }
           break;
         case $.ui.keyCode.LEFT:
           self.prev("left");
@@ -51,17 +53,6 @@
           event.preventDefault();
           break;
         }
-      });
-      $(window).resize(function () {
-        if (!self.lightbox.dialog('isOpen')) {
-          return;
-        }
-        var type = self._deriveType(self.getCurrentAnchor());
-
-        if (type == 'image') {
-          self._resize();
-        }
-        self.lightbox.dialog('option', 'position', self.options.position);
       });
       if ($.fn.mousewheel) {
         $(document).mousewheel(function (event, delta) {
