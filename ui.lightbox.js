@@ -105,24 +105,6 @@
       }
     },
 
-    _showLoadingIndicator: function () {
-      var self = this;
-
-      this.loadingIndicatorTimeout = setTimeout(function() {
-        if (!self.loadingIndicator) {
-          self.loadingIndicator = self._element("div", "ui-loading-indicator ui-corner-all").appendTo(document.body);
-        }
-        self.loadingIndicator.fadeIn("slow");
-      }, 250);
-    },
-
-    _hideLoadingIndicator: function () {
-      clearTimeout(this.loadingIndicatorTimeout);
-      if (this.loadingIndicator) {
-        this.loadingIndicator.hide();
-      }
-    },
-
     destroy: function () {
       (this.overlay && this.overlay.destroy());
       this.element
@@ -173,9 +155,9 @@
       switch (key) {
       case "cursor":
         this.options[key] = value;
-        this._showLoadingIndicator();
+        this.spinner = new $.ui.lightbox.spinner(this);
         this._display(this._loadContent(value));
-        this._hideLoadingIndicator();
+        this.spinner.destroy();
         break;
       }
 
@@ -431,6 +413,9 @@
     uuid: 0,
     overlay: function (dialog) {
       this.$el = $.ui.lightbox.overlay.create(dialog);
+    },
+    spinner: function (lightbox) {
+      this.$el = $.ui.lightbox.spinner.create(lightbox);
     }
   });
 
@@ -441,4 +426,29 @@
       $.ui.lightbox.overlay.destroy(this.$el);
     }
   });
+
+  $.extend($.ui.lightbox.spinner, {
+    instances: [],
+    create: function (lightbox) {
+      if (this.instances.length === 0) {
+        var $el = $('<div></div>').appendTo(document.body)
+          .addClass('ui-loading-indicator ui-corner-all').fadeIn("slow");
+
+        this.instances.push($el);
+        return $el;
+      };
+    },
+    destroy: function($el) {
+      this.instances.splice($.inArray(this.instances, $el), 1);
+
+      $el.remove();
+    }
+  });
+
+  $.extend($.ui.lightbox.spinner.prototype, {
+    destroy: function() {
+      $.ui.lightbox.spinner.destroy(this.$el);
+    }
+  });
+
 })(jQuery);
