@@ -268,7 +268,7 @@
 
     _calculateSize: function (content) {
       var width,height;
-      $.swap($(content).appendTo(document.body)[0], {
+      $.swap($(content).appendTo('<div>').appendTo(document.body)[0], {
         position: "absolute",
         visibility: "hidden",
         display: "block"
