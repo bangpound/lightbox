@@ -1,5 +1,5 @@
-/*globals document,window,$,jQuery */
-/*jslint white: true, onevar: true, undef: true, eqeqeq: true, plusplus: true, bitwise: true, regexp: true, strict: true, newcap: true, immed: true, indent: 2 */
+/*globals document,window,$,jQuery,Image */
+/*jslint white: true, browser: true, onevar: true, undef: true, eqeqeq: true, plusplus: true, bitwise: true, regexp: true, strict: true, newcap: true, immed: true, indent: 2 */
 
 "use strict";
 
@@ -19,63 +19,32 @@
 
   $.widget('ui.lightbox', {
     _init: function () {
-      var self = this,
-        lightbox = (this.lightbox = $('<div/>')
-          .dialog({
-            autoOpen: false,
-            closeOnEscape: this.options.closeOnEscape,
-            modal: this.options.overlay,
-            dialogClass: this.options.dialogClass,
-            position: this.options.position,
-            resizable: this.options.resizable,
-            draggable: this.options.draggable,
-            height: this.options.height,
-            width: this.options.width,
-            show: null,
-            hide: null,
-            open: function (event, ui) {
-              var type = self._deriveType(self.getCurrentAnchor());
-
-              $('.ui-dialog-buttonpane button', $(this).parents('.ui-dialog'))
-                .each(function (index, domElement) {
-                  $(domElement).addClass('button-' + index);
-                });
-              self._hideLoadingIndicator();
-            },
-            resize: function (event, ui) {
-              var type = self._deriveType(self.getCurrentAnchor());
-
-              if (type == 'image') {
-                self._resize();
-                $(this).dialog('option', 'position', self.options.position);
-              }
-            }
-          }));
+      var self = this;
 
       // consider event delegation to make this more dynamic
       $(this.options.selector, this.element).click(function (event) {
         event.preventDefault();
-        self._showLoadingIndicator();
-
-        var content,
-          viewer = self.lightbox;
-
-        content = self._loadContent(this);
-        self.setCurrentAnchor(this);
-        self.setContent(content);
-        self._display();
-        return false;
+        self.open(this);
       });
       $(document).keydown(function (event) {
-        if (!self.getCurrentAnchor()) {
+        if (!self.lightbox || !self.lightbox.dialog('isOpen')) {
           return;
         }
         switch (event.keyCode) {
         case $.ui.keyCode.ESCAPE:
-          self.close();
+          if (!self.lightbox.dialog('isOpen')) {
+            return;
+          }
+          if (self.options.closeOnEscape) {
+            self.lightbox
+              .unbind('dialogclose.lightbox')
+              .bind('dialogclose.lightbox', self._dialogClose)
+              .dialog('close')
+            event.preventDefault();
+          }
           break;
         case $.ui.keyCode.LEFT:
-          self.prev("left");
+          self.prev("right");
           event.preventDefault();
           break;
         case $.ui.keyCode.UP:
@@ -83,7 +52,7 @@
           event.preventDefault();
           break;
         case $.ui.keyCode.RIGHT:
-          self.next("right");
+          self.next("left");
           event.preventDefault();
           break;
         case $.ui.keyCode.DOWN:
@@ -92,24 +61,13 @@
           break;
         }
       });
-      $(window).resize(function () {
-        if (!self.getCurrentAnchor()) {
-          return;
-        }
-        var type = self._deriveType(self.getCurrentAnchor());
-
-        if (type == 'image') {
-          self._resize();
-        }
-        self.lightbox.dialog('option', 'position', self.options.position);
-      });
       if ($.fn.mousewheel) {
         $(document).mousewheel(function (event, delta) {
-          if (!self.getCurrentAnchor()) {
+          if (!self.lightbox.dialog('isOpen')) {
             return;
           }
           event.preventDefault();
-          if (self.viewerElement.is(":animated")) {
+          if (self.lightbox.is(":animated")) {
             return;
           }
           if (delta < 0) {
@@ -122,34 +80,94 @@
       }
     },
 
-    _showLoadingIndicator: function () {
-      var self = this;
-
-      this.loadingIndicatorTimeout = setTimeout(function() {
-        if (!self.loadingIndicator) {
-          self.loadingIndicator = self._element("div", "ui-loading-indicator ui-corner-all").appendTo(document.body);
+    _makeDialog: function () {
+      return $('<div/>').dialog({
+        autoOpen: false,
+        closeOnEscape: false,
+        modal: false,
+        show: null,
+        hide: null,
+        dialogClass: this.options.dialogClass,
+        position: this.options.position,
+        resizable: this.options.resizable,
+        draggable: this.options.draggable,
+        height: this.options.height,
+        width: this.options.width,
+        // TODO: Support overlay by implementing focus,dragstop,resizestop
+        open: function (event, ui) {
+          $('.ui-dialog-buttonpane button', $(this).parents('.ui-dialog'))
+            .each(function (index, domElement) {
+              $(domElement).addClass('button-' + index);
+            });
         }
-        self.loadingIndicator.fadeIn("slow");
-      }, 250);
+      });
     },
 
-    _hideLoadingIndicator: function () {
-      clearTimeout(this.loadingIndicatorTimeout);
-      if (this.loadingIndicator) {
-        this.loadingIndicator.hide();
+    _show: function (anchor) {
+      var thumb = $(anchor),
+        offset = thumb.offset(),
+        dialog = this.lightbox.data('dialog'),
+        start = {
+          left: offset.left,
+          top: offset.top,
+          width: thumb.width(),
+          height: thumb.height(),
+          opacity: 0
+        },
+        stop = {
+          left: $(dialog.uiDialog).css("left"),
+          top: $(dialog.uiDialog).css("top"),
+          width: $(dialog.uiDialog).width(),
+          height: $(dialog.uiDialog).height(),
+          opacity: 1
+        };
+      $(dialog.uiDialog).css(start).show('scale', { to: stop }, this.options.duration).animate(stop, this.options.duration);
+    },
+
+    _buttons: {
+      'Previous': function (eventObject) {
+        $(this).dialog('option', '_lightbox').prev("right");
+      },
+      'Next': function (eventObject) {
+        $(this).dialog('option', '_lightbox').next("left");
       }
+    },
+
+    destroy: function () {
+      (this.overlay && this.overlay.destroy());
+      this.element
+        .unbind('.lightbox')
+        .removeData('lightbox');
+
+      this._anchors().removeData('lightbox');
+    },
+
+    open: function (anchor) {
+      var viewer = (this.lightbox = this._makeDialog());
+
+      this.overlay = this.options.modal ? new $.ui.lightbox.overlay(viewer.data('dialog')) : null;
+      this._setData('cursor', anchor);
+
+      viewer.dialog('option', 'buttons', this._buttons)
+        .unbind('dialogclose.lightbox')
+        .bind('dialogclose.lightbox', this._dialogClose)
+        .dialog('open');
+
+      this._show(anchor);
+
+      viewer.dialog('option', '_lightbox', this);
+      this._preloadNeighbours();
     },
 
     close: function () {
-      if (!this.getCurrentAnchor()) {
-        return;
-      }
-      var self = this,
-        anchor = this.getCurrentAnchor(),
-        viewer = this.lightbox;
+      var viewer = this.lightbox;
+
+      (this.overlay && this.overlay.destroy());
+
+      $.ui.lightbox.overlay.resize();
 
       // TODO: these need to be destroyed with the widget.
-      viewer.dialog('close');
+      viewer.dialog('destroy').remove();
     },
 
     next: function (direction) {
@@ -165,55 +183,48 @@
       return this.element.find(this.options.selector);
     },
 
-    _display: function (direction) {
-      if (!this.getContent()) {
-        return;
+    _setData: function (key, value) {
+      if (key === 'cursor') {
+        this.options[key] = value;
+        this.spinner = new $.ui.lightbox.spinner(this);
+        this._display(this._loadContent(value));
+        this.spinner.destroy();
       }
 
-      var self = this,
-        visible = this.lightbox.dialog('isOpen'),
-        anchor = this.getCurrentAnchor(),
-        type = this._deriveType(this.getCurrentAnchor()),
-        content = this.getContent(),
-        viewer = this.lightbox;
+      $.widget.prototype._setData.apply(this, arguments);
+    },
+
+    _display: function (content) {
+      var anchor = this.options.cursor,
+        viewer = this.lightbox,
+        size = this._calculateSize(content),
+        $el = $(content).css(size).appendTo(viewer);
 
       viewer.dialog('option', 'title', $(anchor).attr('title') + this.options.titleSuffix);
+      viewer.dialog('option', this._resize($el, size.width, size.height));
+    },
 
-      viewer.empty();
-      viewer.append(content.show());
-      //self._resize();
-      if (visible && direction) {
-        this.options.rotateIn.call(viewer.data('dialog').uiDialog, {
-          up: "down",
-          down: "up",
-          left: "right",
-          right: "left"
-        }[direction]);
-      }
-      else {
-        self.options.show.call(viewer.data('dialog').uiDialog, anchor);
-      }
-      viewer.dialog('open');
-
-      // Default close animation. Rotate actions have opportunity to disable this.
-      viewer.dialog('option', 'beforeclose', function (event, ui) {
-        self.options.hide.call($(this).data('dialog').uiDialog, self.getCurrentAnchor(), function() {
-        });
-      });
+    _jQueryToString: function (input) {
+      return $('<div>').append($(input).clone().show()).remove().html();
     },
 
     _loadContent: function (anchor) {
       var self = this,
-        content = 'BUG',
-        type = this.options.type ? this.options.type : this._deriveType(anchor);
+        anchorData = $(anchor).data('lightbox') || {};
 
-      switch (type) {
+      if (!this.options.reset && anchorData.content) {
+        return anchorData.content;
+      }
+      else {
+        anchorData = {
+          content: 'BUG',
+          type: this.options.type ? this.options.type : this._deriveType(anchor)
+        };
+      }
+
+      switch (anchorData.type) {
       case "image":
-        content = this._element('img')
-          .attr("src", anchor.href)
-          .load(function (event) {
-            self.lightbox.dialog('option', 'position', self.options.position);
-          });
+        anchorData.content = this._jQueryToString($('<img/>').attr('src', anchor.href));
         break;
       case "flash":
       case "flashvideo":
@@ -227,18 +238,16 @@
           autoplay: 1
         }, function (element, options) {
         }, function (element, data, options, playerName) {
-          content = $(data).clone();
+          anchorData.content = self._jQueryToString(data);
           $(data).media('undo');
         });
         break;
       case "iframe":
-        content = this._element('iframe').attr('src', anchor.href).attr('frameborder', 0).attr('border', 0);
+        anchorData.content = this._element('iframe').attr('src', anchor.href).attr('frameborder', 0).attr('border', 0).html();
         break;
       case "html":
       case "dom":
-        var reference = $($(anchor).attr('href'));
-
-        content = $(reference).clone();
+        anchorData.content = this._jQueryToString($(anchor).attr('href'));
         break;
       case "ajax":
       case "script":
@@ -248,15 +257,19 @@
           cache: true,
           async: false,
           data: self.options.parameters,
-          dataType: (type === "ajax") ? "html" : "script",
+          dataType: (anchorData.type === "ajax") ? "html" : "script",
           success: function (data, textStatus) {
-            content = $(data);
+            anchorData.content = data;
           }
         });
         break;
       }
 
-      return content;
+      if (this.options.cache) {
+        $(anchor).data('lightbox', anchorData);
+      }
+
+      return anchorData.content;
     },
 
     _deriveType: function (anchor) {
@@ -284,9 +297,10 @@
 
     _preloadNeighbours: function () {
       var anchors = this._anchors(),
-        index = anchors.index(this.getCurrentAnchor());
-      anchors.filter(this._neighbours(anchors.length, index)).each(function () {
-        //new Image().src = this.href;
+        index = anchors.index(this.options.cursor),
+        self = this;
+      anchors.filter(this._neighbours(index, anchors.length)).each(function () {
+        self._loadContent(this);
       });
     },
 
@@ -297,107 +311,133 @@
     _position: function (img) {
     },
 
-    _resize: function () {
-      var content = this.getContent(),
-        viewer = this.lightbox,
-        dialog = this.lightbox.data('dialog'),
+    _calculateSize: function (content) {
+      var width, height;
+      $.swap($(content).appendTo('<div>').appendTo(document.body)[0], {
+        position: "absolute",
+        visibility: "hidden",
+        display: "block"
+      }, function () {
+        width = $(this).width();
+        height = $(this).height();
+        $(this).remove();
+      });
+      return { width: width, height: height };
+    },
+
+    _resize: function (elem, width, height) {
+      var viewer = this.lightbox,
+        dialog = viewer.data('dialog'),
         offset = 20,
-        type = this._deriveType(this.getCurrentAnchor()),
-        cWidth,cHeight,finalWidth,finalHeight,
+
         // difference
         deltaContentWidth = viewer.outerWidth() - viewer.width(),
         deltaContentHeight = viewer.outerHeight() - viewer.height(),
 
-        dialogTitlebarWidth = dialog.uiDialogTitlebar.outerWidth(),
         dialogTitlebarHeight = dialog.uiDialogTitlebar.outerHeight(),
 
         // Window
         wWidth = $(window).width(),
         wHeight = $(window).height(),
 
-        size = (this.size = {});
+        size = {width: width, height: height},
 
-      $.swap(content[0], {
-        position: "absolute",
-        visibility: "hidden",
-        display: "block"
-      }, function () {
-        cWidth = $(this).attr('width') || $(this).width(),
-        cHeight = $(this).attr('height') || $(this).height();
-      });
+        // Desired width
+        finalWidth = size.width + deltaContentWidth,
+        finalHeight = size.height + deltaContentHeight + dialogTitlebarHeight,
 
-      // Desired width
-      finalWidth = cWidth + deltaContentWidth,
-      finalHeight = cHeight + deltaContentHeight + dialogTitlebarHeight,
-
-      ratio = Math.min(
-        Math.min(
-          Math.min(wWidth - deltaContentWidth - offset, cWidth) / cWidth,
-          Math.min(wHeight - deltaContentHeight - dialogTitlebarHeight - offset, cHeight) / cHeight, 1)),
-
+        ratio = Math.min(
+          Math.min(
+            Math.min(wWidth - deltaContentWidth - offset, size.width) / size.width,
+            Math.min(wHeight - deltaContentHeight - dialogTitlebarHeight - offset, size.height) / size.height, 1));
 
       $.extend(size, {
-        width: Math.round(ratio * cWidth),
-        height: Math.round(ratio * cHeight)
+        width: Math.round(ratio * size.width),
+        height: Math.round(ratio * size.height)
       });
 
-      if (type == 'image') {
-        content.css('width', size.width);
-        content.css('height', size.height);
+      elem.css(size);
+
+      if (ratio !== 1) {
+        elem.attr('width', '').attr('height', '');
       }
 
-      viewer.dialog('option', 'width', size.width + deltaContentWidth);
-      viewer.dialog('option', 'height', size.height + deltaContentHeight + dialogTitlebarHeight);
-      viewer.css({
-        width: size.width + deltaContentWidth,
-        height: size.height + deltaContentHeight
-      });
-    },
+      finalWidth = size.width + deltaContentWidth;
+      finalHeight = size.height + deltaContentHeight + dialogTitlebarHeight;
 
-    setContent: function (content) {
-      this._setData('content', content);
-    },
-    getContent: function () {
-      return this._getData('content');
-    },
-
-    setCurrentAnchor: function (anchor) {
-      this._setData('currentAnchor', anchor);
-    },
-    getCurrentAnchor: function () {
-      return this._getData('currentAnchor');
+      return { width: finalWidth, height: finalHeight };
     },
 
     _rotate: function (selectorA, selectorB, direction) {
       var self = this,
-        content,
         anchors = this._anchors(),
-        target = current = this.getCurrentAnchor(),
-        viewer = this.lightbox;
+        current = this.options.cursor,
+        target = this.options.cursor,
+        viewer = this.lightbox,
+        dialog = viewer.data('dialog').uiDialog,
 
-      if (!this.getCurrentAnchor()) {
-        console.log('Called _rotate without an anchor');
-        return;
-      }
+        effectOut = {
+          direction: direction
+        },
+        effectIn = {
+          direction: { up: "down", down: "up", left: "right", right: "left" }[direction]
+        };
 
       if (anchors.length === 1) {
         return;
       }
-
-      this._showLoadingIndicator();
 
       target = anchors.filter(selectorA + anchors.index(current) + ")" + selectorB)[0];
       if (!target && this.options.loop && anchors.length > 1) {
         target = anchors.filter(selectorB)[0];
       }
 
-      this.options.rotateOut.call(viewer.data('dialog').uiDialog, direction, function() {
-        // Dialog's default close animation must be disabled.
-        viewer.dialog('option', 'beforeclose', null).dialog('close');
-        self.setCurrentAnchor(target);
-        content = self._loadContent(target);
-        self.setContent(content);
-        self._display(direction);
+      dialog.hide(this.options.rotateOut, effectOut, this.options.duration, function () {
+        viewer
+          .unbind('dialogclose.lightbox')
+          .bind('dialogclose.lightbox', self._rotateClose)
+          .dialog('close')
+          .unbind('dialogclose.lightbox');
+        self._setData('cursor', target);
+        self._preloadNeighbours();
+        $(this).show(self.options.rotateIn, effectIn, self.options.duration, function () {
+          viewer
+            .dialog('open')
+            .unbind('dialogclose.lightbox')
+            .bind('dialogclose.lightbox', self._dialogClose);
+        });
+      });
+    },
+
+
+    // Swappable dialog event handlers.
+
+    _rotateClose: function (event, ui) {
+      var lightbox = $(this).dialog('option', '_lightbox'),
+        dialog = $(lightbox.lightbox).data('dialog');
+
+      $(this).empty();
+      $(dialog.uiDialog).hide();
+    },
+
+    _dialogClose: function (event, ui) {
+      var self = this,
+        lightbox = $(this).dialog('option', '_lightbox'),
+        dialog = $(lightbox.lightbox).data('dialog'),
+
+        thumb = $(lightbox.options.cursor),
+        offset = thumb.offset(),
+        options = {
+          to: {
+            width: thumb.width(),
+            height: thumb.height(),
+          },
+          origin: [ offset.top - thumb.height(), offset.left - thumb.width() ],
+          fade: true
+        };
+
+      $(dialog.uiDialog).hide('scale', options, lightbox.options.duration, function () {
+        $(self).empty().dialog('option', '_lightbox').close();
       });
     },
 
@@ -409,7 +449,9 @@
   $.extend($.ui.lightbox, {
     defaults: {
       loop: true,
-      overlay: true,
+      modal: true,
+      overlay: {},
+      cache: true,
       post: 0,
       dialogClass: 'ui-lightbox',
       closeOnEscape: true,
@@ -421,52 +463,50 @@
       width: 'auto',
       height: 'auto',
       parameters: {},
+      duration: 1000,
+      rotateIn: 'drop',
+      rotateOut: 'drop',
+      show: '',
+      hide: ''
+    },
+    uuid: 0,
+    overlay: function (dialog) {
+      this.$el = $.ui.lightbox.overlay.create(dialog);
+    },
+    spinner: function (lightbox) {
+      this.$el = $.ui.lightbox.spinner.create(lightbox);
+    }
+  });
 
-      rotateIn: function(direction, finished) {
-        $(this).effect("drop", {
-          direction: direction,
-          mode: "show"
-        }, "normal", finished);
-      },
-      rotateOut: function(direction, finished) {
-        $(this).effect("drop", {
-          direction: direction
-        }, "normal", finished);
-      },
-      show: function (anchor) {
-        var thumb = $(anchor),
-          offset = thumb.offset();
-        // TODO refactor
-        var start = {
-          left: offset.left,
-          top: offset.top,
-          width: thumb.width(),
-          height: thumb.height(),
-          opacity: 0
-        }
-        var img = $(this);
-        var stop = {
-          left: img.css("left"),
-          top: img.css("top"),
-          width: img.width(),
-          height: img.height(),
-          opacity: 1
-        }
-        $(this).css(start).show().animate(stop);
-      },
-      hide: function (anchor, finished) {
-        var thumb = $(anchor),
-          offset = thumb.offset();
-        // TODO refactor (see above)
-        var stop = {
-          left: offset.left,
-          top: offset.top,
-          width: thumb.width(),
-          height: thumb.height(),
-          opacity: 0
-        }
-        $(this).animate(stop, finished);
+  $.extend($.ui.lightbox.overlay, $.ui.dialog.overlay, {});
+
+  $.extend($.ui.lightbox.overlay.prototype, $.ui.dialog.overlay.prototype, {
+    destroy: function () {
+      $.ui.lightbox.overlay.destroy(this.$el);
+    }
+  });
+
+  $.extend($.ui.lightbox.spinner, {
+    instances: [],
+    create: function (lightbox) {
+      if (this.instances.length === 0) {
+        var $el = $('<div></div>').appendTo(document.body)
+          .addClass('ui-loading-indicator ui-corner-all').fadeIn("slow");
+
+        this.instances.push($el);
+        return $el;
       }
+    },
+    destroy: function ($el) {
+      this.instances.splice($.inArray(this.instances, $el), 1);
+
+      $el.remove();
+    }
+  });
+
+  $.extend($.ui.lightbox.spinner.prototype, {
+    destroy: function () {
+      $.ui.lightbox.spinner.destroy(this.$el);
     }
   });
 
