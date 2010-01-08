@@ -21,7 +21,7 @@
     _init: function () {
       var self = this;
 
-      // consider event delegation to make this more dynamic
+      // todo: consider event delegation to make this more dynamic
       $(this.options.selector, this.element).click(function (event) {
         event.preventDefault();
         self.open(this);
@@ -471,6 +471,9 @@
     }
   });
 
+  /**
+   * Overlay
+   */
   $.extend($.ui.lightbox.overlay, $.ui.dialog.overlay, {});
 
   $.extend($.ui.lightbox.overlay.prototype, $.ui.dialog.overlay.prototype, {
@@ -479,6 +482,9 @@
     }
   });
 
+  /**
+   * Spinner
+   */
   $.extend($.ui.lightbox.spinner, {
     instances: [],
     create: function (lightbox) {
