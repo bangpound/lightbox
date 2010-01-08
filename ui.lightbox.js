@@ -119,25 +119,31 @@
       });
     },
 
+    _calculateOffset: function (anchor) {
+      var offset;
+      $.swap(anchor, { display: 'block' }, function () {
+        offset = $(this).offset();
+      });
+      return offset;
+    },
+
     _show: function (anchor) {
       var thumb = $(anchor),
-        offset = thumb.offset(),
+        offset = this._calculateOffset(anchor),
         dialog = this.lightbox.data('dialog'),
-        start = {
-          left: offset.left,
-          top: offset.top,
-          width: thumb.width(),
-          height: thumb.height(),
-          opacity: 0
-        },
-        stop = {
-          left: $(dialog.uiDialog).css("left"),
-          top: $(dialog.uiDialog).css("top"),
-          width: $(dialog.uiDialog).width(),
-          height: $(dialog.uiDialog).height(),
-          opacity: 1
+        options = {
+          from: {
+            width: thumb.width(),
+            height: thumb.height()
+          },
+          to: {
+            width: $(dialog.uiDialog).width(),
+            height: $(dialog.uiDialog).height()
+          },
+          origin: [ offset.top - thumb.height(), offset.left - thumb.width() ],
+          fade: true
         };
-      $(dialog.uiDialog).css(start).show(this.options.show, { to: stop }, this.options.duration).animate(stop, this.options.duration);
+      $(dialog.uiDialog).show(this.options.show, options, this.options.duration);
     },
 
     _buttons: {
@@ -441,11 +447,15 @@
         dialog = $(this).data('dialog'),
 
         thumb = $(lightbox.options.cursor),
-        offset = thumb.offset(),
+        offset = lightbox._calculateOffset(lightbox.options.cursor),
         options = {
           to: {
             width: thumb.width(),
             height: thumb.height()
+          },
+          from: {
+            width: $(dialog.uiDialog).width(),
+            height: $(dialog.uiDialog).height()
           },
           origin: [ offset.top - thumb.height(), offset.left - thumb.width() ],
           fade: true
