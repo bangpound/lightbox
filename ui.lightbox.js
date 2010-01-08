@@ -114,7 +114,7 @@
           height: $(dialog.uiDialog).height(),
           opacity: 1
         };
-      $(dialog.uiDialog).show('scale', { to: stop }, this.options.duration);
+      $(dialog.uiDialog).css(start).show('scale', { to: stop }, this.options.duration).animate(stop, this.options.duration);
     },
 
     _buttons: {
@@ -145,6 +145,8 @@
         .unbind('dialogclose.lightbox')
         .bind('dialogclose.lightbox', this._dialogClose)
         .dialog('open');
+
+      this._show(anchor);
 
       viewer.dialog('option', '_lightbox', this);
       this._preloadNeighbours();
