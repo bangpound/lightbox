@@ -169,6 +169,7 @@
         viewer = this.lightbox;
 
       viewer.dialog('option', 'title', $(anchor).attr('title') + this.options.titleSuffix);
+      viewer.dialog('option', this._calculateSize(content));
 
       viewer.html(content);
     },
@@ -265,6 +266,20 @@
     _position: function (img) {
     },
 
+    _calculateSize: function (content) {
+      var width,height;
+      $.swap($(content).appendTo(document.body)[0], {
+        position: "absolute",
+        visibility: "hidden",
+        display: "block"
+      }, function () {
+        width = $(this).width(),
+        height = $(this).height();
+        $(this).remove();
+      });
+      return { width: width, height: height };
+    },
+
     _resize: function (content) {
       var viewer = this.lightbox,
         dialog = this.lightbox.data('dialog'),
@@ -282,30 +297,21 @@
         wWidth = $(window).width(),
         wHeight = $(window).height(),
 
-        size = (this.size = {});
-
-      $.swap(content[0], {
-        position: "absolute",
-        visibility: "hidden",
-        display: "block"
-      }, function () {
-        cWidth = $(this).attr('width') || $(this).width(),
-        cHeight = $(this).attr('height') || $(this).height();
-      });
+        size = _calculateSize(content);
 
       // Desired width
-      finalWidth = cWidth + deltaContentWidth,
-      finalHeight = cHeight + deltaContentHeight + dialogTitlebarHeight,
+      finalWidth = size.width + deltaContentWidth,
+      finalHeight = size.height + deltaContentHeight + dialogTitlebarHeight,
 
       ratio = Math.min(
         Math.min(
-          Math.min(wWidth - deltaContentWidth - offset, cWidth) / cWidth,
-          Math.min(wHeight - deltaContentHeight - dialogTitlebarHeight - offset, cHeight) / cHeight, 1)),
+          Math.min(wWidth - deltaContentWidth - offset, size.width) / size.width,
+          Math.min(wHeight - deltaContentHeight - dialogTitlebarHeight - offset, size.height) / size.height, 1)),
 
 
       $.extend(size, {
-        width: Math.round(ratio * cWidth),
-        height: Math.round(ratio * cHeight)
+        width: Math.round(ratio * size.width),
+        height: Math.round(ratio * size.height)
       });
 
       if (type == 'image') {
