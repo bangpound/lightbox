@@ -78,6 +78,8 @@
         autoOpen: false,
         closeOnEscape: false,
         modal: false,
+        show: null,
+        hide: null,
         dialogClass: this.options.dialogClass,
         position: this.options.position,
         resizable: this.options.resizable,
