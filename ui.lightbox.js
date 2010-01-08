@@ -110,6 +110,8 @@
       this.element
         .unbind('.lightbox')
         .removeData('lightbox');
+
+      this._anchors().removeData('lightbox');
     },
 
     open: function (anchor) {
@@ -123,6 +125,7 @@
         .dialog('open');
 
       viewer.dialog('option', '_lightbox', this);
+      this._preloadNeighbours();
     },
 
     close: function () {
@@ -150,6 +153,9 @@
     },
 
     _setData: function (key, value) {
+      var anchorData = $(value).data('lightbox') || {},
+        content;
+
       if (key === 'cursor') {
         this.options[key] = value;
         this.spinner = new $.ui.lightbox.spinner(this);
@@ -170,15 +176,27 @@
       viewer.dialog('option', this._resize($el, size.width, size.height));
     },
 
+    _jQueryToString: function (input) {
+      return $('<div>').append($(input).clone().show()).remove().html();
+    },
+
     _loadContent: function (anchor) {
       var self = this,
-        content = 'BUG',
-        type = this.options.type ? this.options.type : this._deriveType(anchor);
+        anchorData = $(anchor).data('lightbox') || {};
 
-      switch (type) {
+      if (!this.options.reset && anchorData.content) {
+        return anchorData.content;
+      }
+      else {
+        anchorData = {
+          content: 'BUG',
+          type: this.options.type ? this.options.type : this._deriveType(anchor)
+        };
+      }
+
+      switch (anchorData.type) {
       case "image":
-        content = new Image();
-        content.src = anchor.href;
+        anchorData.content = this._jQueryToString($('<img/>').attr('src', anchor.href));
         break;
       case "flash":
       case "flashvideo":
@@ -192,16 +210,16 @@
           autoplay: 1
         }, function (element, options) {
         }, function (element, data, options, playerName) {
-          content = $(data).html();
-          $(data).media('undo');
+          anchorData.content = this._jQueryToString(data);
+          $(this).media('undo');
         });
         break;
       case "iframe":
-        content = this._element('iframe').attr('src', anchor.href).attr('frameborder', 0).attr('border', 0).html();
+        anchorData.content = this._element('iframe').attr('src', anchor.href).attr('frameborder', 0).attr('border', 0).html();
         break;
       case "html":
       case "dom":
-        content = $('<div>').append($(anchor.href).clone().show()).remove().html();
+        anchorData.content = this._jQueryToString(anchor.href);
         break;
       case "ajax":
       case "script":
@@ -211,15 +229,19 @@
           cache: true,
           async: false,
           data: self.options.parameters,
-          dataType: (type === "ajax") ? "html" : "script",
+          dataType: (anchorData.type === "ajax") ? "html" : "script",
           success: function (data, textStatus) {
-            content = data;
+            anchorData.content = data;
           }
         });
         break;
       }
 
-      return content;
+      if (this.options.cache) {
+        $(anchor).data('lightbox', anchorData);
+      }
+
+      return anchorData.content;
     },
 
     _deriveType: function (anchor) {
@@ -354,6 +376,7 @@
           .unbind('dialogclose.lightbox')
           .bind('dialogclose.lightbox', self._rotateClose).dialog('close');
         self.setCurrentAnchor(target);
+        self._preloadNeighbours();
         $(this).show(self.options.rotateIn, effectIn, self.options.duration, function () {
           viewer
             .dialog('open')
@@ -384,6 +407,7 @@
       loop: true,
       modal: true,
       overlay: {},
+      cache: true,
       post: 0,
       dialogClass: 'ui-lightbox',
       closeOnEscape: true,
