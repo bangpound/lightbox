@@ -137,6 +137,12 @@
       }
     },
 
+    destroy: function () {
+      this.element
+        .unbind('.lightbox')
+        .removeData('lightbox');
+    },
+
     close: function () {
       if (!this.lightbox.dialog('isOpen')) {
         return;
