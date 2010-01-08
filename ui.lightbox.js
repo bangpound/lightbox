@@ -269,9 +269,10 @@
 
     _preloadNeighbours: function () {
       var anchors = this._anchors(),
-        index = anchors.index(this.getCurrentAnchor());
-      anchors.filter(this._neighbours(anchors.length, index)).each(function () {
-        //new Image().src = this.href;
+        index = anchors.index(this.getCurrentAnchor()),
+        self = this;
+      anchors.filter(this._neighbours(index, anchors.length)).each(function () {
+        self._loadContent(this);
       });
     },
 
