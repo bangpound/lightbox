@@ -463,7 +463,7 @@
       width: 'auto',
       height: 'auto',
       parameters: {},
-      duration: 1000,
+      duration: 400,
       rotateIn: 'drop',
       rotateOut: 'drop',
       show: '',
