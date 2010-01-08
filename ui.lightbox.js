@@ -429,8 +429,7 @@
     // Swappable dialog event handlers.
 
     _rotateClose: function (event, ui) {
-      var lightbox = $(this).dialog('option', '_lightbox'),
-        dialog = $(this).data('dialog');
+      var dialog = $(this).data('dialog');
 
       $(this).empty();
       $(dialog.uiDialog).hide();
@@ -453,7 +452,7 @@
         };
 
       $(dialog.uiDialog).hide('scale', options, lightbox.options.duration, function () {
-        $(self).empty()
+        $(self).empty();
         lightbox.close();
       });
     }
