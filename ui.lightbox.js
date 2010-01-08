@@ -137,7 +137,7 @@
           height: $(dialog.uiDialog).height(),
           opacity: 1
         };
-      $(dialog.uiDialog).css(start).show('scale', { to: stop }, this.options.duration).animate(stop, this.options.duration);
+      $(dialog.uiDialog).css(start).show(this.options.show, { to: stop }, this.options.duration).animate(stop, this.options.duration);
     },
 
     _buttons: {
@@ -451,7 +451,7 @@
           fade: true
         };
 
-      $(dialog.uiDialog).hide('scale', options, lightbox.options.duration, function () {
+      $(dialog.uiDialog).hide(lightbox.options.hide, options, lightbox.options.duration, function () {
         $(self).empty();
         lightbox.close();
       });
@@ -478,8 +478,8 @@
       duration: 400,
       rotateIn: 'drop',
       rotateOut: 'drop',
-      show: '',
-      hide: ''
+      show: 'scale',
+      hide: 'scale'
     },
     uuid: 0,
     overlay: function (dialog) {
