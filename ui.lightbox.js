@@ -251,7 +251,9 @@
 
       switch (anchorData.type) {
       case "image":
-        anchorData.content = this._jQueryToString($('<img/>').attr('src', anchor.href));
+        anchorData.content = $('<img/>').attr('src', anchor.href).load(function (eventObject) {
+
+        });
         break;
       case "flash":
       case "flashvideo":
@@ -265,16 +267,16 @@
           autoplay: 1
         }, function (element, options) {
         }, function (element, data, options, playerName) {
-          anchorData.content = self._jQueryToString(data);
+          anchorData.content = $(data);
           $(data).media('undo');
         });
         break;
       case "iframe":
-        anchorData.content = this._jQueryToString($('iframe').attr('src', anchor.href).attr('frameborder', 0).attr('border', 0));
+        anchorData.content = $('iframe').attr('src', anchor.href).attr('frameborder', 0).attr('border', 0);
         break;
       case "html":
       case "dom":
-        anchorData.content = this._jQueryToString($(anchor).attr('href'));
+        anchorData.content = $(anchor).attr('href');
         break;
       case "ajax":
       case "script":
@@ -286,7 +288,7 @@
           data: self.options.parameters,
           dataType: (anchorData.type === "ajax") ? "html" : "script",
           success: function (data, textStatus) {
-            anchorData.content = data;
+            anchorData.content = $(data);
           }
         });
         break;
