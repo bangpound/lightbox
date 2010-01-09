@@ -224,11 +224,11 @@
     _display: function (content) {
       var anchor = this.options.cursor,
         viewer = this.lightbox,
-        size = this._calculateSize(content),
-        $el = $(content).css(size).appendTo(viewer);
+        content = (this.content = $(content));
+
+      content.appendTo(viewer);
 
       viewer.dialog('option', 'title', $(anchor).attr('title') + this.options.titleSuffix);
-      viewer.dialog('option', this._resize($el, size.width, size.height));
     },
 
     _jQueryToString: function (input) {
