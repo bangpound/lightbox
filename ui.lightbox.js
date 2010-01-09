@@ -107,16 +107,8 @@
         resizable: this.options.resizable,
         draggable: this.options.draggable,
         height: this.options.height,
-        width: this.options.width,
+        width: this.options.width
         // TODO: Support overlay by implementing focus,dragstop,resizestop
-        open: function (event, ui) {
-          var buttonPane = $(this).data('dialog').uiDialogButtonPane;
-          $('button', buttonPane)
-            .each(function (index, domElement) {
-              var value = $(domElement).text().toLowerCase();
-              $(domElement).addClass('button-' + index +' button-' + value);
-            });
-        }
       });
     },
 
@@ -166,7 +158,8 @@
     },
 
     open: function (anchor) {
-      var viewer = (this.lightbox = this._makeDialog());
+      var viewer = (this.lightbox = this._makeDialog()),
+        buttonPane = viewer.data('dialog').uiDialogButtonPane;
 
       this.overlay = this.options.modal ? new $.ui.lightbox.overlay(viewer.data('dialog')) : null;
       this._setData('cursor', anchor);
@@ -178,10 +171,19 @@
 
       this._show(anchor);
 
+      this._setupButtons(buttonPane);
+
       // The ui.dialog widget has a reference to the ui.lightbox widget that
       // opened it in the dialog's options._lightbox property.
       viewer.dialog('option', '_lightbox', this);
       this._preloadNeighbours();
+    },
+
+    _setupButtons: function (pane) {
+      $('button', pane).each(function (index, domElement) {
+        var value = $(domElement).text().toLowerCase();
+        $(domElement).addClass('button-' + index + ' button-' + value);
+      });
     },
 
     close: function () {
