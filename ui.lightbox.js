@@ -269,7 +269,7 @@
         });
         break;
       case "iframe":
-        anchorData.content = this.__jQueryToString($('iframe').attr('src', anchor.href).attr('frameborder', 0).attr('border', 0));
+        anchorData.content = this._jQueryToString($('iframe').attr('src', anchor.href).attr('frameborder', 0).attr('border', 0));
         break;
       case "html":
       case "dom":
