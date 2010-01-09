@@ -109,7 +109,7 @@
         height: this.options.height,
         width: this.options.width
         // TODO: Support overlay by implementing focus,dragstop,resizestop
-      });
+      }).dialog('option', '_lightbox', this);
     },
 
     _calculateOffset: function (anchor) {
@@ -175,7 +175,6 @@
 
       // The ui.dialog widget has a reference to the ui.lightbox widget that
       // opened it in the dialog's options._lightbox property.
-      viewer.dialog('option', '_lightbox', this);
       this._preloadNeighbours();
     },
 
