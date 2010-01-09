@@ -96,7 +96,7 @@
     },
 
     _makeDialog: function () {
-      return $('<div/>').dialog({
+      var lightbox = $('<div/>').dialog({
         autoOpen: false,
         closeOnEscape: false,
         modal: false,
@@ -110,6 +110,7 @@
         width: this.options.width
         // TODO: Support overlay by implementing focus,dragstop,resizestop
       }).dialog('option', '_lightbox', this);
+      return lightbox;
     },
 
     _calculateOffset: function (anchor) {
