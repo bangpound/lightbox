@@ -335,7 +335,9 @@
       return ":eq(" + (index === 0 ? length - 1 : index - 1) + "), :eq(" + (index === length - 1 ? 0 : index + 1) + ")";
     },
 
-    _calculateSize: function (content) {
+    // Sizing functions
+
+    _actualContentSize: function (content) {
       var width, height;
       $.swap($(content).appendTo('<div>').appendTo(document.body)[0], {
         position: "absolute",
@@ -349,47 +351,39 @@
       return { width: width, height: height };
     },
 
-    _resize: function (elem, width, height) {
-      var viewer = this.lightbox,
-        dialog = viewer.data('dialog'),
-        offset = 20,
-
-        // difference
-        deltaContentWidth = viewer.outerWidth() - viewer.width(),
-        deltaContentHeight = viewer.outerHeight() - viewer.height(),
-
-        dialogTitlebarHeight = dialog.uiDialogTitlebar.outerHeight(),
-
-        // Window
+    _idealContentSize: function (width, height) {
+      var container = this.lightbox.data('dialog').uiDialogContainer,
+        titlebar = this.lightbox.data('dialog').uiDialogTitlebar,
+        buttonPane = this.lightbox.data('dialog').uiDialogButtonPane,
+        dialog = this.lightbox.data('dialog').uiDialog,
+        content = this.lightbox,
         wWidth = $(window).width(),
         wHeight = $(window).height(),
+        tbMargin = 0,
+        lrMargin = 0,
+        ratio = 1;
 
-        size = {width: width, height: height},
+      tbMargin += $(titlebar).outerHeight();
+      // Subtract the buttonpane here.
+      tbMargin += $(buttonPane).outerHeight();
+      tbMargin += $(dialog).outerHeight() - $(dialog).height();
+      tbMargin += $(content).outerHeight() - $(content).height();
 
-        // Desired width
-        finalWidth = size.width + deltaContentWidth,
-        finalHeight = size.height + deltaContentHeight + dialogTitlebarHeight,
+      lrMargin += $(content).outerWidth() - $(content).width();
 
-        ratio = Math.min(
-          Math.min(
-            Math.min(wWidth - deltaContentWidth - offset, size.width) / size.width,
-            Math.min(wHeight - deltaContentHeight - dialogTitlebarHeight - offset, size.height) / size.height, 1));
+      // Window real estate is taken by dialog chrome.
+      wWidth = wWidth - lrMargin;
+      wHeight = wHeight - tbMargin;
 
-      $.extend(size, {
-        width: Math.round(ratio * size.width),
-        height: Math.round(ratio * size.height)
-      });
+      ratio = Math.min(
+        Math.min(
+          Math.min(wWidth, width) / width,
+          Math.min(wHeight, height) / height, 1));
 
-      elem.css(size);
-
-      if (ratio !== 1) {
-        elem.attr('width', '').attr('height', '');
+      return {
+        width: Math.round(ratio * width),
+        height: Math.round(ratio * height)
       }
-
-      finalWidth = size.width + deltaContentWidth;
-      finalHeight = size.height + deltaContentHeight + dialogTitlebarHeight;
-
-      return { width: finalWidth, height: finalHeight };
     },
 
     _rotate: function (selectorA, selectorB, direction) {
@@ -432,7 +426,6 @@
         });
       });
     },
-
 
     // Swappable dialog event handlers.
 
