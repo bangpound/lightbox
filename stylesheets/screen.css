@@ -156,7 +156,7 @@ body { margin-top: 36px; margin-bottom: 36px; background-color: #eee; }
 
 #container { width: 590px; margin: 0 auto; overflow: hidden; display: inline-block; border-radius: 5px; -moz-border-radius: 5px; -webkit-border-radius: 5px; /* Webkit (Safari, Chrome) */ -webkit-box-shadow: #333333 1px 1px 5px; /* Gecko (Firefox, Camino) */ -moz-box-shadow: #333333 1px 1px 5px; /* CSS3 */ box-shadow: #333333 1px 1px 5px; background-color: white; padding: 18px; }
 #container { display: block; }
-#container .section { overflow: hidden; display: inline-block; background: url('../images/grid.png?1262803280'); }
+#container .section { overflow: hidden; display: inline-block; background: url('../images/grid.png?1262983969'); }
 #container .section { display: block; }
 
 h1 { display: inline; float: left; margin-right: 10px; width: 390px; font-size: 6em; line-height: 1.25em; height: 1.25em; margin-bottom: 0; }
@@ -191,7 +191,8 @@ hr { padding-right: 29px; margin-right: 30px; border-right: 1px solid #eeeeee; }
 * html #gallery, * html #youtube, * html #quicktime { overflow-x: hidden; }
 #gallery h2, #gallery p.usage, #youtube h2, #youtube p.usage, #quicktime h2, #quicktime p.usage { display: inline; float: left; position: relative; margin-left: -200px; }
 #gallery h2, #youtube h2, #quicktime h2 { margin-top: 18px; margin-bottom: 0; }
-#gallery p.usage, #youtube p.usage, #quicktime p.usage { padding-top: 54px; margin-bottom: 0; white-space: pre; }
+#gallery p.usage, #youtube p.usage, #quicktime p.usage { display: inline; float: left; margin-right: 10px; width: 190px; padding-top: 54px; margin-bottom: 0; }
+* html #gallery p.usage, * html #youtube p.usage, * html #quicktime p.usage { overflow-x: hidden; }
 #gallery ul, #youtube ul, #quicktime ul { margin: 0; padding: 0; border: 0; outline: 0; }
 #gallery ul li, #youtube ul li, #quicktime ul li { display: inline; float: left; margin-right: 10px; width: 90px; line-height: 90px; text-align: center; }
 * html #gallery ul li, * html #youtube ul li, * html #quicktime ul li { overflow-x: hidden; }
