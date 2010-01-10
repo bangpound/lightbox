@@ -510,7 +510,7 @@
         anchorStyle = lightbox._anchorStyle(lightbox.options.cursor),
         lightboxStyle = lightbox._lightboxStyle(dialog, contentSize);
 
-      lightbox._resizeContent();
+      lightbox.content.effect('size', { from: { width: '0', height: 0 }, to: size }, lightbox.options.duration);
 
       $(dialog.uiDialog).css(anchorStyle).show().animate(lightboxStyle, lightbox.options.duration);
     },
