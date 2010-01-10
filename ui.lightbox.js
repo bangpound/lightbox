@@ -66,7 +66,7 @@
           event.preventDefault();
           break;
         case $.ui.keyCode.UP:
-          self.prev("up");
+          self.prev("down");
           event.preventDefault();
           break;
         case $.ui.keyCode.RIGHT:
@@ -74,7 +74,7 @@
           event.preventDefault();
           break;
         case $.ui.keyCode.DOWN:
-          self.next("down");
+          self.next("up");
           event.preventDefault();
           break;
         }
