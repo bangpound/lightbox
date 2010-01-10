@@ -17,6 +17,9 @@
  */
 (function ($) {
 
+  /**
+   * Lightbox
+   */
   $.widget('ui.lightbox', {
     /**
      * Moving parts of jQuery UI Lightbox widget.
