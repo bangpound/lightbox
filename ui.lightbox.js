@@ -117,7 +117,13 @@
       }),
         dialog = lightbox.data('dialog'),
         height = dialog.uiDialog.innerHeight(),
-        width = dialog.uiDialog.innerWidth();
+        width = dialog.uiDialog.innerWidth(),
+        buttonPane = lightbox.data('dialog').uiDialogButtonPane;
+
+      $('button', buttonPane).each(function (index, domElement) {
+        var value = $(domElement).text().toLowerCase();
+        $(domElement).addClass('button-' + index + ' button-' + value);
+      });
 
       lightbox.dialog('option', {
         _lightbox: this,
@@ -127,12 +133,41 @@
       return lightbox;
     },
 
-    _resizeContent: function () {
-      var content = this.content,
-        contentSize = this._actualContentSize(this.content),
-        size = this._idealContentSize(contentSize.width, contentSize.height);
+    _getData: function (key) {
+      switch (key) {
+      case 'content':
+        return $(this.lightbox).html();
 
-      content.effect('size', { to: size }, this.options.duration);
+      case 'cursor':
+        return $(this.options.cursor);
+
+      default:
+        return this.lightbox.dialog('option', key);
+      }
+    },
+
+    _setData: function (key, value) {
+      switch (key) {
+      case 'content':
+        if (!this.lightbox) {
+          this.lightbox = this._makeDialog();
+        }
+        else if (this.lightbox.dialog('isOpen')) {
+          $(this.lightbox).dialog('close');
+        }
+        this.options.content = $(this.lightbox).append(value);
+        this.lightbox.dialog('open');
+        break;
+      case 'cursor':
+        this.options.cursor = value;
+        $('.active', this).removeClass('active');
+        $(value).addClass('active');
+        break;
+      default:
+        this.lightbox.dialog(key, value);
+      }
+
+      $.widget.prototype._setData.apply(this, arguments);
     },
 
     _position: function (size, pos) {
@@ -216,20 +251,11 @@
       this.overlay = this.options.modal ? new $.ui.lightbox.overlay(viewer.data('dialog')) : null;
       this._setData('cursor', anchor);
 
-      this._setupButtons(buttonPane);
-
-      viewer.append(this._loadContent(anchor)).dialog('open');
+      this._setData('content', this._loadContent(anchor));
 
       // The ui.dialog widget has a reference to the ui.lightbox widget that
       // opened it in the dialog's options._lightbox property.
       this._preloadNeighbours();
-    },
-
-    _setupButtons: function (pane) {
-      $('button', pane).each(function (index, domElement) {
-        var value = $(domElement).text().toLowerCase();
-        $(domElement).addClass('button-' + index + ' button-' + value);
-      });
     },
 
     close: function () {
@@ -254,15 +280,6 @@
     _anchors: function () {
       // if deemed necessary, cache selection here
       return this.element.find(this.options.selector);
-    },
-
-    _display: function (content) {
-      var anchor = this.options.cursor,
-        viewer = this.lightbox;
-
-      this.content = $(content).appendTo(viewer);
-
-      viewer.dialog('option', 'title', $(anchor).attr('title') + this.options.titleSuffix);
     },
 
     _loadContent: function (anchor) {
@@ -293,7 +310,7 @@
       case "quicktime":
       case "realplayer":
       case "windowsmedia":
-        $(anchor).media({
+        $(anchor).clone().appendTo(document.body).media({
           width: this.options.width,
           height: this.options.height,
           src: anchor.href,
@@ -301,15 +318,14 @@
         }, function (element, options) {
         }, function (element, data, options, playerName) {
           anchorData.content = $(data);
-          $(data).media('undo');
-        });
+        }).remove();
         break;
       case "iframe":
         anchorData.content = $('<iframe/>').attr('src', anchor.href).attr('frameborder', 0).attr('border', 0);
         break;
       case "html":
       case "dom":
-        anchorData.content = $(anchor).attr('href');
+        anchorData.content = $($(anchor).attr('href'));
         break;
       case "ajax":
       case "script":
@@ -399,8 +415,8 @@
 
       // Window real estate is taken by dialog chrome.
       // todo: set up offset option.
-      wWidth = wWidth - tbMargin - 20;
-      wHeight = wHeight - lrMargin - 20;
+      wWidth = wWidth - tbMargin - this.options.margin;
+      wHeight = wHeight - lrMargin - this.options.margin;
 
       ratio = Math.min(
         Math.min(
@@ -436,13 +452,14 @@
 
       this.lightbox = newViewer;
 
+      newViewer
+        .unbind('dialogopen.lightbox')
+        .bind('dialogopen.lightbox', { direction: direction }, this._rotateOpen);
+
       this._setData('cursor', target);
+      this._setData('content', this._loadContent(target));
 
       newViewer
-        .append(this._loadContent(target))
-        .unbind('dialogopen.lightbox')
-        .bind('dialogopen.lightbox', { direction: direction }, this._rotateOpen)
-        .dialog('open')
         .bind('dialogopen.lightbox', this._dialogOpen)
         .bind('dialogclose.lightbox', this._dialogClose);
 
@@ -556,7 +573,8 @@
       rotateIn: 'drop',
       rotateOut: 'drop',
       show: 'scale',
-      hide: 'scale'
+      hide: 'scale',
+      margin: 100
     },
     uuid: 0,
     overlay: function (dialog) {
@@ -585,7 +603,7 @@
     instances: [],
     create: function (lightbox) {
       if (this.instances.length === 0) {
-        var $el = $('<div></div>').appendTo(document.body)
+        var $el = $('<div/>').appendTo(document.body)
           .addClass('ui-loading-indicator ui-corner-all').fadeIn("slow");
 
         this.instances.push($el);
