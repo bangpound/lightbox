@@ -134,29 +134,6 @@
       return offset;
     },
 
-    _dialogOpen: function (event, ui) {
-      var lightbox = $(this).dialog('option', '_lightbox'),
-        contentSize = lightbox._actualContentSize(lightbox.content),
-        size = lightbox._idealContentSize(contentSize.width, contentSize.height),
-        thumb = $(lightbox.options.cursor),
-        offset = lightbox._calculateOffset(lightbox.options.cursor),
-        dialog = $(this).data('dialog'),
-        options = {
-          from: {
-            width: thumb.width(),
-            height: thumb.height()
-          },
-          to: size,
-          origin: [ offset.top - thumb.height(), offset.left - thumb.width() ],
-          fade: true
-        };
-
-      lightbox._resizeContent();
-      $(this).css(size);
-      $(dialog.uiDialog).css(lightbox._position(lightbox.options.position));
-      $(dialog.uiDialog).show(lightbox.options.show, options, lightbox.options.duration);
-    },
-
     _resizeContent: function () {
       var content = this.content,
         contentSize = this._actualContentSize(this.content),
@@ -528,6 +505,29 @@
 
       $(this).empty();
       $(dialog.uiDialog).hide();
+    },
+
+    _dialogOpen: function (event, ui) {
+      var lightbox = $(this).dialog('option', '_lightbox'),
+        contentSize = lightbox._actualContentSize(lightbox.content),
+        size = lightbox._idealContentSize(contentSize.width, contentSize.height),
+        thumb = $(lightbox.options.cursor),
+        offset = lightbox._calculateOffset(lightbox.options.cursor),
+        dialog = $(this).data('dialog'),
+        options = {
+          from: {
+            width: thumb.width(),
+            height: thumb.height()
+          },
+          to: size,
+          origin: [ offset.top - thumb.height(), offset.left - thumb.width() ],
+          fade: true
+        };
+
+      lightbox._resizeContent();
+      $(this).css(size);
+      $(dialog.uiDialog).css(lightbox._position(lightbox.options.position));
+      $(dialog.uiDialog).show(lightbox.options.show, options, lightbox.options.duration);
     },
 
     _dialogClose: function (event, ui) {
