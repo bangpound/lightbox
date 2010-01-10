@@ -112,7 +112,7 @@
         dialogClass: this.options.dialogClass,
         resizable: this.options.resizable,
         draggable: this.options.draggable,
-        buttons: (this._anchors().length > 1) ? this._buttons : {},
+        buttons: (this._anchors().length > 1) ? this._buttons : {}
         // TODO: Support overlay by implementing focus,dragstop,resizestop
       }),
         dialog = lightbox.data('dialog'),
@@ -504,8 +504,7 @@
     },
 
     _anchorStyle: function (anchor) {
-      var thumb = $(anchor),
-        offset = {},
+      var offset = {},
         size = {};
 
       $.swap(anchor, { display: 'block' }, function () {
