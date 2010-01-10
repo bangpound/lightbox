@@ -431,19 +431,10 @@
     },
 
     _rotate: function (selectorA, selectorB, direction) {
-      var self = this,
-        anchors = this._anchors(),
+      var anchors = this._anchors(),
         current = this.options.cursor,
         target = this.options.cursor,
-        viewer = this.lightbox,
-        dialog = viewer.data('dialog'),
-
-        effectOut = {
-          direction: direction
-        },
-        effectIn = {
-          direction: { up: "down", down: "up", left: "right", right: "left" }[direction]
-        };
+        viewer = this.lightbox;
 
       if (anchors.length === 1) {
         return;
@@ -454,52 +445,46 @@
         target = anchors.filter(selectorB)[0];
       }
 
-      $(dialog.uiDialog).hide(this.options.rotateOut, effectOut, this.options.duration, function () {
-        viewer
-          .unbind('dialogopen.lightbox')
-          .unbind('dialogclose.lightbox')
-          .bind('dialogopen.lightbox', self._rotateOpen)
-          .bind('dialogclose.lightbox', self._rotateClose)
-          .dialog('close');
-        self._setData('cursor', target);
-        self._preloadNeighbours();
-        $(this).show(self.options.rotateIn, effectIn, self.options.duration, function () {
-          viewer
-            .dialog('open')
-            .unbind('dialogopen.lightbox')
-            .unbind('dialogclose.lightbox')
-            .bind('dialogopen.lightbox', self._dialogOpen)
-            .bind('dialogclose.lightbox', self._dialogClose);
-        });
-      });
+      viewer
+        .dialog('option', '_lightboxRotate', direction)
+        .unbind('dialogopen.lightbox')
+        .unbind('dialogclose.lightbox')
+        .bind('dialogopen.lightbox', this._rotateOpen)
+        .bind('dialogclose.lightbox', this._rotateClose)
+        .dialog('close');
+      this._setData('cursor', target);
+      viewer
+        .dialog('open')
+        .unbind('dialogopen.lightbox')
+        .unbind('dialogclose.lightbox')
+        .bind('dialogopen.lightbox', this._dialogOpen)
+        .bind('dialogclose.lightbox', this._dialogClose);
+      this._preloadNeighbours();
     },
 
     // Swappable dialog event handlers.
 
     _rotateOpen: function (event, ui) {
-      var self = this,
-        lightbox = $(this).dialog('option', '_lightbox'),
+      var lightbox = $(this).dialog('option', '_lightbox'),
+        dialog = $(this).data('dialog'),
         contentSize = lightbox._actualContentSize(lightbox.content),
         size = lightbox._idealContentSize(contentSize.width, contentSize.height),
-        tbMargin = $(this).dialog('option', '_lightboxExtraWidth'),
-        lrMargin = $(this).dialog('option', '_lightboxExtraHeight'),
-        titlebarHeight = $(this).data('dialog').uiDialogTitlebar.outerHeight(),
-        buttonPaneHeight = $(this).data('dialog').uiDialogButtonPane.outerHeight();
+        direction = { up: "down", down: "up", left: "right", right: "left" }[$(this).dialog('option', '_lightboxRotate')];
 
-      lightbox._resizeContent();
+      lightbox.content.effect('size', { to: size }, lightbox.options.duration);
 
-      $(this).effect('size', { to: size, scale: 'box' }, lightbox.options.duration, function () {
-        $(self).css(size);
-        $(self).dialog('option', {
-        });
-      });
+      $(dialog.uiDialog).show(lightbox.options.rotateIn, { direction: direction }, lightbox.options.duration);
     },
 
     _rotateClose: function (event, ui) {
-      var dialog = $(this).data('dialog');
+      var self = this,
+        lightbox = $(this).dialog('option', '_lightbox'),
+        direction = $(this).dialog('option', '_lightboxRotate'),
+        dialog = $(this).data('dialog');
 
-      $(this).empty();
-      $(dialog.uiDialog).hide();
+      $(dialog.uiDialog).hide(lightbox.options.rotateOut, { direction: direction }, lightbox.options.duration, function () {
+        $(self).empty();
+      });
     },
 
     _dialogOpen: function (event, ui) {
