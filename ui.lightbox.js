@@ -312,7 +312,7 @@
       case "quicktime":
       case "realplayer":
       case "windowsmedia":
-        $(anchor).media({
+        $(anchor).clone().appendTo(document.body).media({
           width: this.options.width,
           height: this.options.height,
           src: anchor.href,
@@ -320,15 +320,14 @@
         }, function (element, options) {
         }, function (element, data, options, playerName) {
           anchorData.content = $(data);
-          $(data).media('undo');
-        });
+        }).remove();
         break;
       case "iframe":
         anchorData.content = $('<iframe/>').attr('src', anchor.href).attr('frameborder', 0).attr('border', 0);
         break;
       case "html":
       case "dom":
-        anchorData.content = $(anchor).attr('href');
+        anchorData.content = $($(anchor).attr('href'));
         break;
       case "ajax":
       case "script":
