@@ -568,7 +568,7 @@
     instances: [],
     create: function (lightbox) {
       if (this.instances.length === 0) {
-        var $el = $('<div></div>').appendTo(document.body)
+        var $el = $('<div/>').appendTo(document.body)
           .addClass('ui-loading-indicator ui-corner-all').fadeIn("slow");
 
         this.instances.push($el);
