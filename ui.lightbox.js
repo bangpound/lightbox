@@ -223,13 +223,13 @@
       this.overlay = this.options.modal ? new $.ui.lightbox.overlay(viewer.data('dialog')) : null;
       this._setData('cursor', anchor);
 
+      this._setupButtons(buttonPane);
+
       viewer.dialog('option', 'buttons', this._buttons)
         .unbind('dialogclose.lightbox')
         .bind('dialogclose.lightbox', this._dialogClose)
         .bind('dialogopen.lightbox', this._dialogOpen)
         .dialog('open');
-
-      this._setupButtons(buttonPane);
 
       // The ui.dialog widget has a reference to the ui.lightbox widget that
       // opened it in the dialog's options._lightbox property.
