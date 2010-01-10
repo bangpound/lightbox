@@ -127,14 +127,6 @@
       return lightbox;
     },
 
-    _calculateOffset: function (anchor) {
-      var offset;
-      $.swap(anchor, { display: 'block' }, function () {
-        offset = $(this).offset();
-      });
-      return offset;
-    },
-
     _resizeContent: function () {
       var content = this.content,
         contentSize = this._actualContentSize(this.content),
@@ -513,9 +505,16 @@
 
     _anchorStyle: function (anchor) {
       var thumb = $(anchor),
-        offset = this._calculateOffset(anchor);
+        offset = {},
+        size = {};
 
-      return $.extend({ width: thumb.width(), height: thumb.height(), opacity: 0    }, offset);
+      $.swap(anchor, { display: 'block' }, function () {
+        offset = $(this).offset();
+        size.height = $(this).outerHeight();
+        size.width = $(this).outerWidth();
+      });
+
+      return $.extend({ opacity: 0 }, size, offset);
     },
 
     _lightboxStyle: function (dialog, size) {
