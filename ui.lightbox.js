@@ -417,8 +417,9 @@
 
       lightbox.dialog('option', 'position', 'center');
       // Window real estate is taken by dialog chrome.
-      wWidth = wWidth - tbMargin;
-      wHeight = wHeight - lrMargin;
+      // todo: set up offset option.
+      wWidth = wWidth - tbMargin - 20;
+      wHeight = wHeight - lrMargin - 20;
 
       ratio = Math.min(
         Math.min(
