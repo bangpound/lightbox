@@ -96,21 +96,31 @@
     },
 
     _makeDialog: function () {
-      var lightbox = $('<div/>').dialog({
+      // Using &nbsp; adds unwanted width and height to the calculation.
+      var lightbox = $('<div>&nbsp;</div>').dialog({
         autoOpen: false,
         closeOnEscape: false,
         modal: false,
         show: null,
         hide: null,
+        width: this.options.width,
+        height: this.options.height,
         dialogClass: this.options.dialogClass,
         position: this.options.position,
         resizable: this.options.resizable,
-        draggable: this.options.draggable,
-        height: this.options.height,
-        width: this.options.width
+        draggable: this.options.draggable
         // TODO: Support overlay by implementing focus,dragstop,resizestop
-      }).dialog('option', '_lightbox', this);
-      return lightbox;
+      }),
+        dialog = lightbox.data('dialog'),
+        height = dialog.uiDialog.outerHeight(),
+        width = dialog.uiDialog.outerWidth();
+
+      lightbox.dialog('option', {
+        _lightbox: this,
+        _lightboxExtraWidth: width,
+        _lightboxExtraHeight: height
+      });
+      return lightbox.empty();
     },
 
     _calculateOffset: function (anchor) {
@@ -223,10 +233,9 @@
 
     _display: function (content) {
       var anchor = this.options.cursor,
-        viewer = this.lightbox,
-        content = (this.content = $(content));
+        viewer = this.lightbox;
 
-      content.appendTo(viewer);
+      this.content = $(content).appendTo(viewer);
 
       viewer.dialog('option', 'title', $(anchor).attr('title') + this.options.titleSuffix);
     },
@@ -338,9 +347,11 @@
       return ":eq(" + (index === 0 ? length - 1 : index - 1) + "), :eq(" + (index === length - 1 ? 0 : index + 1) + ")";
     },
 
-    _calculateSize: function (content) {
+    // Sizing functions
+
+    _actualContentSize: function (content) {
       var width, height;
-      $.swap($(content).appendTo('<div>').appendTo(document.body)[0], {
+      $.swap($(content).clone().appendTo('<div>').appendTo(document.body)[0], {
         position: "absolute",
         visibility: "hidden",
         display: "block"
@@ -352,47 +363,28 @@
       return { width: width, height: height };
     },
 
-    _resize: function (elem, width, height) {
-      var viewer = this.lightbox,
-        dialog = viewer.data('dialog'),
-        offset = 20,
-
-        // difference
-        deltaContentWidth = viewer.outerWidth() - viewer.width(),
-        deltaContentHeight = viewer.outerHeight() - viewer.height(),
-
-        dialogTitlebarHeight = dialog.uiDialogTitlebar.outerHeight(),
-
-        // Window
-        wWidth = $(window).width(),
+    _idealContentSize: function (width, height) {
+      var wWidth = $(window).width(),
         wHeight = $(window).height(),
+        lightbox = this.lightbox,
+        tbMargin = lightbox.dialog('option', '_lightboxExtraWidth'),
+        lrMargin = lightbox.dialog('option', '_lightboxExtraHeight'),
+        ratio = 1;
 
-        size = {width: width, height: height},
+      lightbox.dialog('option', 'position', 'center');
+      // Window real estate is taken by dialog chrome.
+      wWidth = wWidth - tbMargin;
+      wHeight = wHeight - lrMargin;
 
-        // Desired width
-        finalWidth = size.width + deltaContentWidth,
-        finalHeight = size.height + deltaContentHeight + dialogTitlebarHeight,
+      ratio = Math.min(
+        Math.min(
+          Math.min(wWidth, width) / width,
+          Math.min(wHeight, height) / height, 1));
 
-        ratio = Math.min(
-          Math.min(
-            Math.min(wWidth - deltaContentWidth - offset, size.width) / size.width,
-            Math.min(wHeight - deltaContentHeight - dialogTitlebarHeight - offset, size.height) / size.height, 1));
-
-      $.extend(size, {
-        width: Math.round(ratio * size.width),
-        height: Math.round(ratio * size.height)
-      });
-
-      elem.css(size);
-
-      if (ratio !== 1) {
-        elem.attr('width', '').attr('height', '');
-      }
-
-      finalWidth = size.width + deltaContentWidth;
-      finalHeight = size.height + deltaContentHeight + dialogTitlebarHeight;
-
-      return { width: finalWidth, height: finalHeight };
+      return {
+        width: Math.round(ratio * width),
+        height: Math.round(ratio * height)
+      };
     },
 
     _rotate: function (selectorA, selectorB, direction) {
