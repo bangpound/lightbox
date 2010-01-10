@@ -415,7 +415,6 @@
         lrMargin = lightbox.dialog('option', '_lightboxExtraHeight'),
         ratio = 1;
 
-      lightbox.dialog('option', 'position', 'center');
       // Window real estate is taken by dialog chrome.
       // todo: set up offset option.
       wWidth = wWidth - tbMargin - 20;
