@@ -117,7 +117,13 @@
       }),
         dialog = lightbox.data('dialog'),
         height = dialog.uiDialog.innerHeight(),
-        width = dialog.uiDialog.innerWidth();
+        width = dialog.uiDialog.innerWidth(),
+        buttonPane = lightbox.data('dialog').uiDialogButtonPane;
+
+      $('button', buttonPane).each(function (index, domElement) {
+        var value = $(domElement).text().toLowerCase();
+        $(domElement).addClass('button-' + index + ' button-' + value);
+      });
 
       lightbox.dialog('option', {
         _lightbox: this,
@@ -245,19 +251,11 @@
       this.overlay = this.options.modal ? new $.ui.lightbox.overlay(viewer.data('dialog')) : null;
       this._setData('cursor', anchor);
 
-      this._setupButtons(buttonPane);
       this._setData('content', this._loadContent(anchor));
 
       // The ui.dialog widget has a reference to the ui.lightbox widget that
       // opened it in the dialog's options._lightbox property.
       this._preloadNeighbours();
-    },
-
-    _setupButtons: function (pane) {
-      $('button', pane).each(function (index, domElement) {
-        var value = $(domElement).text().toLowerCase();
-        $(domElement).addClass('button-' + index + ' button-' + value);
-      });
     },
 
     close: function () {
