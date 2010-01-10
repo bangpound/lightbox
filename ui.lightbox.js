@@ -127,14 +127,6 @@
       return lightbox;
     },
 
-    _resizeContent: function () {
-      var content = this.content,
-        contentSize = this._actualContentSize(this.content),
-        size = this._idealContentSize(contentSize.width, contentSize.height);
-
-      content.effect('size', { to: size }, this.options.duration);
-    },
-
     _position: function (size, pos) {
       var wnd = $(window),
         doc = $(document),
@@ -254,15 +246,6 @@
     _anchors: function () {
       // if deemed necessary, cache selection here
       return this.element.find(this.options.selector);
-    },
-
-    _display: function (content) {
-      var anchor = this.options.cursor,
-        viewer = this.lightbox;
-
-      this.content = $(content).appendTo(viewer);
-
-      viewer.dialog('option', 'title', $(anchor).attr('title') + this.options.titleSuffix);
     },
 
     _loadContent: function (anchor) {
