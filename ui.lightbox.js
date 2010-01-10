@@ -123,7 +123,7 @@
         _lightboxExtraWidth: width,
         _lightboxExtraHeight: height
       });
-      return lightbox.empty();
+      return lightbox;
     },
 
     _calculateOffset: function (anchor) {
