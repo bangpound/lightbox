@@ -308,10 +308,6 @@
       viewer.dialog('option', 'title', $(anchor).attr('title') + this.options.titleSuffix);
     },
 
-    _jQueryToString: function (input) {
-      return $('<div>').append($(input).clone().show()).remove().html();
-    },
-
     _loadContent: function (anchor) {
       var self = this,
         anchorData = $(anchor).data('lightbox') || {};
