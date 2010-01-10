@@ -127,6 +127,43 @@
       return lightbox;
     },
 
+    _getData: function (key) {
+      switch (key) {
+      case 'content':
+        return $(this.lightbox).html();
+
+      case 'cursor':
+        return $(this.options.cursor);
+
+      default:
+        return this.lightbox.dialog('option', key);
+      }
+    },
+
+    _setData: function (key, value) {
+      switch (key) {
+      case 'content':
+        if (!this.lightbox) {
+          this.lightbox = this._makeDialog();
+        }
+        else if (this.lightbox.dialog('isOpen')) {
+          $(this.lightbox).dialog('close');
+        }
+        this.options.content = $(this.lightbox).append(value);
+        this.lightbox.dialog('open');
+        break;
+      case 'cursor':
+        this.options.cursor = value;
+        $('.active', this).removeClass('active');
+        $(value).addClass('active');
+        break;
+      default:
+        this.lightbox.dialog(key, value);
+      }
+
+      $.widget.prototype._setData.apply(this, arguments);
+    },
+
     _position: function (size, pos) {
       var wnd = $(window),
         doc = $(document),
@@ -209,8 +246,7 @@
       this._setData('cursor', anchor);
 
       this._setupButtons(buttonPane);
-
-      viewer.append(this._loadContent(anchor)).dialog('open');
+      this._setData('content', this._loadContent(anchor));
 
       // The ui.dialog widget has a reference to the ui.lightbox widget that
       // opened it in the dialog's options._lightbox property.
@@ -419,13 +455,14 @@
 
       this.lightbox = newViewer;
 
+      newViewer
+        .unbind('dialogopen.lightbox')
+        .bind('dialogopen.lightbox', { direction: direction }, this._rotateOpen);
+
       this._setData('cursor', target);
+      this._setData('content', this._loadContent(target));
 
       newViewer
-        .append(this._loadContent(target))
-        .unbind('dialogopen.lightbox')
-        .bind('dialogopen.lightbox', { direction: direction }, this._rotateOpen)
-        .dialog('open')
         .bind('dialogopen.lightbox', this._dialogOpen)
         .bind('dialogclose.lightbox', this._dialogClose);
 
