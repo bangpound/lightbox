@@ -486,7 +486,7 @@
         titlebarHeight = $(this).data('dialog').uiDialogTitlebar.outerHeight(),
         buttonPaneHeight = $(this).data('dialog').uiDialogButtonPane.outerHeight();
 
-      lightbox.content.effect('size', { to: size, scale: 'box' }, lightbox.options.duration);
+      lightbox._resizeContent();
 
       $(this).effect('size', { to: size, scale: 'box' }, lightbox.options.duration, function () {
         $(self).css(size);
@@ -510,38 +510,19 @@
       var lightbox = $(this).dialog('option', '_lightbox'),
         contentSize = lightbox._actualContentSize(lightbox.content),
         size = lightbox._idealContentSize(contentSize.width, contentSize.height),
-        thumb = $(lightbox.options.cursor),
-        offset = lightbox._calculateOffset(lightbox.options.cursor),
         dialog = $(this).data('dialog'),
-        lrMargin = $(this).dialog('option', '_lightboxExtraWidth'),
-        tbMargin = $(this).dialog('option', '_lightboxExtraHeight'),
-        titlebarHeight = dialog.uiDialogTitlebar.outerHeight(),
-        buttonPaneHeight = dialog.uiDialogButtonPane.outerHeight();
+        anchorStyle = lightbox._anchorStyle(lightbox.options.cursor),
+        lightboxStyle = lightbox._lightboxStyle(dialog, contentSize);
 
       lightbox._resizeContent();
-      $(this).css(size);
-      $(dialog.uiDialog).css(lightbox._anchorStyle(lightbox.options.cursor)).show().animate(lightbox._lightboxStyle(dialog, contentSize), lightbox.options.duration);
+
+      $(dialog.uiDialog).css(anchorStyle).show().animate(lightboxStyle, lightbox.options.duration);
     },
 
     _dialogClose: function (event, ui) {
       var self = this,
         lightbox = $(this).dialog('option', '_lightbox'),
-        dialog = $(this).data('dialog'),
-
-        thumb = $(lightbox.options.cursor),
-        offset = lightbox._calculateOffset(lightbox.options.cursor),
-        options = {
-          to: {
-            width: thumb.width(),
-            height: thumb.height()
-          },
-          from: {
-            width: $(dialog.uiDialog).width(),
-            height: $(dialog.uiDialog).height()
-          },
-          origin: [ offset.top - thumb.height(), offset.left - thumb.width() ],
-          fade: true
-        };
+        dialog = $(this).data('dialog');
 
       $(dialog.uiDialog).animate(lightbox._anchorStyle(lightbox.options.cursor), lightbox.options.duration, function () {
         $(this).hide();
@@ -558,9 +539,7 @@
     },
 
     _lightboxStyle: function (dialog, size) {
-      var container = dialog.uiDialogContainer,
-        titlebar = dialog.uiDialogTitlebar,
-        content = dialog.element,
+      var content = dialog.element,
         tbMargin = (parseInt(content.css('margin-top'), 10) || 0) + (parseInt(content.css('margin-bottom'), 10) || 0),
         lrMargin = (parseInt(content.css('margin-left'), 10) || 0) + (parseInt(content.css('margin-right'), 10) || 0),
         position = '';
