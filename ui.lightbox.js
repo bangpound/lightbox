@@ -415,8 +415,8 @@
 
       // Window real estate is taken by dialog chrome.
       // todo: set up offset option.
-      wWidth = wWidth - tbMargin - 20;
-      wHeight = wHeight - lrMargin - 20;
+      wWidth = wWidth - tbMargin - this.options.margin;
+      wHeight = wHeight - lrMargin - this.options.margin;
 
       ratio = Math.min(
         Math.min(
@@ -573,7 +573,8 @@
       rotateIn: 'drop',
       rotateOut: 'drop',
       show: 'scale',
-      hide: 'scale'
+      hide: 'scale',
+      margin: 100
     },
     uuid: 0,
     overlay: function (dialog) {
