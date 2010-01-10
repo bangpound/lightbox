@@ -100,8 +100,9 @@
 
     _makeDialog: function () {
       // Using &nbsp; adds unwanted width and height to the calculation.
-      var lightbox = $('<div>&nbsp;</div>').dialog({
+      var lightbox = $('<div/>').dialog({
         autoOpen: false,
+        autoResize: false,
         closeOnEscape: false,
         modal: false,
         show: 'lightboxDialog',
@@ -109,14 +110,13 @@
         width: this.options.width,
         height: this.options.height,
         dialogClass: this.options.dialogClass,
-        position: this.options.position,
         resizable: this.options.resizable,
         draggable: this.options.draggable
         // TODO: Support overlay by implementing focus,dragstop,resizestop
       }),
         dialog = lightbox.data('dialog'),
-        height = dialog.uiDialog.outerHeight(),
-        width = dialog.uiDialog.outerWidth();
+        height = dialog.uiDialog.innerHeight(),
+        width = dialog.uiDialog.innerWidth();
 
       lightbox.dialog('option', {
         _lightbox: this,
@@ -142,10 +142,9 @@
       content.effect('size', { to: size }, this.options.duration);
     },
 
-    _position: function (pos) {
+    _position: function (size, pos) {
       var wnd = $(window),
         doc = $(document),
-        dialog = this.lightbox.data('dialog'),
         pTop = doc.scrollTop(),
         pLeft = doc.scrollLeft(),
         minTop = pTop;
@@ -167,11 +166,11 @@
             pLeft += 0;
             break;
           case 'right':
-            pLeft += wnd.width() - dialog.uiDialog.outerWidth();
+            pLeft += wnd.width() - size.width;
             break;
           default:
           case 'center':
-            pLeft += (wnd.width() - dialog.uiDialog.outerWidth()) / 2;
+            pLeft += (wnd.width() - size.width) / 2;
         }
       }
       if (pos[1].constructor == Number) {
@@ -183,12 +182,12 @@
             break;
           case 'bottom':
             // Opera check fixes #3564, can go away with jQuery 1.3
-            pTop += ($.browser.opera ? window.innerHeight : wnd.height()) - dialog.uiDialog.outerHeight();
+            pTop += ($.browser.opera ? window.innerHeight : wnd.height()) - size.height;
             break;
           default:
           case 'middle':
             // Opera check fixes #3564, can go away with jQuery 1.3
-            pTop += (($.browser.opera ? window.innerHeight : wnd.height()) - dialog.uiDialog.outerHeight()) / 2;
+            pTop += (($.browser.opera ? window.innerHeight : wnd.height()) - size.height) / 2;
         }
       }
 
@@ -514,20 +513,14 @@
         thumb = $(lightbox.options.cursor),
         offset = lightbox._calculateOffset(lightbox.options.cursor),
         dialog = $(this).data('dialog'),
-        options = {
-          from: {
-            width: thumb.width(),
-            height: thumb.height()
-          },
-          to: size,
-          origin: [ offset.top - thumb.height(), offset.left - thumb.width() ],
-          fade: true
-        };
+        lrMargin = $(this).dialog('option', '_lightboxExtraWidth'),
+        tbMargin = $(this).dialog('option', '_lightboxExtraHeight'),
+        titlebarHeight = dialog.uiDialogTitlebar.outerHeight(),
+        buttonPaneHeight = dialog.uiDialogButtonPane.outerHeight();
 
       lightbox._resizeContent();
       $(this).css(size);
-      $(dialog.uiDialog).css(lightbox._position(lightbox.options.position));
-      $(dialog.uiDialog).show(lightbox.options.show, options, lightbox.options.duration);
+      $(dialog.uiDialog).css(lightbox._anchorStyle(lightbox.options.cursor)).show().animate(lightbox._lightboxStyle(dialog, contentSize), lightbox.options.duration);
     },
 
     _dialogClose: function (event, ui) {
@@ -550,10 +543,36 @@
           fade: true
         };
 
-      $(dialog.uiDialog).hide(lightbox.options.hide, options, lightbox.options.duration, function () {
+      $(dialog.uiDialog).animate(lightbox._anchorStyle(lightbox.options.cursor), lightbox.options.duration, function () {
+        $(this).hide();
         $(self).empty();
         lightbox.close();
       });
+    },
+
+    _anchorStyle: function (anchor) {
+      var thumb = $(anchor),
+        offset = this._calculateOffset(anchor);
+
+      return $.extend({ width: thumb.width(), height: thumb.height(), opacity: 0    }, offset);
+    },
+
+    _lightboxStyle: function (dialog, size) {
+      var container = dialog.uiDialogContainer,
+        titlebar = dialog.uiDialogTitlebar,
+        content = dialog.element,
+        tbMargin = (parseInt(content.css('margin-top'), 10) || 0) + (parseInt(content.css('margin-bottom'), 10) || 0),
+        lrMargin = (parseInt(content.css('margin-left'), 10) || 0) + (parseInt(content.css('margin-right'), 10) || 0),
+        position = '';
+
+      size = this._idealContentSize(size.width, size.height);
+
+      size.height += tbMargin + dialog.options._lightboxExtraHeight;
+      size.width += lrMargin + dialog.options._lightboxExtraWidth;
+
+      position = this._position(size, this.options.position);
+
+      return $.extend({ opacity: 1 }, size, position);
     }
   });
 
