@@ -149,45 +149,45 @@
         pLeft = doc.scrollLeft(),
         minTop = pTop;
 
-      if ($.inArray(pos, ['center','top','right','bottom','left']) >= 0) {
+      if ($.inArray(pos, ['center', 'top', 'right', 'bottom', 'left']) >= 0) {
         pos = [
-          pos == 'right' || pos == 'left' ? pos : 'center',
-          pos == 'top' || pos == 'bottom' ? pos : 'middle'
+          pos === 'right' || pos === 'left' ? pos : 'center',
+          pos === 'top' || pos === 'bottom' ? pos : 'middle'
         ];
       }
-      if (pos.constructor != Array) {
+      if (pos.constructor !== Array) {
         pos = ['center', 'middle'];
       }
-      if (pos[0].constructor == Number) {
+      if (pos[0].constructor === Number) {
         pLeft += pos[0];
       } else {
         switch (pos[0]) {
-          case 'left':
-            pLeft += 0;
-            break;
-          case 'right':
-            pLeft += wnd.width() - size.width;
-            break;
-          default:
-          case 'center':
-            pLeft += (wnd.width() - size.width) / 2;
+        case 'left':
+          pLeft += 0;
+          break;
+        case 'right':
+          pLeft += wnd.width() - size.width;
+          break;
+        default:
+        case 'center':
+          pLeft += (wnd.width() - size.width) / 2;
         }
       }
-      if (pos[1].constructor == Number) {
+      if (pos[1].constructor === Number) {
         pTop += pos[1];
       } else {
         switch (pos[1]) {
-          case 'top':
-            pTop += 0;
-            break;
-          case 'bottom':
-            // Opera check fixes #3564, can go away with jQuery 1.3
-            pTop += ($.browser.opera ? window.innerHeight : wnd.height()) - size.height;
-            break;
-          default:
-          case 'middle':
-            // Opera check fixes #3564, can go away with jQuery 1.3
-            pTop += (($.browser.opera ? window.innerHeight : wnd.height()) - size.height) / 2;
+        case 'top':
+          pTop += 0;
+          break;
+        case 'bottom':
+          // Opera check fixes #3564, can go away with jQuery 1.3
+          pTop += ($.browser.opera ? window.innerHeight : wnd.height()) - size.height;
+          break;
+        default:
+        case 'middle':
+          // Opera check fixes #3564, can go away with jQuery 1.3
+          pTop += (($.browser.opera ? window.innerHeight : wnd.height()) - size.height) / 2;
         }
       }
 
@@ -648,7 +648,7 @@
 
   // This effect does nothing because the dialogopen and dialogclose event
   // trigger the effect.
-  $.effects.lightboxDialog = function(o) {
+  $.effects.lightboxDialog = function (o) {
     return $(this);
   };
 
