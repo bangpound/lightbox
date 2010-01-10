@@ -345,7 +345,7 @@
         });
         break;
       case "iframe":
-        anchorData.content = $('iframe').attr('src', anchor.href).attr('frameborder', 0).attr('border', 0);
+        anchorData.content = $('<iframe/>').attr('src', anchor.href).attr('frameborder', 0).attr('border', 0);
         break;
       case "html":
       case "dom":
