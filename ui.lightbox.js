@@ -502,6 +502,8 @@
         lightbox = $(this).dialog('option', '_lightbox'),
         dialog = $(this).data('dialog');
 
+      lightbox.content.effect('size', { to: { width: '0', height: 0 } }, lightbox.options.duration);
+
       $(dialog.uiDialog).animate(lightbox._anchorStyle(lightbox.options.cursor), lightbox.options.duration, function () {
         $(this).hide();
         $(self).empty();
