@@ -286,7 +286,6 @@
       switch (anchorData.type) {
       case "image":
         anchorData.content = $('<img/>').attr('src', anchor.href).load(function (eventObject) {
-
         });
         break;
       case "flash":
@@ -364,6 +363,7 @@
       var anchors = this._anchors(),
         index = anchors.index(this.options.cursor),
         self = this;
+
       anchors.filter(this._neighbours(index, anchors.length)).each(function () {
         self._loadContent(this);
       });
