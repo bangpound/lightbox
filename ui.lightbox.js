@@ -491,10 +491,6 @@
       $(this).effect('size', { to: size, scale: 'box' }, lightbox.options.duration, function () {
         $(self).css(size);
         $(self).dialog('option', {
-          width: 'auto',
-          height: $(self).outerHeight(true) + titlebarHeight + buttonPaneHeight,
-          maxWidth: contentSize.width + lrMargin,
-          maxHeight: contentSize.height + tbMargin
         });
       });
     },
