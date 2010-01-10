@@ -111,7 +111,8 @@
         height: this.options.height,
         dialogClass: this.options.dialogClass,
         resizable: this.options.resizable,
-        draggable: this.options.draggable
+        draggable: this.options.draggable,
+        buttons: this._buttons
         // TODO: Support overlay by implementing focus,dragstop,resizestop
       }),
         dialog = lightbox.data('dialog'),
@@ -122,7 +123,7 @@
         _lightbox: this,
         _lightboxExtraWidth: width,
         _lightboxExtraHeight: height
-      });
+      }).bind('dialogclose.lightbox', this._dialogClose).bind('dialogopen.lightbox', this._dialogOpen);
       return lightbox;
     },
 
@@ -225,11 +226,7 @@
 
       this._setupButtons(buttonPane);
 
-      viewer.dialog('option', 'buttons', this._buttons)
-        .unbind('dialogclose.lightbox')
-        .bind('dialogclose.lightbox', this._dialogClose)
-        .bind('dialogopen.lightbox', this._dialogOpen)
-        .dialog('open');
+      viewer.dialog('open');
 
       // The ui.dialog widget has a reference to the ui.lightbox widget that
       // opened it in the dialog's options._lightbox property.
