@@ -34,7 +34,6 @@
      *
      * anchors = _anchors() = anchors in this lightbox collection.
      * cursor = this.options.cursor = active item in lightbox.
-     * anchorData = $(anchor).data('lightbox') = cache.
      */
     _init: function () {
       var self = this;
@@ -98,29 +97,38 @@
     _makeDialog: function () {
       // Using &nbsp; adds unwanted width and height to the calculation.
       var lightbox = $('<div/>').dialog({
-        autoOpen: false,
-        autoResize: false,
-        closeOnEscape: false,
-        modal: false,
-        show: 'lightboxDialog',
-        hide: 'lightboxDialog',
-        width: 'auto',
-        height: 'auto',
-        dialogClass: this.options.dialogClass,
-        resizable: this.options.resizable,
-        draggable: this.options.draggable,
-        buttons: (this._anchors().length > 1) ? this._buttons : {}
-        // TODO: Support overlay by implementing focus,dragstop,resizestop
-      }),
+          autoOpen: false,
+          autoResize: false,
+          closeOnEscape: false,
+          modal: false,
+          show: 'lightboxDialog',
+          hide: 'lightboxDialog',
+          width: 'auto',
+          height: 'auto',
+          dialogClass: this.options.dialogClass,
+          resizable: this.options.resizable,
+          draggable: this.options.draggable
+          // TODO: Support overlay by implementing focus,dragstop,resizestop
+        }),
         dialog = lightbox.data('dialog'),
-        height = dialog.uiDialog.innerHeight(),
-        width = dialog.uiDialog.innerWidth(),
+        height = 0,
+        width = 0,
         buttonPane = lightbox.data('dialog').uiDialogButtonPane;
 
-      $('button', buttonPane).each(function (index, domElement) {
-        var value = $(domElement).text().toLowerCase();
-        $(domElement).addClass('button-' + index + ' button-' + value);
-      });
+      height = dialog.uiDialog.innerHeight();
+
+      // Hide the title bar so its padding does not count in the extra width.
+      $(dialog.uiDialogTitlebar).hide();
+      width = dialog.uiDialog.innerWidth();
+      $(dialog.uiDialogTitlebar).show();
+
+      if (this._anchors().length > 1) {
+        lightbox.dialog('option', 'buttons', this._buttons);
+        $('button', buttonPane).each(function (index, domElement) {
+          var value = $(domElement).text().toLowerCase();
+          $(domElement).addClass('button-' + index + ' button-' + value);
+        });
+      }
 
       lightbox.dialog('option', {
         _lightbox: this,
@@ -153,7 +161,9 @@
           $(this.lightbox).dialog('close');
         }
         this.options.content = $(this.lightbox).append(value);
-        this.lightbox.dialog('open');
+        this.lightbox.dialog('open')
+          .bind('dialogopen.lightbox', this._dialogOpen)
+          .bind('dialogclose.lightbox', this._dialogClose);
         break;
       case 'cursor':
         this.options.cursor = value;
@@ -238,21 +248,19 @@
         .unbind('.lightbox')
         .removeData('lightbox');
 
-      this._anchors().removeData('lightbox');
+      this._anchors().removeData('lightbox.content');
     },
 
     open: function (anchor) {
-      var viewer = (this.lightbox = this._makeDialog()),
-        buttonPane = viewer.data('dialog').uiDialogButtonPane;
+      var viewer = (this.lightbox = this._makeDialog());
 
       this.overlay = this.options.modal ? new $.ui.lightbox.overlay(viewer.data('dialog')) : null;
       this._setData('cursor', anchor);
 
-      this._setData('content', this._loadContent(anchor));
+      this._loadContent(anchor);
 
       // The ui.dialog widget has a reference to the ui.lightbox widget that
       // opened it in the dialog's options._lightbox property.
-      this._preloadNeighbours();
     },
 
     close: function () {
@@ -281,25 +289,16 @@
 
     _loadContent: function (anchor) {
       var self = this,
-        anchorData = $(anchor).data('lightbox') || {};
+        type = this.options.type ? this.options.type : this._deriveType(anchor);
 
       if (!this.spinner) {
         this.spinner = new $.ui.lightbox.spinner(this);
       }
 
-      if (!this.options.reset && anchorData.content) {
-        return anchorData.content;
-      }
-      else {
-        anchorData = {
-          content: 'BUG',
-          type: this.options.type ? this.options.type : this._deriveType(anchor)
-        };
-      }
-
-      switch (anchorData.type) {
+      switch (type) {
       case "image":
-        anchorData.content = $('<img/>').attr('src', anchor.href).load(function (eventObject) {
+        $('<img/>').attr('src', anchor.href).load(function (eventObject) {
+          self._setData('content', $(this));
         });
         break;
       case "flash":
@@ -314,15 +313,15 @@
           autoplay: 1
         }, function (element, options) {
         }, function (element, data, options, playerName) {
-          anchorData.content = $(data);
+          self._setData('content', $(data));
         }).remove();
         break;
       case "iframe":
-        anchorData.content = $('<iframe/>').attr('src', anchor.href).attr('frameborder', 0).attr('border', 0);
+        this._setData('content', $('<iframe/>').attr('src', anchor.href).attr('frameborder', 0).attr('border', 0));
         break;
       case "html":
       case "dom":
-        anchorData.content = $($(anchor).attr('href'));
+        this._setData('content', $($(anchor).attr('href')).clone());
         break;
       case "ajax":
       case "script":
@@ -332,20 +331,15 @@
           cache: true,
           async: false,
           data: self.options.parameters,
-          dataType: (anchorData.type === "ajax") ? "html" : "script",
+          dataType: (type === "ajax") ? "html" : "script",
           success: function (data, textStatus) {
-            anchorData.content = $(data);
+            self._setData('content', $(data));
           }
         });
         break;
       }
 
-      if (this.options.cache) {
-        $(anchor).data('lightbox', anchorData);
-      }
-
       this.spinner.destroy();
-      return anchorData.content;
     },
 
     // todo: find better way to guess media type from filename.
@@ -370,20 +364,6 @@
         return "windowsmedia";
       }
       return "ajax";
-    },
-
-    _preloadNeighbours: function () {
-      var anchors = this._anchors(),
-        index = anchors.index(this.options.cursor),
-        self = this;
-
-      anchors.filter(this._neighbours(index, anchors.length)).each(function () {
-        self._loadContent(this);
-      });
-    },
-
-    _neighbours: function (index, length) {
-      return ":eq(" + (index === 0 ? length - 1 : index - 1) + "), :eq(" + (index === length - 1 ? 0 : index + 1) + ")";
     },
 
     // Sizing functions
@@ -459,13 +439,7 @@
         .bind('dialogopen.lightbox', { direction: direction }, this._rotateOpen);
 
       this._setData('cursor', target);
-      this._setData('content', this._loadContent(target));
-
-      newViewer
-        .bind('dialogopen.lightbox', this._dialogOpen)
-        .bind('dialogclose.lightbox', this._dialogClose);
-
-      this._preloadNeighbours();
+      this._loadContent(target);
     },
 
     // Swappable dialog event handlers.
@@ -479,19 +453,22 @@
         direction = { up: "down", down: "up", left: "right", right: "left" }[event.data.direction],
         lightboxStyle = {};
 
-      if (size.width == 'auto' && size.height == 'auto') {
+      if (size.width === 'auto' && size.height === 'auto') {
         size = lightbox._idealContentSize(lightbox._actualContentSize(content));
         content.css(size);
       }
-      else if (size.width == 'constrain' || size.height == 'constrain') {
+      else if (size.width === 'constrain' || size.height === 'constrain') {
         $.each(size, function (i, val) {
-          if (val == 'constrain') {
+          if (val === 'constrain') {
             size = lightbox._constrainContentSize(content, options.constraint, i);
           }
         });
       }
 
-      lightboxStyle = lightbox._lightboxStyle(dialog, size);
+      if (options.modal) {
+        lightboxStyle.position = 'fixed';
+      }
+      $.extend(lightboxStyle, lightbox._lightboxStyle(dialog, size));
 
       $(dialog.uiDialog).css(lightboxStyle).show(options.rotateIn, { direction: direction }, options.duration);
     },
@@ -517,20 +494,23 @@
         anchorStyle = lightbox._anchorStyle(options.cursor),
         lightboxStyle = {};
 
-      if (size.width == 'auto' && size.height == 'auto') {
+      if (size.width === 'auto' && size.height === 'auto') {
         size = lightbox._idealContentSize(lightbox._actualContentSize(content));
       }
-      else if (size.width == 'constrain' || size.height == 'constrain') {
+      else if (size.width === 'constrain' || size.height === 'constrain') {
         $.each(size, function (i, val) {
-          if (val == 'constrain') {
+          if (val === 'constrain') {
             size = lightbox._constrainContentSize(content, options.constraint, i);
           }
         });
       }
 
-      lightboxStyle = lightbox._lightboxStyle(dialog, size);
+      if (options.modal) {
+        lightboxStyle.position = 'fixed';
+      }
+      $.extend(lightboxStyle, lightbox._lightboxStyle(dialog, size));
 
-      content.effect('size', { from: { width: '0', height: 0 }, to: size }, options.duration);
+      content.effect('size', { from: { width: anchorStyle.width, height: anchorStyle.height }, to: size }, options.duration);
 
       $(dialog.uiDialog).css(anchorStyle).show().animate(lightboxStyle, options.duration);
     },
@@ -540,11 +520,12 @@
         lightbox = $(this).dialog('option', '_lightbox'),
         options = lightbox.options,
         content = $(this).children(),
-        dialog = $(this).data('dialog');
+        dialog = $(this).data('dialog'),
+        anchorStyle = lightbox._anchorStyle(options.cursor);
 
-      content.effect('size', { to: { width: '0', height: 0 } }, options.duration);
+      content.effect('size', { to: { width: anchorStyle.width, height: anchorStyle.height } }, options.duration);
 
-      $(dialog.uiDialog).animate(lightbox._anchorStyle(options.cursor), options.duration, function () {
+      $(dialog.uiDialog).animate(anchorStyle, options.duration, function () {
         $(this).hide();
         $(self).empty();
         lightbox.close();
@@ -584,7 +565,6 @@
       loop: true,
       modal: true,
       overlay: {},
-      cache: true,
       post: 0,
       dialogClass: 'ui-lightbox',
       closeOnEscape: true,
