@@ -544,7 +544,7 @@
       }
       $.extend(lightboxStyle, lightbox._lightboxStyle(dialog, size));
 
-      content.effect('size', { from: { width: '0', height: 0 }, to: size }, options.duration);
+      content.effect('size', { from: { width: anchorStyle.width, height: anchorStyle.height }, to: size }, options.duration);
 
       $(dialog.uiDialog).css(anchorStyle).show().animate(lightboxStyle, options.duration);
     },
@@ -554,11 +554,12 @@
         lightbox = $(this).dialog('option', '_lightbox'),
         options = lightbox.options,
         content = $(this).children(),
-        dialog = $(this).data('dialog');
+        dialog = $(this).data('dialog'),
+        anchorStyle = lightbox._anchorStyle(options.cursor);
 
-      content.effect('size', { to: { width: '0', height: 0 } }, options.duration);
+      content.effect('size', { to: { width: anchorStyle.width, height: anchorStyle.height } }, options.duration);
 
-      $(dialog.uiDialog).animate(lightbox._anchorStyle(options.cursor), options.duration, function () {
+      $(dialog.uiDialog).animate(anchorStyle, options.duration, function () {
         $(this).hide();
         $(self).empty();
         lightbox.close();
