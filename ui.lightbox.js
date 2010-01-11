@@ -36,6 +36,8 @@
      * cursor = this.options.cursor = active item in lightbox.
      */
     _init: function () {
+      this.instances = [];
+
       var self = this;
 
       // todo: consider event delegation to make this more dynamic
@@ -92,6 +94,18 @@
           }
         });
       }
+    },
+
+    _getDialog: function () {
+      var instances = this.instances,
+        dialog = {};
+      if (instances.length) {
+        dialog = instances.pop();
+      }
+      else {
+        dialog = this._makeDialog();
+      }
+      return dialog.empty();
     },
 
     _makeDialog: function () {
@@ -155,7 +169,7 @@
       switch (key) {
       case 'content':
         if (!this.lightbox) {
-          this.lightbox = this._makeDialog();
+          this.lightbox = this._getDialog();
         }
         else if (this.lightbox.dialog('isOpen')) {
           $(this.lightbox).dialog('close');
@@ -243,16 +257,24 @@
     },
 
     destroy: function () {
+      var instances = this.instances,
+        lightbox = this.lightbox;
+
       (this.overlay && this.overlay.destroy());
       this.element
         .unbind('.lightbox')
         .removeData('lightbox');
 
       this._anchors().removeData('lightbox.content');
+
+      instances.push(lightbox);
+      $.each(instances, function (index, instance) {
+        instance.dialog('destroy').remove();
+      });
     },
 
     open: function (anchor) {
-      var viewer = (this.lightbox = this._makeDialog());
+      var viewer = (this.lightbox = this._getDialog());
 
       this.overlay = this.options.modal ? new $.ui.lightbox.overlay(viewer.data('dialog')) : null;
       this._setData('cursor', anchor);
@@ -264,14 +286,15 @@
     },
 
     close: function () {
-      var viewer = this.lightbox;
+      var viewer = this.lightbox,
+        instances = this.instances;
 
       (this.overlay && this.overlay.destroy());
 
       $.ui.lightbox.overlay.resize();
 
       // TODO: these need to be destroyed with the widget.
-      viewer.dialog('destroy').remove();
+      instances.push(viewer.empty());
     },
 
     next: function (direction) {
@@ -416,7 +439,7 @@
         current = this.options.cursor,
         target = this.options.cursor,
         viewer = this.lightbox,
-        newViewer = this._makeDialog();
+        newViewer = this._getDialog();
 
       if (anchors.length === 1) {
         return;
@@ -481,7 +504,7 @@
         dialog = $(this).data('dialog');
 
       $(dialog.uiDialog).hide(options.rotateOut, { direction: direction }, options.duration, function () {
-        $(self).dialog('destroy').remove();
+        lightbox.instances.push($(self).empty());
       });
     },
 
