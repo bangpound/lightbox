@@ -109,7 +109,6 @@
         dialogClass: this.options.dialogClass,
         resizable: this.options.resizable,
         draggable: this.options.draggable,
-        buttons: (this._anchors().length > 1) ? this._buttons : {}
         // TODO: Support overlay by implementing focus,dragstop,resizestop
       }),
         dialog = lightbox.data('dialog'),
@@ -117,17 +116,20 @@
         width = 0,
         buttonPane = lightbox.data('dialog').uiDialogButtonPane;
 
-      $('button', buttonPane).each(function (index, domElement) {
-        var value = $(domElement).text().toLowerCase();
-        $(domElement).addClass('button-' + index + ' button-' + value);
-      });
-
       height = dialog.uiDialog.innerHeight();
 
       // Hide the title bar so its padding does not count in the extra width.
       $(dialog.uiDialogTitlebar).hide();
       width = dialog.uiDialog.innerWidth();
       $(dialog.uiDialogTitlebar).show();
+
+      if (this._anchors().length > 1) {
+        lightbox.dialog('option', 'buttons', this._buttons);
+        $('button', buttonPane).each(function (index, domElement) {
+          var value = $(domElement).text().toLowerCase();
+          $(domElement).addClass('button-' + index + ' button-' + value);
+        });
+      }
 
       lightbox.dialog('option', {
         _lightbox: this,
