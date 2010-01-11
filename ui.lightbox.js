@@ -547,12 +547,21 @@
 
     _lightboxStyle: function (dialog, size) {
       var content = dialog.element,
-        tbMargin = (parseInt(content.css('margin-top'), 10) || 0) + (parseInt(content.css('margin-bottom'), 10) || 0),
-        lrMargin = (parseInt(content.css('margin-left'), 10) || 0) + (parseInt(content.css('margin-right'), 10) || 0),
+        margin = {
+          height: (parseInt(content.css('margin-top'), 10) || 0) + (parseInt(content.css('margin-bottom'), 10) || 0),
+          width: (parseInt(content.css('margin-left'), 10) || 0) + (parseInt(content.css('margin-right'), 10) || 0)
+        },
+        chrome = {
+          height: dialog.options._lightboxExtraHeight,
+          width: dialog.options._lightboxExtraWidth
+        },
         position = '';
 
-      size.height += tbMargin + dialog.options._lightboxExtraHeight;
-      size.width += lrMargin + dialog.options._lightboxExtraWidth;
+      $.each(size, function (i, val) {
+        if (parseInt(val, 10) > 0) {
+          size[i] += margin[i] + chrome[i];
+        }
+      });
 
       position = this._position(size, this.options.position);
 
