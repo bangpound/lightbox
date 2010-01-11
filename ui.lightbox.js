@@ -499,7 +499,10 @@
         });
       }
 
-      lightboxStyle = lightbox._lightboxStyle(dialog, size);
+      if (options.modal) {
+        lightboxStyle.position = 'fixed';
+      }
+      $.extend(lightboxStyle, lightbox._lightboxStyle(dialog, size));
 
       $(dialog.uiDialog).css(lightboxStyle).show(options.rotateIn, { direction: direction }, options.duration);
     },
@@ -536,7 +539,10 @@
         });
       }
 
-      lightboxStyle = lightbox._lightboxStyle(dialog, size);
+      if (options.modal) {
+        lightboxStyle.position = 'fixed';
+      }
+      $.extend(lightboxStyle, lightbox._lightboxStyle(dialog, size));
 
       content.effect('size', { from: { width: '0', height: 0 }, to: size }, options.duration);
 
