@@ -402,7 +402,7 @@
       return { width: width, height: height };
     },
 
-    _idealContentSize: function (width, height) {
+    _idealContentSize: function (size) {
       var wWidth = $(window).width(),
         wHeight = $(window).height(),
         lightbox = this.lightbox,
@@ -417,12 +417,12 @@
 
       ratio = Math.min(
         Math.min(
-          Math.min(wWidth, width) / width,
-          Math.min(wHeight, height) / height, 1));
+          Math.min(wWidth, size.width) / size.width,
+          Math.min(wHeight, size.height) / size.height, 1));
 
       return {
-        width: Math.round(ratio * width),
-        height: Math.round(ratio * height)
+        width: Math.round(ratio * size.width),
+        height: Math.round(ratio * size.height)
       };
     },
 
@@ -467,52 +467,65 @@
 
     _rotateOpen: function (event, ui) {
       var lightbox = $(this).dialog('option', '_lightbox'),
+        options = lightbox.options,
         dialog = $(this).data('dialog'),
         content = $(this).children(),
-        contentSize = lightbox._actualContentSize(content),
-        size = lightbox._idealContentSize(contentSize.width, contentSize.height),
+        size = { width: options.width, height: options.height },
         direction = { up: "down", down: "up", left: "right", right: "left" }[event.data.direction],
-        lightboxStyle = lightbox._lightboxStyle(dialog, contentSize);
+        lightboxStyle = {};
 
-      content.css(size);
+      if (size.width == 'auto' && size.height == 'auto') {
+        size = lightbox._idealContentSize(lightbox._actualContentSize(content));
+        content.css(size);
+      }
 
-      $(dialog.uiDialog).css(lightboxStyle).show(lightbox.options.rotateIn, { direction: direction }, lightbox.options.duration);
+      lightboxStyle = lightbox._lightboxStyle(dialog, size);
+
+      $(dialog.uiDialog).css(lightboxStyle).show(options.rotateIn, { direction: direction }, options.duration);
     },
 
     _rotateClose: function (event, ui) {
       var self = this,
         lightbox = $(this).dialog('option', '_lightbox'),
+        options = lightbox.options,
         direction = event.data.direction,
         dialog = $(this).data('dialog');
 
-      $(dialog.uiDialog).hide(lightbox.options.rotateOut, { direction: direction }, lightbox.options.duration, function () {
+      $(dialog.uiDialog).hide(options.rotateOut, { direction: direction }, options.duration, function () {
         $(self).dialog('destroy').remove();
       });
     },
 
     _dialogOpen: function (event, ui) {
       var lightbox = $(this).dialog('option', '_lightbox'),
+        options = lightbox.options,
         content = $(this).children(),
-        contentSize = lightbox._actualContentSize(content),
-        size = lightbox._idealContentSize(contentSize.width, contentSize.height),
+        size = { width: options.width, height: options.height },
         dialog = $(this).data('dialog'),
-        anchorStyle = lightbox._anchorStyle(lightbox.options.cursor),
-        lightboxStyle = lightbox._lightboxStyle(dialog, contentSize);
+        anchorStyle = lightbox._anchorStyle(options.cursor),
+        lightboxStyle = {};
 
-      content.effect('size', { from: { width: '0', height: 0 }, to: size }, lightbox.options.duration);
+      if (size.width == 'auto' && size.height == 'auto') {
+        size = lightbox._idealContentSize(lightbox._actualContentSize(content));
+      }
 
-      $(dialog.uiDialog).css(anchorStyle).show().animate(lightboxStyle, lightbox.options.duration);
+      lightboxStyle = lightbox._lightboxStyle(dialog, size);
+
+      content.effect('size', { from: { width: '0', height: 0 }, to: size }, options.duration);
+
+      $(dialog.uiDialog).css(anchorStyle).show().animate(lightboxStyle, options.duration);
     },
 
     _dialogClose: function (event, ui) {
       var self = this,
         lightbox = $(this).dialog('option', '_lightbox'),
+        options = lightbox.options,
         content = $(this).children(),
         dialog = $(this).data('dialog');
 
-      content.effect('size', { to: { width: '0', height: 0 } }, lightbox.options.duration);
+      content.effect('size', { to: { width: '0', height: 0 } }, options.duration);
 
-      $(dialog.uiDialog).animate(lightbox._anchorStyle(lightbox.options.cursor), lightbox.options.duration, function () {
+      $(dialog.uiDialog).animate(lightbox._anchorStyle(options.cursor), options.duration, function () {
         $(this).hide();
         $(self).empty();
         lightbox.close();
@@ -537,8 +550,6 @@
         tbMargin = (parseInt(content.css('margin-top'), 10) || 0) + (parseInt(content.css('margin-bottom'), 10) || 0),
         lrMargin = (parseInt(content.css('margin-left'), 10) || 0) + (parseInt(content.css('margin-right'), 10) || 0),
         position = '';
-
-      size = this._idealContentSize(size.width, size.height);
 
       size.height += tbMargin + dialog.options._lightboxExtraHeight;
       size.width += lrMargin + dialog.options._lightboxExtraWidth;
