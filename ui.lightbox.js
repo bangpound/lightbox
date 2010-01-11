@@ -98,19 +98,19 @@
     _makeDialog: function () {
       // Using &nbsp; adds unwanted width and height to the calculation.
       var lightbox = $('<div/>').dialog({
-        autoOpen: false,
-        autoResize: false,
-        closeOnEscape: false,
-        modal: false,
-        show: 'lightboxDialog',
-        hide: 'lightboxDialog',
-        width: 'auto',
-        height: 'auto',
-        dialogClass: this.options.dialogClass,
-        resizable: this.options.resizable,
-        draggable: this.options.draggable,
-        // TODO: Support overlay by implementing focus,dragstop,resizestop
-      }),
+          autoOpen: false,
+          autoResize: false,
+          closeOnEscape: false,
+          modal: false,
+          show: 'lightboxDialog',
+          hide: 'lightboxDialog',
+          width: 'auto',
+          height: 'auto',
+          dialogClass: this.options.dialogClass,
+          resizable: this.options.resizable,
+          draggable: this.options.draggable
+          // TODO: Support overlay by implementing focus,dragstop,resizestop
+        }),
         dialog = lightbox.data('dialog'),
         height = 0,
         width = 0,
