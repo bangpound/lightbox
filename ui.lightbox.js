@@ -370,13 +370,13 @@
 
     _actualContentSize: function (content) {
       var width, height;
-      $.swap($(content).clone().appendTo('<div>').appendTo(document.body)[0], {
+      $.swap($('<div/>').append(content.clone()).appendTo(document.body)[0], {
         position: "absolute",
         visibility: "hidden",
         display: "block"
       }, function () {
-        width = $(this).width();
-        height = $(this).height();
+        width = $(this).outerWidth();
+        height = $(this).outerHeight();
         $(this).remove();
       });
       return { width: width, height: height };
