@@ -41,7 +41,7 @@
       var self = this;
 
       // todo: consider event delegation to make this more dynamic
-      $(this.options.selector, this.element).click(function (event) {
+      $(this.options.selector, this.element).bind('click.lightbox', function (event) {
         event.preventDefault();
         self.open(this);
       });
@@ -262,8 +262,9 @@
 
       (this.overlay && this.overlay.destroy());
       this.element
-        .unbind('.lightbox')
         .removeData('lightbox');
+
+      $("*", this.element).unbind('.lightbox');
 
       this._anchors().removeData('lightbox.content');
 
