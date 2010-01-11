@@ -36,10 +36,12 @@
      * cursor = this.options.cursor = active item in lightbox.
      */
     _init: function () {
+      this.instances = [];
+
       var self = this;
 
       // todo: consider event delegation to make this more dynamic
-      $(this.options.selector, this.element).click(function (event) {
+      $(this.options.selector, this.element).bind('click.lightbox', function (event) {
         event.preventDefault();
         self.open(this);
       });
@@ -92,6 +94,18 @@
           }
         });
       }
+    },
+
+    _getDialog: function () {
+      var instances = this.instances,
+        dialog = {};
+      if (instances.length) {
+        dialog = instances.pop();
+      }
+      else {
+        dialog = this._makeDialog();
+      }
+      return dialog.empty();
     },
 
     _makeDialog: function () {
@@ -155,13 +169,14 @@
       switch (key) {
       case 'content':
         if (!this.lightbox) {
-          this.lightbox = this._makeDialog();
+          this.lightbox = this._getDialog();
         }
         else if (this.lightbox.dialog('isOpen')) {
           $(this.lightbox).dialog('close');
         }
         this.options.content = $(this.lightbox).append(value);
         this.lightbox.dialog('open')
+          .unbind('.lightbox')
           .bind('dialogopen.lightbox', this._dialogOpen)
           .bind('dialogclose.lightbox', this._dialogClose);
         break;
@@ -243,16 +258,26 @@
     },
 
     destroy: function () {
+      var instances = this.instances,
+        lightbox = this.lightbox;
+
       (this.overlay && this.overlay.destroy());
       this.element
-        .unbind('.lightbox')
         .removeData('lightbox');
 
+      $("*", this.element).unbind('.lightbox');
+
       this._anchors().removeData('lightbox.content');
+
+      instances.push(lightbox);
+      $.each(instances, function (index, instance) {
+        instance.data('dialog').uiDialog.stop(true);
+        instance.dialog('destroy').remove();
+      });
     },
 
     open: function (anchor) {
-      var viewer = (this.lightbox = this._makeDialog());
+      var viewer = (this.lightbox = this._getDialog());
 
       this.overlay = this.options.modal ? new $.ui.lightbox.overlay(viewer.data('dialog')) : null;
       this._setData('cursor', anchor);
@@ -264,14 +289,15 @@
     },
 
     close: function () {
-      var viewer = this.lightbox;
+      var viewer = this.lightbox,
+        instances = this.instances;
 
       (this.overlay && this.overlay.destroy());
 
       $.ui.lightbox.overlay.resize();
 
       // TODO: these need to be destroyed with the widget.
-      viewer.dialog('destroy').remove();
+      instances.push(viewer);
     },
 
     next: function (direction) {
@@ -370,13 +396,13 @@
 
     _actualContentSize: function (content) {
       var width, height;
-      $.swap($(content).clone().appendTo('<div>').appendTo(document.body)[0], {
+      $.swap($('<div/>').append(content.clone()).appendTo(document.body)[0], {
         position: "absolute",
         visibility: "hidden",
         display: "block"
       }, function () {
-        width = $(this).width();
-        height = $(this).height();
+        width = $(this).outerWidth();
+        height = $(this).outerHeight();
         $(this).remove();
       });
       return { width: width, height: height };
@@ -416,7 +442,7 @@
         current = this.options.cursor,
         target = this.options.cursor,
         viewer = this.lightbox,
-        newViewer = this._makeDialog();
+        newViewer = this._getDialog();
 
       if (anchors.length === 1) {
         return;
@@ -481,7 +507,7 @@
         dialog = $(this).data('dialog');
 
       $(dialog.uiDialog).hide(options.rotateOut, { direction: direction }, options.duration, function () {
-        $(self).dialog('destroy').remove();
+        lightbox.instances.push($(self));
       });
     },
 
@@ -527,7 +553,6 @@
 
       $(dialog.uiDialog).animate(anchorStyle, options.duration, function () {
         $(this).hide();
-        $(self).empty();
         lightbox.close();
       });
     },
@@ -547,12 +572,21 @@
 
     _lightboxStyle: function (dialog, size) {
       var content = dialog.element,
-        tbMargin = (parseInt(content.css('margin-top'), 10) || 0) + (parseInt(content.css('margin-bottom'), 10) || 0),
-        lrMargin = (parseInt(content.css('margin-left'), 10) || 0) + (parseInt(content.css('margin-right'), 10) || 0),
+        margin = {
+          height: (parseInt(content.css('margin-top'), 10) || 0) + (parseInt(content.css('margin-bottom'), 10) || 0),
+          width: (parseInt(content.css('margin-left'), 10) || 0) + (parseInt(content.css('margin-right'), 10) || 0)
+        },
+        chrome = {
+          height: dialog.options._lightboxExtraHeight,
+          width: dialog.options._lightboxExtraWidth
+        },
         position = '';
 
-      size.height += tbMargin + dialog.options._lightboxExtraHeight;
-      size.width += lrMargin + dialog.options._lightboxExtraWidth;
+      $.each(size, function (i, val) {
+        if (parseInt(val, 10) > 0) {
+          size[i] += margin[i] + chrome[i];
+        }
+      });
 
       position = this._position(size, this.options.position);
 
