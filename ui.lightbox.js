@@ -176,6 +176,7 @@
         }
         this.options.content = $(this.lightbox).append(value);
         this.lightbox.dialog('open')
+          .unbind('.lightbox')
           .bind('dialogopen.lightbox', this._dialogOpen)
           .bind('dialogclose.lightbox', this._dialogClose);
         break;
