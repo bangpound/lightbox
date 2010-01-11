@@ -162,7 +162,9 @@
           $(this.lightbox).dialog('close');
         }
         this.options.content = $(this.lightbox).append(value);
-        this.lightbox.dialog('open');
+        this.lightbox.dialog('open')
+          .bind('dialogopen.lightbox', this._dialogOpen)
+          .bind('dialogclose.lightbox', this._dialogClose);
         break;
       case 'cursor':
         this.options.cursor = value;
@@ -247,7 +249,7 @@
         .unbind('.lightbox')
         .removeData('lightbox');
 
-      this._anchors().removeData('lightbox');
+      this._anchors().removeData('lightbox.content');
     },
 
     open: function (anchor) {
@@ -256,7 +258,7 @@
       this.overlay = this.options.modal ? new $.ui.lightbox.overlay(viewer.data('dialog')) : null;
       this._setData('cursor', anchor);
 
-      this._setData('content', this._loadContent(anchor));
+      this._loadContent(anchor);
 
       // The ui.dialog widget has a reference to the ui.lightbox widget that
       // opened it in the dialog's options._lightbox property.
@@ -287,27 +289,33 @@
       return this.element.find(this.options.selector);
     },
 
-    _loadContent: function (anchor) {
-      var self = this,
-        anchorData = $(anchor).data('lightbox') || {};
+    _cacheContent: function (anchor, content) {
+      if (content && this.options.cache) {
+        $(anchor).data('lightbox.content', content);
+      }
+    },
 
-      if (!this.spinner) {
+    _loadContent: function (anchor, noDisplay) {
+      var self = this,
+        content = $(anchor).data('lightbox.content'),
+        type = this.options.type ? this.options.type : this._deriveType(anchor);
+
+      if (!this.spinner && !noDisplay) {
         this.spinner = new $.ui.lightbox.spinner(this);
       }
 
-      if (!this.options.reset && anchorData.content) {
-        return anchorData.content;
-      }
-      else {
-        anchorData = {
-          content: 'BUG',
-          type: this.options.type ? this.options.type : this._deriveType(anchor)
-        };
+      if (content && !this.options.reset && !noDisplay) {
+        self._setData('content', $(content));
+        return;
       }
 
-      switch (anchorData.type) {
+      switch (type) {
       case "image":
-        anchorData.content = $('<img/>').attr('src', anchor.href).load(function (eventObject) {
+        $('<img/>').attr('src', anchor.href).load(function (eventObject) {
+          self._cacheContent(anchor, this);
+          if (!noDisplay) {
+            self._setData('content', $(this));
+          }
         });
         break;
       case "flash":
@@ -322,15 +330,23 @@
           autoplay: 1
         }, function (element, options) {
         }, function (element, data, options, playerName) {
-          anchorData.content = $(data);
+          self._cacheContent(anchor, data);
+          if (!noDisplay) {
+            self._setData('content', $(data));
+          }
         }).remove();
         break;
       case "iframe":
-        anchorData.content = $('<iframe/>').attr('src', anchor.href).attr('frameborder', 0).attr('border', 0);
+        if (!noDisplay) {
+          this._setData('content', $('<iframe/>').attr('src', anchor.href).attr('frameborder', 0).attr('border', 0));
+        }
         break;
       case "html":
       case "dom":
-        anchorData.content = $($(anchor).attr('href'));
+        // HTML and DOM types don't need to be cached.
+        if (!noDisplay) {
+          this._setData('content', $($(anchor).attr('href')).clone());
+        }
         break;
       case "ajax":
       case "script":
@@ -340,20 +356,20 @@
           cache: true,
           async: false,
           data: self.options.parameters,
-          dataType: (anchorData.type === "ajax") ? "html" : "script",
+          dataType: (type === "ajax") ? "html" : "script",
           success: function (data, textStatus) {
-            anchorData.content = $(data);
+            self._cacheContent(anchor, data);
+            if (!noDisplay) {
+              self._setData('content', $(data));
+            }
           }
         });
         break;
       }
 
-      if (this.options.cache) {
-        $(anchor).data('lightbox', anchorData);
+      if (!noDisplay) {
+        this.spinner.destroy();
       }
-
-      this.spinner.destroy();
-      return anchorData.content;
     },
 
     // todo: find better way to guess media type from filename.
@@ -386,7 +402,9 @@
         self = this;
 
       anchors.filter(this._neighbours(index, anchors.length)).each(function () {
-        self._loadContent(this);
+        if (!$(this).data('lightbox.content')) {
+          self._loadContent(this, true);
+        }
       });
     },
 
@@ -467,11 +485,7 @@
         .bind('dialogopen.lightbox', { direction: direction }, this._rotateOpen);
 
       this._setData('cursor', target);
-      this._setData('content', this._loadContent(target));
-
-      newViewer
-        .bind('dialogopen.lightbox', this._dialogOpen)
-        .bind('dialogclose.lightbox', this._dialogClose);
+      this._loadContent(target);
 
       this._preloadNeighbours();
     },
