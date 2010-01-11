@@ -251,8 +251,7 @@
     },
 
     open: function (anchor) {
-      var viewer = (this.lightbox = this._makeDialog()),
-        buttonPane = viewer.data('dialog').uiDialogButtonPane;
+      var viewer = (this.lightbox = this._makeDialog());
 
       this.overlay = this.options.modal ? new $.ui.lightbox.overlay(viewer.data('dialog')) : null;
       this._setData('cursor', anchor);
