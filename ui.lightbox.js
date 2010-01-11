@@ -270,6 +270,7 @@
 
       instances.push(lightbox);
       $.each(instances, function (index, instance) {
+        instance.data('dialog').uiDialog.stop(true);
         instance.dialog('destroy').remove();
       });
     },
