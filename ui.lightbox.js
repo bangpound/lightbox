@@ -487,13 +487,13 @@
         direction = { up: "down", down: "up", left: "right", right: "left" }[event.data.direction],
         lightboxStyle = {};
 
-      if (size.width == 'auto' && size.height == 'auto') {
+      if (size.width === 'auto' && size.height === 'auto') {
         size = lightbox._idealContentSize(lightbox._actualContentSize(content));
         content.css(size);
       }
-      else if (size.width == 'constrain' || size.height == 'constrain') {
+      else if (size.width === 'constrain' || size.height === 'constrain') {
         $.each(size, function (i, val) {
-          if (val == 'constrain') {
+          if (val === 'constrain') {
             size = lightbox._constrainContentSize(content, options.constraint, i);
           }
         });
@@ -525,12 +525,12 @@
         anchorStyle = lightbox._anchorStyle(options.cursor),
         lightboxStyle = {};
 
-      if (size.width == 'auto' && size.height == 'auto') {
+      if (size.width === 'auto' && size.height === 'auto') {
         size = lightbox._idealContentSize(lightbox._actualContentSize(content));
       }
-      else if (size.width == 'constrain' || size.height == 'constrain') {
+      else if (size.width === 'constrain' || size.height === 'constrain') {
         $.each(size, function (i, val) {
-          if (val == 'constrain') {
+          if (val === 'constrain') {
             size = lightbox._constrainContentSize(content, options.constraint, i);
           }
         });
