@@ -296,7 +296,7 @@
       $.ui.lightbox.overlay.resize();
 
       // TODO: these need to be destroyed with the widget.
-      instances.push(viewer.empty());
+      instances.push(viewer);
     },
 
     next: function (direction) {
@@ -506,7 +506,7 @@
         dialog = $(this).data('dialog');
 
       $(dialog.uiDialog).hide(options.rotateOut, { direction: direction }, options.duration, function () {
-        lightbox.instances.push($(self).empty());
+        lightbox.instances.push($(self));
       });
     },
 
@@ -552,7 +552,6 @@
 
       $(dialog.uiDialog).animate(anchorStyle, options.duration, function () {
         $(this).hide();
-        $(self).empty();
         lightbox.close();
       });
     },
