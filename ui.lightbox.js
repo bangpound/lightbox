@@ -34,7 +34,6 @@
      *
      * anchors = _anchors() = anchors in this lightbox collection.
      * cursor = this.options.cursor = active item in lightbox.
-     * anchorData = $(anchor).data('lightbox') = cache.
      */
     _init: function () {
       var self = this;
@@ -262,7 +261,6 @@
 
       // The ui.dialog widget has a reference to the ui.lightbox widget that
       // opened it in the dialog's options._lightbox property.
-      this._preloadNeighbours();
     },
 
     close: function () {
@@ -289,33 +287,18 @@
       return this.element.find(this.options.selector);
     },
 
-    _cacheContent: function (anchor, content) {
-      if (content && this.options.cache) {
-        $(anchor).data('lightbox.content', content);
-      }
-    },
-
-    _loadContent: function (anchor, noDisplay) {
+    _loadContent: function (anchor) {
       var self = this,
-        content = $(anchor).data('lightbox.content'),
         type = this.options.type ? this.options.type : this._deriveType(anchor);
 
-      if (!this.spinner && !noDisplay) {
+      if (!this.spinner) {
         this.spinner = new $.ui.lightbox.spinner(this);
-      }
-
-      if (content && !this.options.reset && !noDisplay) {
-        self._setData('content', $(content));
-        return;
       }
 
       switch (type) {
       case "image":
         $('<img/>').attr('src', anchor.href).load(function (eventObject) {
-          self._cacheContent(anchor, this);
-          if (!noDisplay) {
-            self._setData('content', $(this));
-          }
+          self._setData('content', $(this));
         });
         break;
       case "flash":
@@ -330,23 +313,15 @@
           autoplay: 1
         }, function (element, options) {
         }, function (element, data, options, playerName) {
-          self._cacheContent(anchor, data);
-          if (!noDisplay) {
-            self._setData('content', $(data));
-          }
+          self._setData('content', $(data));
         }).remove();
         break;
       case "iframe":
-        if (!noDisplay) {
-          this._setData('content', $('<iframe/>').attr('src', anchor.href).attr('frameborder', 0).attr('border', 0));
-        }
+        this._setData('content', $('<iframe/>').attr('src', anchor.href).attr('frameborder', 0).attr('border', 0));
         break;
       case "html":
       case "dom":
-        // HTML and DOM types don't need to be cached.
-        if (!noDisplay) {
-          this._setData('content', $($(anchor).attr('href')).clone());
-        }
+        this._setData('content', $($(anchor).attr('href')).clone());
         break;
       case "ajax":
       case "script":
@@ -358,18 +333,13 @@
           data: self.options.parameters,
           dataType: (type === "ajax") ? "html" : "script",
           success: function (data, textStatus) {
-            self._cacheContent(anchor, data);
-            if (!noDisplay) {
-              self._setData('content', $(data));
-            }
+            self._setData('content', $(data));
           }
         });
         break;
       }
 
-      if (!noDisplay) {
-        this.spinner.destroy();
-      }
+      this.spinner.destroy();
     },
 
     // todo: find better way to guess media type from filename.
@@ -394,22 +364,6 @@
         return "windowsmedia";
       }
       return "ajax";
-    },
-
-    _preloadNeighbours: function () {
-      var anchors = this._anchors(),
-        index = anchors.index(this.options.cursor),
-        self = this;
-
-      anchors.filter(this._neighbours(index, anchors.length)).each(function () {
-        if (!$(this).data('lightbox.content')) {
-          self._loadContent(this, true);
-        }
-      });
-    },
-
-    _neighbours: function (index, length) {
-      return ":eq(" + (index === 0 ? length - 1 : index - 1) + "), :eq(" + (index === length - 1 ? 0 : index + 1) + ")";
     },
 
     // Sizing functions
@@ -486,8 +440,6 @@
 
       this._setData('cursor', target);
       this._loadContent(target);
-
-      this._preloadNeighbours();
     },
 
     // Swappable dialog event handlers.
@@ -613,7 +565,6 @@
       loop: true,
       modal: true,
       overlay: {},
-      cache: true,
       post: 0,
       dialogClass: 'ui-lightbox',
       closeOnEscape: true,
