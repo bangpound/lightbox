@@ -402,6 +402,11 @@
       return { width: width, height: height };
     },
 
+    _constrainContentSize: function (content, constraint, dimension) {
+      $(content).css(dimension, $(constraint, content).attr(dimension));
+      return this._actualContentSize(content);
+    },
+
     _idealContentSize: function (size) {
       var wWidth = $(window).width(),
         wHeight = $(window).height(),
@@ -478,6 +483,13 @@
         size = lightbox._idealContentSize(lightbox._actualContentSize(content));
         content.css(size);
       }
+      else if (size.width == 'constrain' || size.height == 'constrain') {
+        $.each(size, function (i, val) {
+          if (val == 'constrain') {
+            size = lightbox._constrainContentSize(content, options.constraint, i);
+          }
+        });
+      }
 
       lightboxStyle = lightbox._lightboxStyle(dialog, size);
 
@@ -507,6 +519,13 @@
 
       if (size.width == 'auto' && size.height == 'auto') {
         size = lightbox._idealContentSize(lightbox._actualContentSize(content));
+      }
+      else if (size.width == 'constrain' || size.height == 'constrain') {
+        $.each(size, function (i, val) {
+          if (val == 'constrain') {
+            size = lightbox._constrainContentSize(content, options.constraint, i);
+          }
+        });
       }
 
       lightboxStyle = lightbox._lightboxStyle(dialog, size);
@@ -574,8 +593,19 @@
       selector: "a[href]:has(img[src])",
       titleSuffix: "",
       position: 'center',
+
+      // Width/height is the size of the content.
+      // Allowed values for width, height:
+      // 'auto' = if contents have width or height, the lightbox will size
+      //   to fit.
+      // 'constrain' = when the 'constraint' option is also set, the element
+      //   selected by 'constraint' in the content will determine the width or
+      //   height.
+      //  6px,1em, 50% = normal CSS style.
       width: 'auto',
       height: 'auto',
+      constraint: '',
+
       parameters: {},
       duration: 400,
       rotateIn: 'drop',
