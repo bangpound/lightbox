@@ -54,10 +54,7 @@
             return;
           }
           if (self.options.closeOnEscape) {
-            self.lightbox
-              .unbind('dialogclose.lightbox')
-              .bind('dialogclose.lightbox', self._dialogClose)
-              .dialog('close');
+            self.lightbox.dialog('close');
             event.preventDefault();
           }
           break;
