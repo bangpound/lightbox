@@ -14,6 +14,7 @@
     $('#gallery').lightbox({ });
     $('#youtube').lightbox({ type: 'dom', selector: 'a', width: 425, height: 344 });
     $('#quicktime').lightbox({ selector: 'a', width: 480, height: 260 });
+    $('#ahah').lightbox({ dialogClass: 'ui-lightbox kleenex', type: 'ajax', height: 'constrain', constraint: '.video' });
   });
 })(jQuery);
 // ]]>
@@ -64,6 +65,11 @@
   selector: 'a', width: 480,
   height: 260 });</p>
 				<a href="http://malsup.com/jquery/media/video/simpsons.mov">simpsons</a>
+			</div>
+			<div id="ahah">
+        <h2>AHAH</h2>
+			  <p class="usage">$('#ahah').lightbox({});</p><a href="ajax1.txt">
+			  <img src="http://img.youtube.com/vi/zY2nXUUvwg4/2.jpg" alt="Thumbnail from Pixar Birds" /></a>
 			</div>
 		</div>
 	</div>

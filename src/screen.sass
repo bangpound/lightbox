@@ -108,7 +108,7 @@ hr
   font-style: italic
 
 
-#gallery,#youtube,#quicktime
+#gallery,#youtube,#quicktime,#ahah
   +column(8, true)
   +prepend(4)
   +append-bottom
@@ -135,10 +135,26 @@ hr
       img
         vertical-align: middle
 
-#youtube,#quicktime
+#youtube,#quicktime,#ahah
   a
     +column(3)
     line-height: 90px
     text-align: center
     img
       vertical-align: middle
+
+.kleenex
+  +clearfix
+  .ui-dialog-content
+    padding:
+      left: 435px
+  .video
+    margin:
+      left: -425px
+  h1
+    font-size: 12px
+    font-weight: bold
+  p,h1
+    //width: 50%
+    //+float-left
+

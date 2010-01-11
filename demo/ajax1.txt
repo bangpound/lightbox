@@ -1,0 +1,50 @@
+<div class="video">
+<object width="425" height="344"><param name="movie" value="http://www.youtube.com/v/zY2nXUUvwg4&hl=en_US&fs=1&"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/zY2nXUUvwg4&hl=en_US&fs=1&" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="425" height="344"></embed></object>
+</div>
+
+<h1>Nice by KLEENEX</h1>
+
+<p>
+Oh sie sind so h&uuml;bsch,<br />
+oh sie sind so nett.<br />
+Rosarot das m&ouml;gen sie,<br />
+hellblau das tragen sie.<br />
+Die kleinen weissen Pudel,<br />
+oh, so naiv im Rudel.<br />
+</p>
+
+<p>
+Sie brauchen dich nicht,<br />
+sie k&ouml;nnen alles kaufen.<br />
+Rosarot das m&ouml;gen sie,<br />
+hellblau das tragen sie.<br />
+Die kleinen schwarzen Pudel,<br />
+oh, so naiv im Rudel.<br />
+</p>
+
+<p>
+Die denken was du denkst,<br />
+sie sagen was du sagst.<br />
+Sie k&ouml;nnen alles kaufen,<br />
+sie k&ouml;nnen nicht tr&auml;umen.<br />
+Rosarot das m&ouml;gen sie,<br />
+hellblau das tragen sie.<br />
+</p>
+
+<p>
+Oh sie sind so h&uuml;bsch,<br />
+oh sie sind so nett.<br />
+Rosarot das m&ouml;gen sie.<br />
+hellblau das tragen sie.<br />
+Die kleinen schwarzen Pudel<br />
+oh, so naiv im Rudel<br />
+</p>
+
+<p>
+Sie m&uuml;ssen nicht denken,<br />
+sie sind so gleich.<br />
+Rosarot das m&ouml;gen sie,<br />
+hellblau das tragen sie.<br />
+Die kleinen schwarzen Pudel,<br />
+oh, so naiv im Rudel.<br />
+</p>
