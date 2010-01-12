@@ -663,7 +663,7 @@
         $(window).bind('resize.dialog-overlay', $.ui.lightbox.overlay.resize);
       }
 
-      var $el = $('<div></div>').appendTo(document.body)
+      var $el = $('<div/>').appendTo(document.body)
         .addClass('ui-dialog-overlay').css($.extend({
           borderWidth: 0,
           margin: 0,
