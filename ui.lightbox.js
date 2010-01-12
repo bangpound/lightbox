@@ -262,16 +262,20 @@
         lightbox = this.lightbox;
 
       (this.overlay && this.overlay.destroy());
-      this.element
-        .removeData('lightbox');
 
-      $("*", this.element).unbind('.lightbox');
+      instances.push(lightbox);
+      this._flushInstances();
 
       this._anchors().removeData('lightbox.content');
 
-      instances.push(lightbox);
+      this.element.removeData('lightbox');
+      $("*", this.element).unbind('.lightbox');
+    },
+
+    _flushInstances: function () {
+      var instances = this.instances;
       $.each(instances, function (index, instance) {
-        instance.data('dialog').uiDialog.stop(true);
+        instance.empty().data('dialog').uiDialog.stop(true);
         instance.dialog('destroy').remove();
       });
     },
@@ -296,8 +300,8 @@
 
       $.ui.lightbox.overlay.resize();
 
-      // TODO: these need to be destroyed with the widget.
       instances.push(viewer);
+      this._flushInstances();
     },
 
     next: function (direction) {
