@@ -146,6 +146,8 @@
       var viewer = this.lightbox,
         content = $(anchor).data('lightbox.content');
 
+      (this.spinner && this.spinner.destroy());
+
       viewer
         .append(content)
         .dialog('open')
@@ -295,9 +297,7 @@
         type = this.options.type ? this.options.type : this._deriveType(anchor),
         content = $(anchor).data('lightbox.content');
 
-      if (!this.spinner) {
-        this.spinner = new $.ui.lightbox.spinner(this);
-      }
+      this.spinner = new $.ui.lightbox.spinner(this);
 
       if (!content) {
         switch (type) {
@@ -353,8 +353,6 @@
       else {
         this._display(anchor);
       }
-
-      this.spinner.destroy();
     },
 
     // todo: find better way to guess media type from filename.
