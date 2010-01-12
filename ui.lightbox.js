@@ -608,12 +608,12 @@
       loop: true,
       modal: true,
       overlay: {},
-      post: 0,
+      selector: "a[href]:has(img[src])",
+
       dialogClass: 'ui-lightbox',
       closeOnEscape: true,
       resizable: false,
       draggable: false,
-      selector: "a[href]:has(img[src])",
       titleSuffix: "",
       position: 'center',
 
@@ -630,12 +630,16 @@
       constraint: '',
       resizeContent: true,
 
+      post: 0,
       parameters: {},
-      duration: 400,
+
+      // Transition effects and animation options.
       rotateIn: 'drop',
       rotateOut: 'drop',
       show: 'scale',
       hide: 'scale',
+      duration: 400,
+
       margin: 100
     },
     uuid: 0,
