@@ -254,7 +254,7 @@
 
     _flushInstances: function () {
       $.each(this.instances, function (index, instance) {
-        (instance && instance.empty().data('dialog').uiDialog.stop(true) && instance.dialog('destroy').remove());
+        instance.remove();
       });
       this.instances = [];
     },
@@ -276,7 +276,6 @@
 
       instances.push(viewer);
       this._flushInstances();
-      delete this.lightbox;
     },
 
     next: function (direction) {
