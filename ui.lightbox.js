@@ -547,15 +547,20 @@
 
     _anchorStyle: function (anchor) {
       var offset = {},
-        size = {};
+        size = {},
+        style = $(anchor).data('lightbox.anchorStyle');
 
-      $.swap(anchor, { display: 'block' }, function () {
-        offset = $(this).offset();
-        size.height = $(this).outerHeight();
-        size.width = $(this).outerWidth();
-      });
+      if (!style) {
+        $.swap(anchor, { display: 'block' }, function () {
+          offset = $(this).offset();
+          size.height = $(this).outerHeight();
+          size.width = $(this).outerWidth();
+        });
+        style = $.extend({ opacity: 0 }, size, offset);
+        $(anchor).data('lightbox.anchorStyle', style);
+      }
 
-      return $.extend({ opacity: 0 }, size, offset);
+      return style;
     },
 
     _lightboxStyle: function (dialog, size) {
