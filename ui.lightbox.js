@@ -50,15 +50,6 @@
           return;
         }
         switch (event.keyCode) {
-        case $.ui.keyCode.ESCAPE:
-          if (!self.lightbox.dialog('isOpen')) {
-            return;
-          }
-          if (self.options.closeOnEscape) {
-            self.lightbox.dialog('close');
-            event.preventDefault();
-          }
-          break;
         case $.ui.keyCode.LEFT:
           self.prev("right");
           event.preventDefault();
@@ -113,7 +104,7 @@
       var lightbox = $('<div/>').dialog({
           autoOpen: false,
           autoResize: false,
-          closeOnEscape: false,
+          closeOnEscape: this.options.closeOnEscape,
           modal: false,
           show: 'lightboxDialog',
           hide: 'lightboxDialog',
@@ -274,8 +265,7 @@
 
     _flushInstances: function () {
       $.each(this.instances, function (index, instance) {
-        instance.empty().data('dialog').uiDialog.stop(true);
-        instance.dialog('destroy').remove();
+        (instance && instance.empty().data('dialog').uiDialog.stop(true) && instance.dialog('destroy').remove());
       });
       this.instances = [];
     },
@@ -283,7 +273,7 @@
     open: function (anchor) {
       var viewer = (this.lightbox = this._getDialog());
 
-      this.overlay = this.options.modal ? new $.ui.lightbox.overlay(viewer.data('dialog')) : null;
+      this.overlay = this.options.modal ? new $.ui.lightbox.overlay(this) : null;
       this._setData('cursor', anchor);
 
       this._loadContent(anchor);
@@ -553,8 +543,7 @@
       content.effect('size', { to: { width: anchorStyle.width, height: anchorStyle.height } }, options.duration);
 
       $(dialog.uiDialog).animate(anchorStyle, options.duration, function () {
-        $(this).hide();
-        lightbox.close();
+        ($(this).hide() && lightbox.close());
       });
     },
 
@@ -630,8 +619,8 @@
       margin: 100
     },
     uuid: 0,
-    overlay: function (dialog) {
-      this.$el = $.ui.lightbox.overlay.create(dialog);
+    overlay: function (lightbox) {
+      this.$el = $.ui.lightbox.overlay.create(lightbox);
     },
     spinner: function (lightbox) {
       this.$el = $.ui.lightbox.spinner.create(lightbox);
@@ -641,7 +630,59 @@
   /**
    * Overlay
    */
-  $.extend($.ui.lightbox.overlay, $.ui.dialog.overlay, {});
+  $.extend($.ui.lightbox.overlay, $.ui.dialog.overlay, {
+    create: function (lightbox) {
+      if (this.instances.length === 0) {
+        setTimeout(function () {
+          $('a, :input').bind($.ui.lightbox.overlay.events, function () {
+            var allow = false,
+              $dialog = $(this.lightbox).parents('.ui-dialog'),
+              $overlays = {},
+              maxZ = 0;
+
+            if ($dialog.length) {
+              $overlays = $('.ui-dialog-overlay');
+              if ($overlays.length) {
+                maxZ = parseInt($overlays.css('z-index'), 10);
+                $overlays.each(function () {
+                  maxZ = Math.max(maxZ, parseInt($(this).css('z-index'), 10));
+                });
+                allow = parseInt($dialog.css('z-index'), 10) > maxZ;
+              } else {
+                allow = true;
+              }
+            }
+            return allow;
+          });
+        }, 1);
+
+        // allow closing by pressing the escape key
+        $(document).bind('keydown.lightbox-overlay', function (event) {
+          (lightbox.options.closeOnEscape && event.keyCode && event.keyCode === $.ui.keyCode.ESCAPE && lightbox.close());
+        });
+
+        // handle window resize
+        $(window).bind('resize.lightbox-overlay', $.ui.lightbox.overlay.resize);
+      }
+
+      var $el = $('<div></div>').appendTo(document.body)
+        .addClass('ui-dialog-overlay').css($.extend({
+          borderWidth: 0,
+          margin: 0,
+          padding: 0,
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: this.width(),
+          height: this.height()
+        }, lightbox.options.overlay));
+
+      (lightbox.options.bgiframe && $.fn.bgiframe && $el.bgiframe());
+
+      this.instances.push($el);
+      return $el;
+    }
+  });
 
   $.extend($.ui.lightbox.overlay.prototype, $.ui.dialog.overlay.prototype, {
     destroy: function () {
