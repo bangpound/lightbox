@@ -546,8 +546,7 @@
     },
 
     _dialogClose: function (event, ui) {
-      var self = this,
-        lightbox = $(this).dialog('option', '_lightbox'),
+      var lightbox = $(this).dialog('option', '_lightbox'),
         options = lightbox.options,
         content = $(this).children(),
         dialog = $(this).data('dialog'),
