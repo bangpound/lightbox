@@ -655,12 +655,12 @@
         }, 1);
 
         // allow closing by pressing the escape key
-        $(document).bind('keydown.lightbox-overlay', function (event) {
+        $(document).bind('keydown.dialog-overlay', function (event) {
           (lightbox.options.closeOnEscape && event.keyCode && event.keyCode === $.ui.keyCode.ESCAPE && lightbox.close());
         });
 
         // handle window resize
-        $(window).bind('resize.lightbox-overlay', $.ui.lightbox.overlay.resize);
+        $(window).bind('resize.dialog-overlay', $.ui.lightbox.overlay.resize);
       }
 
       var $el = $('<div></div>').appendTo(document.body)
