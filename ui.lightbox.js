@@ -462,26 +462,12 @@
         options = lightbox.options,
         dialog = $(this).data('dialog'),
         content = $(this).children(),
-        size = { width: options.width, height: options.height },
         direction = { up: "down", down: "up", left: "right", right: "left" }[event.data.direction],
-        lightboxStyle = {};
+        lightboxStyle = lightbox._lightboxStyle(options.cursor);
 
-      if (size.width === 'auto' && size.height === 'auto') {
-        size = lightbox._idealContentSize(lightbox._actualContentSize(content));
-        content.css(size);
+      if (options.resizeContent === true) {
+        content.css({ width: lightboxStyle.width, height: lightboxStyle.height });
       }
-      else if (size.width === 'constrain' || size.height === 'constrain') {
-        $.each(size, function (i, val) {
-          if (val === 'constrain') {
-            size = lightbox._constrainContentSize(content, options.constraint, i);
-          }
-        });
-      }
-
-      if (options.modal) {
-        lightboxStyle.position = 'fixed';
-      }
-      $.extend(lightboxStyle, lightbox._lightboxStyle(options.cursor));
 
       $(dialog.uiDialog).css(lightboxStyle).show(options.rotateIn, { direction: direction }, options.duration);
     },
