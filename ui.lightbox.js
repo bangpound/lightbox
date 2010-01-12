@@ -143,19 +143,6 @@
       return lightbox;
     },
 
-    _getData: function (key) {
-      switch (key) {
-      case 'content':
-        return $(this.lightbox).html();
-
-      case 'cursor':
-        return $(this.options.cursor);
-
-      default:
-        return this.lightbox.dialog('option', key);
-      }
-    },
-
     _display: function (anchor) {
       var viewer = this.lightbox,
         content = $(anchor).data('lightbox.content');
