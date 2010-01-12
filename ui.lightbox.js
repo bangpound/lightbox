@@ -1,4 +1,4 @@
-/*globals document,window,$,jQuery,Image */
+/*globals window,jQuery */
 /*jslint white: true, browser: true, onevar: true, undef: true, eqeqeq: true, plusplus: true, bitwise: true, regexp: true, strict: true, newcap: true, immed: true, indent: 2 */
 
 "use strict";
