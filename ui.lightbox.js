@@ -241,7 +241,10 @@
       instances.push(lightbox);
       this._flushInstances();
 
-      this._anchors().removeData('lightbox.content');
+      this._anchors()
+        .removeData('lightbox.content')
+        .removeData('lightbox.anchorStyle')
+        .removeData('lightbox.lightboxStyle');
 
       this.element.removeData('lightbox');
       $("*", this.element).unbind('.lightbox');
