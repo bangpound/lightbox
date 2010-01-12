@@ -100,7 +100,6 @@
     },
 
     _makeDialog: function () {
-      // Using &nbsp; adds unwanted width and height to the calculation.
       var lightbox = $('<div/>').dialog({
           autoOpen: false,
           autoResize: false,
