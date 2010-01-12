@@ -253,10 +253,13 @@
     },
 
     _flushInstances: function () {
-      $.each(this.instances, function (index, instance) {
-        instance.remove();
-      });
-      this.instances = [];
+      var self = this;
+      setTimeout(function () {
+        $.each(self.instances, function (index, instance) {
+          instance.remove();
+        });
+        self.instances = [];
+      }, this.options.duration);
     },
 
     open: function (anchor) {
