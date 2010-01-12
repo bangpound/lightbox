@@ -507,7 +507,8 @@
       content.effect('size', { to: { width: anchorStyle.width, height: anchorStyle.height } }, options.duration);
 
       $(dialog.uiDialog).animate(anchorStyle, options.duration, function () {
-        ($(this).hide() && lightbox.close());
+        $(this).hide();
+        lightbox.close();
       });
     },
 
