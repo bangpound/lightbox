@@ -124,7 +124,7 @@
     },
     _display: function (anchor) {
       var content = $(anchor).data('lightbox.content');
-      this.options.cursor = anchor;
+      this._setData('cursor', anchor);
       this.lightbox.append(content);
       this.lightbox.dialog('open');
       (this.spinner && this.spinner.destroy());
