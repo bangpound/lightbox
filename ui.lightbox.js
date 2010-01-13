@@ -485,14 +485,14 @@
         dialog = $(element).data('dialog'),
         options = lightbox.options,
         size = {
-        width: options.width,
-        height: options.height
-      },
+          width: options.width,
+          height: options.height
+        },
         contentSize = this._actualContentSize(content),
         margin = {
-        height: (parseInt(content.css('margin-top'), 10) || 0) + (parseInt(content.css('margin-bottom'), 10) || 0),
-        width: (parseInt(content.css('margin-left'), 10) || 0) + (parseInt(content.css('margin-right'), 10) || 0)
-      },
+          height: (parseInt(content.css('margin-top'), 10) || 0) + (parseInt(content.css('margin-bottom'), 10) || 0),
+          width: (parseInt(content.css('margin-left'), 10) || 0) + (parseInt(content.css('margin-right'), 10) || 0)
+        },
         chrome = this._dialogChrome(dialog),
         position = {},
         style = $(anchor).data('lightbox.lightboxStyle');
