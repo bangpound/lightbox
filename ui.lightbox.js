@@ -36,6 +36,9 @@
  */
 
 
+/**
+ * jQuery UI widget methods
+ */
 
     _init: function () {
       var self;
@@ -114,6 +117,9 @@
 
 
 
+/**
+ * ui.dialog integration
+ */
 
     _makeDialog: function (cursor) {
       var viewer, buttonPane;
@@ -238,6 +244,9 @@
       $("*", this.element).unbind('.lightbox');
     },
 
+/**
+ * Lightbox public
+ */
 
     open: function (anchor) {
       this.lightbox = this._makeDialog(anchor);
@@ -262,6 +271,9 @@
     },
 
 
+/**
+ * Elements
+ */
 
     _anchors: function () {
       // if deemed necessary, cache selection here
@@ -530,6 +542,9 @@
 
     },
 
+/**
+ * Style generators
+ */
 
     _anchorStyle: function (anchor) {
       var offset, size, style;
