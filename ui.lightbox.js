@@ -42,6 +42,7 @@
         autoResize: true,
         closeOnEscape: this.options.closeOnEscape,
         modal: false,
+        // $.effects.lightboxDialog blocks ui.dialog's hide/show behavior.
         show: 'lightboxDialog',
         hide: 'lightboxDialog',
         width: 'auto',
