@@ -126,6 +126,14 @@
       $.widget.prototype._setData.apply(this, arguments);
     },
 
+    destroy: function () {
+      if (this.overlay) {
+        this.overlay.destroy();
+      }
+      this._anchors().removeData('lightbox.content').removeData('lightbox.anchorStyle').removeData('lightbox.lightboxStyle');
+      this.element.removeData('lightbox');
+      $("*", this.element).unbind('.lightbox');
+    },
 
 
 /**
@@ -234,15 +242,6 @@
           lightbox.next("left");
         }
       };
-    },
-    destroy: function () {
-      if (this.overlay) {
-        this.overlay.destroy();
-
-      }
-      this._anchors().removeData('lightbox.content').removeData('lightbox.anchorStyle').removeData('lightbox.lightboxStyle');
-      this.element.removeData('lightbox');
-      $("*", this.element).unbind('.lightbox');
     },
 
 /**
