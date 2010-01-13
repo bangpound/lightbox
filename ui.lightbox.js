@@ -408,7 +408,7 @@
         direction = event.data.direction,
         options = lightbox.options,
         dialog = $(this).data('dialog'),
-        content = dialog.element;
+        content = $(this).children();
       dialog.uiDialog.hide(options.rotateOut, {
         direction: direction
       },
@@ -444,7 +444,7 @@
         anchor = event.data.anchor,
         options = lightbox.options,
         dialog = $(this).data('dialog'),
-        content = dialog.element,
+        content = $(this).children(),
         anchorStyle = lightbox._anchorStyle(anchor);
       content.effect('size', {
         to: {
