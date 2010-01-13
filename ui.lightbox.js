@@ -482,7 +482,7 @@
       $(this).css({
         width: lightboxStyle.width - chrome.width,
         height: lightboxStyle.height - chrome.height
-      })
+      });
 
       _dialog.uiDialog
         .css(lightboxStyle)
@@ -545,7 +545,7 @@
       $(this).css({
         width: lightboxStyle.width - chrome.width,
         height: lightboxStyle.height - chrome.height
-      })
+      });
 
       _dialog.uiDialog
         .css(anchorStyle)
