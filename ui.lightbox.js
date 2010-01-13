@@ -454,7 +454,7 @@
  */
 
     _rotateOpen: function (event, ui) {
-      var _lightbox, _dialog, $anchor, $content, direction, options, lightboxStyle;
+      var _lightbox, _dialog, $anchor, $content, direction, options, lightboxStyle, chrome; // this = dialog element.
 
       _lightbox = $(event.data.lightbox).data('lightbox');
       _dialog = $(this).data('dialog');
@@ -470,13 +470,19 @@
       }[event.data.direction];
       options = _lightbox.options;
       lightboxStyle = _lightbox._lightboxStyle(this, $anchor);
+      chrome = _lightbox._dialogChrome(_dialog);
 
       if (options.resizeContent === true) {
         $content.css({
-          width: lightboxStyle.width,
-          height: lightboxStyle.height
+          width: lightboxStyle.width - chrome.width,
+          height: lightboxStyle.height - chrome.height
         });
       }
+
+      $(this).css({
+        width: lightboxStyle.width - chrome.width,
+        height: lightboxStyle.height - chrome.height
+      })
 
       _dialog.uiDialog
         .css(lightboxStyle)
@@ -508,7 +514,7 @@
     },
 
     _dialogOpen: function (event, ui) {
-      var _lightbox, _dialog, $anchor, $content, options, anchorStyle, lightboxStyle;
+      var _lightbox, _dialog, $anchor, $content, options, anchorStyle, lightboxStyle, chrome;
 
       _lightbox = $(event.data.lightbox).data('lightbox');
       _dialog = $(this).data('dialog');
@@ -519,6 +525,7 @@
       options = _lightbox.options;
       anchorStyle = _lightbox._anchorStyle($anchor);
       lightboxStyle = _lightbox._lightboxStyle(this, $anchor);
+      chrome = _lightbox._dialogChrome(_dialog);
 
       if (options.resizeContent === true) {
         $content.effect('size', {
@@ -527,13 +534,18 @@
             height: anchorStyle.height
           },
           to: {
-            width: lightboxStyle.width,
-            height: lightboxStyle.height
+            width: lightboxStyle.width - chrome.width,
+            height: lightboxStyle.height - chrome.height
           },
           scale: 'both'
         },
         options.duration);
       }
+
+      $(this).css({
+        width: lightboxStyle.width - chrome.width,
+        height: lightboxStyle.height - chrome.height
+      })
 
       _dialog.uiDialog
         .css(anchorStyle)
