@@ -735,7 +735,7 @@
           $('a, :input').bind($.ui.lightbox.overlay.events, function () {
             var allow, $dialog, $overlays, maxZ;
             allow = false;
-            $dialog = this.$viewer.parents('.ui-dialog');
+            $dialog = $(this).parents('.ui-dialog');
             $overlays = {};
             maxZ = 0;
             if ($dialog.length) {
