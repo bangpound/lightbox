@@ -244,6 +244,36 @@
       };
     },
 
+    _rotate: function (selectorA, selectorB, direction) {
+      var anchors, current, target, viewer;
+      anchors = this._anchors();
+      current = this.options.cursor;
+      target = this.options.cursor;
+      viewer = this.lightbox;
+      if (anchors.length === 1) {
+        return;
+      }
+      target = anchors.filter(selectorA + anchors.index(current) + ")" + selectorB)[0];
+      if (!target && this.options.loop && anchors.length > 1) {
+        target = anchors.filter(selectorB)[0];
+      }
+      viewer.unbind('dialogclose.lightbox').bind('dialogclose.lightbox', {
+        lightbox: this,
+        anchor: current,
+        direction: direction
+      },
+      this._rotateClose).dialog('close');
+      viewer = this.lightbox = this._makeDialog(target);
+      viewer.unbind('dialogopen.lightbox').bind('dialogopen.lightbox', {
+        lightbox: this,
+        anchor: target,
+        direction: direction
+      },
+      this._rotateOpen);
+      this._setData('cursor', target);
+      this._loadContent(target);
+    },
+
 /**
  * Lightbox public
  */
@@ -410,35 +440,6 @@
         width: Math.round(ratio * size.width),
         height: Math.round(ratio * size.height)
       };
-    },
-    _rotate: function (selectorA, selectorB, direction) {
-      var anchors, current, target, viewer;
-      anchors = this._anchors();
-      current = this.options.cursor;
-      target = this.options.cursor;
-      viewer = this.lightbox;
-      if (anchors.length === 1) {
-        return;
-      }
-      target = anchors.filter(selectorA + anchors.index(current) + ")" + selectorB)[0];
-      if (!target && this.options.loop && anchors.length > 1) {
-        target = anchors.filter(selectorB)[0];
-      }
-      viewer.unbind('dialogclose.lightbox').bind('dialogclose.lightbox', {
-        lightbox: this,
-        anchor: current,
-        direction: direction
-      },
-      this._rotateClose).dialog('close');
-      viewer = this.lightbox = this._makeDialog(target);
-      viewer.unbind('dialogopen.lightbox').bind('dialogopen.lightbox', {
-        lightbox: this,
-        anchor: target,
-        direction: direction
-      },
-      this._rotateOpen);
-      this._setData('cursor', target);
-      this._loadContent(target);
     },
 
 /**
