@@ -514,7 +514,7 @@
     },
 
     _dialogOpen: function (event, ui) {
-      var _lightbox, _dialog, $anchor, $content, options, anchorStyle, lightboxStyle, chrome;
+      var _lightbox, _dialog, $anchor, $content, options, anchorStyle, lightboxStyle, margin, chrome;
 
       _lightbox = $(event.data.lightbox).data('lightbox');
       _dialog = $(this).data('dialog');
@@ -525,6 +525,10 @@
       options = _lightbox.options;
       anchorStyle = _lightbox._anchorStyle($anchor);
       lightboxStyle = _lightbox._lightboxStyle(this, $anchor);
+      margin = {
+        height: (parseInt($content.css('margin-top'), 10) || 0) + (parseInt($content.css('margin-bottom'), 10) || 0),
+        width: (parseInt($content.css('margin-left'), 10) || 0) + (parseInt($content.css('margin-right'), 10) || 0)
+      };
       chrome = _lightbox._dialogChrome(_dialog);
 
       if (options.resizeContent === true) {
@@ -534,8 +538,8 @@
             height: anchorStyle.height
           },
           to: {
-            width: lightboxStyle.width - chrome.width,
-            height: lightboxStyle.height - chrome.height
+            width: lightboxStyle.width - chrome.width - margin.width,
+            height: lightboxStyle.height - chrome.height - margin.height
           },
           scale: 'both'
         },
