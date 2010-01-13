@@ -132,7 +132,7 @@
       this._setData('cursor', anchor);
       this.lightbox.append(content);
       this.lightbox.dialog('open');
-      if ($.isFunction(this.spinner)) {
+      if (this.spinner) {
         this.spinner.destroy();
       }
     },
@@ -214,7 +214,7 @@
       };
     },
     destroy: function () {
-      if ($.isFunction(this.overlay)) {
+      if (this.overlay) {
         this.overlay.destroy();
       }
       this._anchors().removeData('lightbox.content').removeData('lightbox.anchorStyle').removeData('lightbox.lightboxStyle');
@@ -228,6 +228,9 @@
       this._loadContent(anchor);
     },
     close: function () {
+      if (this.spinner) {
+        this.spinner.destroy();
+      }
       this.lightbox.dialog('close');
     },
     next: function (direction) {
@@ -477,7 +480,7 @@
         options.duration);
       }
       dialog.uiDialog.animate(anchorStyle, options.duration, function () {
-        if ($.isFunction(lightbox.overlay)) {
+        if (lightbox.overlay) {
           lightbox.overlay.destroy();
         }
         $.ui.lightbox.overlay.resize();
@@ -656,7 +659,7 @@
         height: this.height()
       },
       lightbox.options.overlay));
-      if (lightbox.options.bgiframe && $.isFunction($.fn.bgiframe)) {
+      if (lightbox.options.bgiframe && $.fn.bgiframe) {
         $el.bgiframe();
       }
       this.instances.push($el);
