@@ -216,8 +216,6 @@
       this._loadContent(anchor);
     },
     close: function () {
-      (this.overlay && this.overlay.destroy());
-      $.ui.lightbox.overlay.resize();
       this.lightbox.dialog('close');
     },
     next: function (direction) {
@@ -457,6 +455,8 @@
       },
       options.duration);
       dialog.uiDialog.animate(anchorStyle, options.duration, function () {
+        (lightbox.overlay && lightbox.overlay.destroy());
+        $.ui.lightbox.overlay.resize();
         content.remove();
       });
     },
