@@ -434,7 +434,8 @@
           to: {
             width: lightboxStyle.width,
             height: lightboxStyle.height
-          }
+          },
+          scale: 'both'
         },
         options.duration);
       }
@@ -447,13 +448,16 @@
         dialog = $(this).data('dialog'),
         content = $(this).children(),
         anchorStyle = lightbox._anchorStyle(anchor);
-      content.effect('size', {
-        to: {
-          width: anchorStyle.width,
-          height: anchorStyle.height
-        }
-      },
-      options.duration);
+      if (options.resizeContent === true) {
+        content.effect('size', {
+          to: {
+            width: anchorStyle.width,
+            height: anchorStyle.height
+          },
+          scale: 'both'
+        },
+        options.duration);
+      }
       dialog.uiDialog.animate(anchorStyle, options.duration, function () {
         (lightbox.overlay && lightbox.overlay.destroy());
         $.ui.lightbox.overlay.resize();
