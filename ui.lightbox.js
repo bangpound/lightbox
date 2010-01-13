@@ -353,8 +353,10 @@
       }
       return "ajax";
     },
-    // Sizing functions
 
+/**
+ * Sizing functions
+ */
 
     _actualContentSize: function (content) {
       var width, height;
@@ -426,8 +428,10 @@
       this._setData('cursor', target);
       this._loadContent(target);
     },
-    // Swappable dialog event handlers.
 
+/**
+ * Swappable dialog event handlers.
+ */
 
     _rotateOpen: function (event, ui) {
       var lightbox, anchor, direction, options, dialog, content, lightboxStyle;
@@ -652,11 +656,11 @@
       this.$el = $.ui.lightbox.spinner.create(lightbox);
     }
   });
-  /**
-   * Overlay
-   */
 
 
+/**
+ * Overlay
+ */
 
   $.extend($.ui.lightbox.overlay, $.ui.dialog.overlay, {
     create: function (lightbox) {
@@ -719,10 +723,10 @@
     }
 
   });
-  /**
-   * Spinner
-   */
 
+/**
+ * Spinner
+ */
 
   $.extend($.ui.lightbox.spinner, {
     instances: [],
@@ -745,9 +749,13 @@
       $.ui.lightbox.spinner.destroy(this.$el);
     }
   });
-  // This effect does nothing because the dialogopen and dialogclose event
-  // trigger the effect.
 
+/**
+ * jQuery UI effect
+ *
+ * Nullifies any transition started by ui.dialog widgets.
+ *
+ */
 
 
   $.effects.lightboxDialog = function (o) {
