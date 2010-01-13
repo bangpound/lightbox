@@ -430,7 +430,7 @@
         direction: direction
       },
       options.duration, function () {
-        content.remove();
+        dialog.element.remove();
       });
     },
     _dialogOpen: function (event, ui) {
@@ -481,7 +481,7 @@
           lightbox.overlay.destroy();
         }
         $.ui.lightbox.overlay.resize();
-        content.remove();
+        dialog.element.remove();
       });
     },
     _anchorStyle: function (anchor) {
