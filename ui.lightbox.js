@@ -148,7 +148,8 @@
         minTop = pTop;
       if ($.inArray(pos, ['center', 'top', 'right', 'bottom', 'left']) >= 0) {
         pos = [
-        pos === 'right' || pos === 'left' ? pos : 'center', pos === 'top' || pos === 'bottom' ? pos : 'middle'];
+          pos === 'right' || pos === 'left' ? pos : 'center', pos === 'top' || pos === 'bottom' ? pos : 'middle'
+        ];
       }
       if (pos.constructor !== Array) {
         pos = ['center', 'middle'];
