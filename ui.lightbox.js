@@ -115,6 +115,17 @@
       }
     },
 
+    _setData: function (key, value) {
+      if (key === 'cursor') {
+        this.options.cursor = value;
+        $('.active', this).removeClass('active');
+        $(value).addClass('active');
+      } else {
+        this.lightbox.dialog(key, value);
+      }
+      $.widget.prototype._setData.apply(this, arguments);
+    },
+
 
 
 /**
@@ -154,16 +165,6 @@
       if (this.spinner) {
         this.spinner.destroy();
       }
-    },
-    _setData: function (key, value) {
-      if (key === 'cursor') {
-        this.options.cursor = value;
-        $('.active', this).removeClass('active');
-        $(value).addClass('active');
-      } else {
-        this.lightbox.dialog(key, value);
-      }
-      $.widget.prototype._setData.apply(this, arguments);
     },
 
     _position: function (size, pos) {
