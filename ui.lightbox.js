@@ -454,57 +454,72 @@
  */
 
     _rotateOpen: function (event, ui) {
-      var _lightbox, $anchor, direction, options, _dialog, $content, lightboxStyle;
+      var _lightbox, _dialog, $anchor, $content, direction, options, lightboxStyle;
+
       _lightbox = $(event.data.lightbox).data('lightbox');
-      $anchor = $(event.data.anchor);
-      direction = event.data.direction;
-      options = _lightbox.options;
       _dialog = $(this).data('dialog');
+
+      $anchor = $(event.data.anchor);
       $content = $(this).children();
-      lightboxStyle = _lightbox._lightboxStyle(this, $anchor);
+
       direction = {
         up: "down",
         down: "up",
         left: "right",
         right: "left"
-      }[direction];
+      }[event.data.direction];
+      options = _lightbox.options;
+      lightboxStyle = _lightbox._lightboxStyle(this, $anchor);
+
       if (options.resizeContent === true) {
         $content.css({
           width: lightboxStyle.width,
           height: lightboxStyle.height
         });
       }
-      _dialog.uiDialog.css(lightboxStyle).show(options.rotateIn, {
-        direction: direction
-      },
-      options.duration);
+
+      _dialog.uiDialog
+        .css(lightboxStyle)
+        .show(options.rotateIn, {
+          direction: direction
+        },
+        options.duration);
+
     },
 
     _rotateClose: function (event, ui) {
-      var _lightbox, direction, options, _dialog, $content;
+      var _lightbox, _dialog, $content, direction, options;
+
       _lightbox = $(event.data.lightbox).data('lightbox');
+      _dialog = $(this).data('dialog');
+
+      $content = $(this).children();
+
       direction = event.data.direction;
       options = _lightbox.options;
-      _dialog = $(this).data('dialog');
-      $content = $(this).children();
-      _dialog.uiDialog.hide(options.rotateOut, {
-        direction: direction
-      },
-      options.duration, function () {
-        _dialog.element.remove();
-      });
+
+      _dialog.uiDialog
+        .hide(options.rotateOut, {
+          direction: direction
+        }, options.duration, function () {
+          _dialog.element.remove();
+        });
 
     },
 
     _dialogOpen: function (event, ui) {
-      var $anchor, _lightbox, options, _dialog, $content, anchorStyle, lightboxStyle;
-      $anchor = $(event.data.anchor);
+      var _lightbox, _dialog, $anchor, $content, options, anchorStyle, lightboxStyle;
+
       _lightbox = $(event.data.lightbox).data('lightbox');
-      options = _lightbox.options;
       _dialog = $(this).data('dialog');
-      anchorStyle = _lightbox._anchorStyle($anchor);
+
+      $anchor = $(event.data.anchor);
       $content = $(this).children();
+
+      options = _lightbox.options;
+      anchorStyle = _lightbox._anchorStyle($anchor);
       lightboxStyle = _lightbox._lightboxStyle(this, $anchor);
+
       if (options.resizeContent === true) {
         $content.effect('size', {
           from: {
@@ -519,17 +534,24 @@
         },
         options.duration);
       }
-      _dialog.uiDialog.css(anchorStyle).animate(lightboxStyle, options.duration);
+
+      _dialog.uiDialog
+        .css(anchorStyle)
+        .animate(lightboxStyle, options.duration);
     },
 
     _dialogClose: function (event, ui) {
-      var _lightbox, $anchor, options, _dialog, $content, anchorStyle;
+      var _lightbox, _dialog, $content, $anchor, options, anchorStyle;
+
       _lightbox = $(event.data.lightbox).data('lightbox');
-      $anchor = $(event.data.anchor);
-      options = _lightbox.options;
       _dialog = $(this).data('dialog');
+
       $content = $(this).children();
+      $anchor = $(event.data.anchor);
+
+      options = _lightbox.options;
       anchorStyle = _lightbox._anchorStyle($anchor);
+
       if (options.resizeContent === true) {
         $content.effect('size', {
           to: {
@@ -540,13 +562,15 @@
         },
         options.duration);
       }
-      _dialog.uiDialog.animate(anchorStyle, options.duration, function () {
-        if (_lightbox.overlay) {
-          _lightbox.overlay.destroy();
-        }
-        $.ui.lightbox.overlay.resize();
-        _dialog.element.remove();
-      });
+
+      _dialog.uiDialog
+        .animate(anchorStyle, options.duration, function () {
+          if (_lightbox.overlay) {
+            _lightbox.overlay.destroy();
+          }
+          $.ui.lightbox.overlay.resize();
+          _dialog.element.remove();
+        });
 
     },
 
@@ -578,10 +602,13 @@
     },
 
     _lightboxStyle: function (element, $anchor) {
-      var _lightbox, $content, _dialog, options, size, contentSize, margin, chrome, position, style;
+      var _lightbox, _dialog, $content, options, size, contentSize, margin, chrome, position, style;
+
       _lightbox = this;
-      $content = $(element).children();
       _dialog = $(element).data('dialog');
+
+      $content = $(element).children();
+
       options = _lightbox.options;
       size = {
         width: options.width,
@@ -595,7 +622,10 @@
       chrome = this._dialogChrome(_dialog);
       position = {};
       style = $anchor.data('lightbox.lightboxStyle');
+
       if (!style) {
+
+        // what sizing strategies should this use?
         if (size.width === 'auto' && size.height === 'auto') {
           size = this._idealContentSize(contentSize);
         } else if (size.width === 'constrain' || size.height === 'constrain') {
@@ -605,34 +635,47 @@
             }
           });
         }
+
+        // add the padding of the dialog and buttons
         $.each(size, function (i, val) {
           if (parseInt(val, 10) > 0) {
             size[i] += margin[i] + chrome[i];
           }
         });
+
         position = this._position(size, this.options.position);
+
         style = $.extend({
-          opacity: 1
-        },
-        size, position);
+            opacity: 1
+          },
+          size, position);
         if (options.modal) {
           style.position = 'fixed';
         }
+
         $anchor.data('lightbox.lightboxStyle', style);
       }
+
       return style;
     },
 
     _dialogChrome: function (_dialog) {
       var size;
       size = {};
+
       _dialog.element.children().hide();
+
       // Hide the title bar so its padding does not count in the extra width.
       _dialog.uiDialogTitlebar.hide();
+
       size.width = _dialog.uiDialog.innerWidth();
+
       _dialog.uiDialogTitlebar.show();
+
       size.height = _dialog.uiDialog.innerHeight();
+
       _dialog.element.children().show();
+
       return size;
     }
   });
