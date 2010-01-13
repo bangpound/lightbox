@@ -436,9 +436,7 @@
         },
         options.duration);
       }
-      $(dialog.uiDialog).css(anchorStyle).show().queue('fx', function () {
-        $(this).animate(lightboxStyle, lightbox.options.duration).dequeue('fx');
-      });
+      dialog.uiDialog.css(anchorStyle).animate(lightboxStyle, lightbox.options.duration);
     },
     _dialogClose: function (event, ui) {
       var lightbox = event.data.lightbox,
