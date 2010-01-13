@@ -17,6 +17,7 @@
   /**
    * Lightbox
    */
+
   $.widget('ui.lightbox', {
     /**
      * Moving parts of jQuery UI Lightbox widget.
@@ -32,6 +33,10 @@
      * anchors = _anchors() = anchors in this lightbox collection.
      * cursor = this.options.cursor = active item in lightbox.
      */
+
+
+
+
     _init: function () {
       var self;
       self = this;
@@ -53,11 +58,13 @@
         draggable: this.options.draggable
         // TODO: Support overlay by implementing focus,dragstop,resizestop
       });
+
       // todo: consider event delegation to make this more dynamic
       $(this.options.selector, this.element).bind('click.lightbox', function (event) {
         event.preventDefault();
         self.open(this);
       });
+
       $(document).keydown(function (event) {
         if (!self.lightbox || !self.lightbox.dialog('isOpen')) {
           return;
@@ -85,6 +92,7 @@
           break;
         }
       });
+
       if ($.fn.mousewheel) {
         $(document).mousewheel(function (event, delta) {
           if (!self.lightbox.dialog('isOpen')) {
@@ -103,6 +111,10 @@
         });
       }
     },
+
+
+
+
     _makeDialog: function (cursor) {
       var viewer, buttonPane;
       viewer = $('<div/>').dialog($.extend(this.dialogOptions));
@@ -126,6 +138,7 @@
       }
       return viewer;
     },
+
     _display: function (anchor) {
       var content;
       content = $(anchor).data('lightbox.content');
@@ -146,6 +159,7 @@
       }
       $.widget.prototype._setData.apply(this, arguments);
     },
+
     _position: function (size, pos) {
       var wnd, doc, pTop, pLeft, minTop;
       wnd = $(window);
@@ -201,6 +215,7 @@
         left: pLeft
       };
     },
+
     _buttons: function () {
       var lightbox;
       lightbox = this;
@@ -216,33 +231,43 @@
     destroy: function () {
       if (this.overlay) {
         this.overlay.destroy();
+
       }
       this._anchors().removeData('lightbox.content').removeData('lightbox.anchorStyle').removeData('lightbox.lightboxStyle');
       this.element.removeData('lightbox');
       $("*", this.element).unbind('.lightbox');
     },
+
+
     open: function (anchor) {
       this.lightbox = this._makeDialog(anchor);
       this.overlay = this.options.modal ? new $.ui.lightbox.overlay(this) : null;
       this._setData('cursor', anchor);
       this._loadContent(anchor);
     },
+
     close: function () {
       if (this.spinner) {
         this.spinner.destroy();
       }
       this.lightbox.dialog('close');
     },
+
     next: function (direction) {
       this._rotate(":gt(", ":first", direction || "up");
     },
+
     prev: function (direction) {
       this._rotate(":lt(", ":last", direction || "down");
     },
+
+
+
     _anchors: function () {
       // if deemed necessary, cache selection here
       return this.element.find(this.options.selector);
     },
+
     _loadContent: function (anchor) {
       var self, type, content;
       self = this;
@@ -303,6 +328,7 @@
         this._display(anchor);
       }
     },
+
     // todo: find better way to guess media type from filename.
     _deriveType: function (anchor) {
       var reference;
@@ -328,6 +354,8 @@
       return "ajax";
     },
     // Sizing functions
+
+
     _actualContentSize: function (content) {
       var width, height;
       $.swap($('<div/>').append(content.clone()).appendTo(document.body)[0], {
@@ -340,15 +368,18 @@
         height = $(this).outerHeight();
         $(this).remove();
       });
+
       return {
         width: width,
         height: height
       };
     },
+
     _constrainContentSize: function (content, constraint, dimension) {
       $(content).css(dimension, $(constraint, content).attr(dimension));
       return this._actualContentSize(content);
     },
+
     _idealContentSize: function (size) {
       var wWidth, wHeight, ratio;
       wWidth = $(window).width();
@@ -396,6 +427,8 @@
       this._loadContent(target);
     },
     // Swappable dialog event handlers.
+
+
     _rotateOpen: function (event, ui) {
       var lightbox, anchor, direction, options, dialog, content, lightboxStyle;
       lightbox = event.data.lightbox;
@@ -422,6 +455,7 @@
       },
       options.duration);
     },
+
     _rotateClose: function (event, ui) {
       var lightbox, direction, options, dialog, content;
       lightbox = event.data.lightbox;
@@ -435,7 +469,9 @@
       options.duration, function () {
         dialog.element.remove();
       });
+
     },
+
     _dialogOpen: function (event, ui) {
       var anchor, lightbox, options, dialog, anchorStyle, content, lightboxStyle;
       anchor = event.data.anchor;
@@ -461,6 +497,7 @@
       }
       dialog.uiDialog.css(anchorStyle).animate(lightboxStyle, lightbox.options.duration);
     },
+
     _dialogClose: function (event, ui) {
       var lightbox, anchor, options, dialog, content, anchorStyle;
       lightbox = event.data.lightbox;
@@ -486,7 +523,10 @@
         $.ui.lightbox.overlay.resize();
         dialog.element.remove();
       });
+
     },
+
+
     _anchorStyle: function (anchor) {
       var offset, size, style;
       offset = {};
@@ -509,6 +549,7 @@
       }
       return style;
     },
+
     _lightboxStyle: function (element, anchor) {
       var lightbox, content, dialog, options, size, contentSize, margin, chrome, position, style;
       lightbox = this;
@@ -554,6 +595,7 @@
       }
       return style;
     },
+
     _dialogChrome: function (dialog) {
       var size;
       size = {};
@@ -567,6 +609,7 @@
       return size;
     }
   });
+
   $.extend($.ui.lightbox, {
     defaults: {
       loop: true,
@@ -612,6 +655,9 @@
   /**
    * Overlay
    */
+
+
+
   $.extend($.ui.lightbox.overlay, $.ui.dialog.overlay, {
     create: function (lightbox) {
       if (this.instances.length === 0) {
@@ -666,14 +712,18 @@
       return $el;
     }
   });
+
   $.extend($.ui.lightbox.overlay.prototype, $.ui.dialog.overlay.prototype, {
     destroy: function () {
       $.ui.lightbox.overlay.destroy(this.$el);
     }
+
   });
   /**
    * Spinner
    */
+
+
   $.extend($.ui.lightbox.spinner, {
     instances: [],
     create: function (lightbox) {
@@ -684,6 +734,7 @@
         return $el;
       }
     },
+
     destroy: function ($el) {
       this.instances.splice($.inArray(this.instances, $el), 1);
       $el.remove();
@@ -696,6 +747,9 @@
   });
   // This effect does nothing because the dialogopen and dialogclose event
   // trigger the effect.
+
+
+
   $.effects.lightboxDialog = function (o) {
     return $(this);
   };
