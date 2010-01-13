@@ -525,11 +525,13 @@
     },
     _dialogChrome: function (dialog) {
       var size = {};
+      dialog.element.children().hide();
       // Hide the title bar so its padding does not count in the extra width.
       dialog.uiDialogTitlebar.hide();
       size.width = dialog.uiDialog.innerWidth();
       dialog.uiDialogTitlebar.show();
       size.height = dialog.uiDialog.innerHeight();
+      dialog.element.children().show();
       return size;
     }
   });
