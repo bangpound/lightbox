@@ -154,7 +154,7 @@
       this._dialogOpen).bind('dialogclose.lightbox', data,
       this._dialogClose);
 
-      if (this._anchors().length > 1) {
+      if (this._anchors().length > 1 && this.options.buttons) {
         $viewer.dialog('option', 'buttons', this._buttons());
         $('button', buttonPane).each(function (index, button) {
           var value;
