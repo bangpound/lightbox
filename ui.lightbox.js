@@ -578,19 +578,18 @@
       offset = {};
       size = {};
       style = {};
-        $.swap($anchor[0], {
-          display: 'block'
-        },
-        function () {
-          var $tmp = $(this);
-          offset = $tmp.offset();
-          size.height = $tmp.outerHeight();
-          size.width = $tmp.outerWidth();
-        });
-        style = $.extend({
-          opacity: 0
-        },
-        size, offset);
+      $.swap($anchor[0], {
+        display: 'block'
+      },
+      function () {
+        var $tmp = $(this);
+        offset = $tmp.offset();
+        size.height = $tmp.outerHeight();
+        size.width = $tmp.outerWidth();
+      });
+      style = $.extend({
+        opacity: 0
+      }, size, offset);
       return style;
     },
 
