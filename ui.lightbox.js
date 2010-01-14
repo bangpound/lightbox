@@ -637,9 +637,7 @@
       };
       chrome = this._dialogChrome(_dialog);
       position = {};
-      style = $anchor.data('lightbox.lightboxStyle');
 
-      if (!style) {
 
         // what sizing strategies should this use?
         if (size.width === 'auto' && size.height === 'auto') {
@@ -669,8 +667,6 @@
           style.position = 'fixed';
         }
 
-        $anchor.data('lightbox.lightboxStyle', style);
-      }
 
       return style;
     },
