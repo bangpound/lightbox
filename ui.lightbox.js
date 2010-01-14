@@ -334,8 +334,9 @@
               visibility: "hidden",
               display: "block"
             }, function () {
-              width = $(this).outerWidth();
-              height = $(this).outerHeight();
+              var $tmp = $(this);
+              width = $tmp.outerWidth();
+              height = $tmp.outerHeight();
             });
             this.width = width;
             this.height = height;
@@ -427,9 +428,10 @@
         display: "block"
       },
       function () {
-        width = $(this).outerWidth();
-        height = $(this).outerHeight();
-        $(this).remove();
+        var $tmp = $(this);
+        width = $tmp.outerWidth();
+        height = $tmp.outerHeight();
+        $tmp.remove();
       });
 
       return {
@@ -585,9 +587,10 @@
           display: 'block'
         },
         function () {
-          offset = $(this).offset();
-          size.height = $(this).outerHeight();
-          size.width = $(this).outerWidth();
+          var $tmp = $(this);
+          offset = $tmp.offset();
+          size.height = $tmp.outerHeight();
+          size.width = $tmp.outerWidth();
         });
         style = $.extend({
           opacity: 0
