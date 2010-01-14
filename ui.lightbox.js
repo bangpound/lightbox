@@ -426,11 +426,6 @@
       };
     },
 
-    _constrainContentSize: function ($content, constraint, dimension) {
-      $content.css(dimension, $(constraint, $content).attr(dimension));
-      return this._actualContentSize($content);
-    },
-
     _idealContentSize: function (size) {
       var wWidth, wHeight, ratio;
       wWidth = $(window).width();
@@ -454,13 +449,13 @@
  */
 
     _rotateOpen: function (event, ui) {
-      var _lightbox, _dialog, $anchor, $content, direction, options, lightboxStyle, chrome; // this = dialog element.
+      var _lightbox, _dialog, $anchor, $content, direction, options, lightboxStyle, length; // this = dialog element.
 
       _lightbox = $(event.data.lightbox).data('lightbox');
       _dialog = $(this).data('dialog');
 
       $anchor = $(event.data.anchor);
-      $content = $(this).children();
+      $content = $(this);
 
       direction = {
         up: "down",
@@ -469,20 +464,16 @@
         right: "left"
       }[event.data.direction];
       options = _lightbox.options;
-      lightboxStyle = _lightbox._lightboxStyle(this, $anchor);
-      chrome = _lightbox._dialogChrome(_dialog);
 
-      if (options.resizeContent === true) {
-        $content.css({
-          width: lightboxStyle.width - chrome.width,
-          height: lightboxStyle.height - chrome.height
-        });
+      if (options.constrain) {
+        // set the size[dimension] value here too?
+        length = $(options.measure, $content).css(options.constrain);
+        $content.css(options.constrain, length);
+        $content.css((options.constrain === 'width' ? 'height' : 'width'), 'auto');
       }
 
-      $(this).css({
-        width: lightboxStyle.width - chrome.width,
-        height: lightboxStyle.height - chrome.height
-      });
+      lightboxStyle = _lightbox._lightboxStyle($content);
+
 
       _dialog.uiDialog
         .css(lightboxStyle)
@@ -499,7 +490,7 @@
       _lightbox = $(event.data.lightbox).data('lightbox');
       _dialog = $(this).data('dialog');
 
-      $content = $(this).children();
+      $content = $(this);
 
       direction = event.data.direction;
       options = _lightbox.options;
@@ -514,46 +505,35 @@
     },
 
     _dialogOpen: function (event, ui) {
-      var _lightbox, _dialog, $anchor, $content, options, anchorStyle, lightboxStyle, margin, chrome;
+      var _lightbox, _dialog, $anchor, $content, options, anchorStyle, lightboxStyle, length;
 
       _lightbox = $(event.data.lightbox).data('lightbox');
       _dialog = $(this).data('dialog');
 
       $anchor = $(event.data.anchor);
-      $content = $(this).children();
+      $content = $(this);
 
       options = _lightbox.options;
-      anchorStyle = _lightbox._anchorStyle($anchor);
-      lightboxStyle = _lightbox._lightboxStyle(this, $anchor);
-      margin = {
-        height: (parseInt($content.css('margin-top'), 10) || 0) + (parseInt($content.css('margin-bottom'), 10) || 0),
-        width: (parseInt($content.css('margin-left'), 10) || 0) + (parseInt($content.css('margin-right'), 10) || 0)
-      };
-      chrome = _lightbox._dialogChrome(_dialog);
 
-      if (options.resizeContent === true) {
-        $content.effect('size', {
-          from: {
-            width: anchorStyle.width,
-            height: anchorStyle.height
-          },
-          to: {
-            width: lightboxStyle.width - chrome.width - margin.width,
-            height: lightboxStyle.height - chrome.height - margin.height
-          },
-          scale: 'both'
-        },
-        options.duration);
+      if (options.constrain) {
+        // set the size[dimension] value here too?
+        length = $(options.measure, $content).css(options.constrain);
+        $content.css(options.constrain, length);
+        $content.css(options.constrain === 'width' ? 'height' : 'width', 'auto');
       }
 
-      $(this).css({
-        width: lightboxStyle.width - chrome.width,
-        height: lightboxStyle.height - chrome.height
-      });
+      anchorStyle = _lightbox._anchorStyle($anchor);
+      lightboxStyle = _lightbox._lightboxStyle($content);
 
       _dialog.uiDialog
         .css(anchorStyle)
         .animate(lightboxStyle, options.duration);
+
+      $content.effect('size', {
+        from: anchorStyle,
+        to: lightboxStyle
+      },
+      options.duration);
     },
 
     _dialogClose: function (event, ui) {
@@ -562,22 +542,20 @@
       _lightbox = $(event.data.lightbox).data('lightbox');
       _dialog = $(this).data('dialog');
 
-      $content = $(this).children();
+      $content = $(this);
       $anchor = $(event.data.anchor);
 
       options = _lightbox.options;
       anchorStyle = _lightbox._anchorStyle($anchor);
 
-      if (options.resizeContent === true) {
-        $content.effect('size', {
-          to: {
-            width: anchorStyle.width,
-            height: anchorStyle.height
-          },
-          scale: 'both'
+      $content.effect('size', {
+        to: {
+          width: anchorStyle.width,
+          height: anchorStyle.height
         },
-        options.duration);
-      }
+        scale: 'both'
+      },
+      options.duration);
 
       _dialog.uiDialog
         .animate(anchorStyle, options.duration, function () {
@@ -617,78 +595,51 @@
       return style;
     },
 
-    _lightboxStyle: function (element, $anchor) {
-      var _lightbox, _dialog, $content, options, size, contentSize, margin, chrome, position, style;
+    _lightboxStyle: function ($content) {
+      var _lightbox, _dialog, options, $container, $titlebar, size, margin, chrome, position, style;
 
       _lightbox = this;
-      _dialog = $(element).data('dialog');
-
-      $content = $(element).children();
+      _dialog = $content.data('dialog');
 
       options = _lightbox.options;
+
+      $container = _dialog.uiDialogContainer;
+      $titlebar = _dialog.uiDialogTitlebar;
+
       size = {
         width: options.width,
         height: options.height
       };
-      contentSize = this._actualContentSize($content);
       margin = {
         height: (parseInt($content.css('margin-top'), 10) || 0) + (parseInt($content.css('margin-bottom'), 10) || 0),
         width: (parseInt($content.css('margin-left'), 10) || 0) + (parseInt($content.css('margin-right'), 10) || 0)
       };
-      chrome = this._dialogChrome(_dialog);
-      position = {};
+      chrome = {
+        height: $titlebar.outerHeight(),
+        width: 0
+      };
 
-
-        // what sizing strategies should this use?
-        if (size.width === 'auto' && size.height === 'auto') {
-          size = this._idealContentSize(contentSize);
-        } else if (size.width === 'constrain' || size.height === 'constrain') {
-          $.each(size, function (i, val) {
-            if (val === 'constrain') {
-              size = _lightbox._constrainContentSize($content, options.constraint, i);
-            }
-          });
+      if (size.width === 'auto' && size.height === 'auto') {
+        size = this._actualContentSize($content);
+        size = this._idealContentSize(size);
+      }
+      // add the padding of the dialog and buttons
+      $.each(size, function (i, val) {
+        if (parseInt(val, 10) > 0) {
+          size[i] += margin[i] + chrome[i];
         }
+      });
 
-        // add the padding of the dialog and buttons
-        $.each(size, function (i, val) {
-          if (parseInt(val, 10) > 0) {
-            size[i] += margin[i] + chrome[i];
-          }
-        });
+      position = this._position(size, options.position);
 
-        position = this._position(size, this.options.position);
-
-        style = $.extend({
-            opacity: 1
-          },
-          size, position);
-        if (options.modal) {
-          style.position = 'fixed';
-        }
-
-
+      style = $.extend({
+          opacity: 1
+        },
+        size, position);
+      if (options.modal) {
+        style.position = 'fixed';
+      }
       return style;
-    },
-
-    _dialogChrome: function (_dialog) {
-      var size;
-      size = {};
-
-      _dialog.element.children().hide();
-
-      // Hide the title bar so its padding does not count in the extra width.
-      _dialog.uiDialogTitlebar.hide();
-
-      size.width = _dialog.uiDialog.innerWidth();
-
-      _dialog.uiDialogTitlebar.show();
-
-      size.height = _dialog.uiDialog.innerHeight();
-
-      _dialog.element.children().show();
-
-      return size;
     }
   });
 
@@ -704,6 +655,7 @@
       draggable: false,
       titleSuffix: "",
       position: 'center',
+
       // Width/height is the size of the content.
       // Allowed values for width, height:
       // 'auto' = if contents have width or height, the lightbox will size
@@ -714,7 +666,14 @@
       //  6px,1em, 50% = normal CSS style.
       width: 'auto',
       height: 'auto',
-      constraint: '',
+
+      // Constrain the width or height of lightbox by the length of that
+      // dimension on the measured element.
+      // { constrain: 'width', measure: 'img' }
+      // would set the width of the lightbox to be the width of the lightbox
+      // content's img element.
+      constrain: '',
+      measure: '',
       resizeContent: true,
       post: 0,
       parameters: {},
