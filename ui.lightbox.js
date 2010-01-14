@@ -355,7 +355,7 @@
           break;
         case "html":
         case "dom":
-          $anchor.data('lightbox.content', $($anchor.attr('href')).clone());
+          $anchor.data('lightbox.content', $($anchor.attr('href')).clone().show());
           _lightbox._display($anchor);
           break;
         case "ajax":
