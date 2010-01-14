@@ -444,7 +444,6 @@
       wHeight = $(window).height();
       ratio = 1;
       // Window real estate is taken by dialog chrome.
-      // todo: set up offset option.
       wWidth = wWidth - this.options.margin;
       wHeight = wHeight - this.options.margin;
       ratio = Math.min(
