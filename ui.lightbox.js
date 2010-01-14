@@ -130,7 +130,7 @@
       if (this.overlay) {
         this.overlay.destroy();
       }
-      this._anchors().removeData('lightbox.content').removeData('lightbox.anchorStyle').removeData('lightbox.lightboxStyle');
+      this._anchors().removeData('lightbox.content');
       this.element.removeData('lightbox');
       $("*", this.element).unbind('.lightbox');
     },
@@ -580,8 +580,7 @@
       var offset, size, style;
       offset = {};
       size = {};
-      style = $anchor.data('lightbox.anchorStyle');
-      if (!style) {
+      style = {};
         $.swap($anchor[0], {
           display: 'block'
         },
@@ -594,8 +593,6 @@
           opacity: 0
         },
         size, offset);
-        $anchor.data('lightbox.anchorStyle', style);
-      }
       return style;
     },
 
