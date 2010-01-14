@@ -530,11 +530,9 @@
         .css(anchorStyle)
         .animate(lightboxStyle, options.duration);
 
-      $content.effect('size', {
-        from: anchorStyle,
-        to: lightboxStyle
-      },
-      options.duration);
+      $content
+        .css(anchorStyle)
+        .animate(lightboxStyle, options.duration);
     },
 
     _dialogClose: function (event, ui) {
@@ -547,16 +545,11 @@
       $anchor = $(event.data.anchor);
 
       options = _lightbox.options;
+
       anchorStyle = _lightbox._anchorStyle($anchor);
 
-      $content.effect('size', {
-        to: {
-          width: anchorStyle.width,
-          height: anchorStyle.height
-        },
-        scale: 'both'
-      },
-      options.duration);
+      $content
+        .animate(anchorStyle, options.duration);
 
       _dialog.uiDialog
         .animate(anchorStyle, options.duration, function () {
