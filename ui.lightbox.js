@@ -328,6 +328,17 @@
         switch (type) {
         case "image":
           $('<img/>').attr('src', $anchor[0].href).load(function (eventObject) {
+            var width, height;
+            $.swap(document.body.appendChild(this), {
+              position: "absolute",
+              visibility: "hidden",
+              display: "block"
+            }, function () {
+              width = $(this).outerWidth();
+              height = $(this).outerHeight();
+            });
+            this.width = width;
+            this.height = height;
             $anchor.data('lightbox.content', this);
             _lightbox._display($anchor);
           });
