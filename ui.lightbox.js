@@ -48,7 +48,7 @@
         // autoOpen always has to be false because the widget's expando
         // doesn't exist until it has been instantiated.
         autoOpen: false,
-        autoResize: true,
+        autoResize: false,
         closeOnEscape: this.options.closeOnEscape,
         modal: false,
         // $.effects.lightboxDialog blocks ui.dialog's hide/show behavior.
