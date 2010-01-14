@@ -647,7 +647,7 @@
       // add the padding of the dialog and buttons
       $.each(size, function (i, val) {
         if (parseInt(val, 10) > 0) {
-          size[i] += margin[i] + chrome[i];
+          size[i] += chrome[i];
         }
       });
 
