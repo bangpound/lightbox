@@ -147,12 +147,14 @@
       buttonPane = $viewer.data('dialog').uiDialogButtonPane;
       data = {
         anchor: cursor,
-        lightbox: this.element
+        lightbox: this.element[0],
+        dialog: $viewer[0]
       };
 
       $viewer
         .bind('dialogopen.lightbox', data, this._dialogOpen)
-        .bind('dialogclose.lightbox', data, this._dialogClose);
+        .bind('dialogclose.lightbox', data, this._dialogClose)
+        .bind('resize', data, this._windowResizeStop);
 
       if (this._anchors().length > 1 && this.options.buttons) {
         $viewer.dialog('option', 'buttons', this._buttons());
@@ -167,7 +169,7 @@
     },
 
     _display: function ($anchor) {
-      var content;
+      var content, data;
       content = $anchor.data('lightbox.content');
       this._setData('cursor', $anchor[0]);
       this.$viewer.append(content);
@@ -177,12 +179,25 @@
         this.spinner.destroy();
       }
 
+      data = {
+        anchor: this.options.cursor,
+        lightbox: this.element[0],
+        dialog: this.$viewer[0]
+      };
+
       $(window)
-        .bind('resize.lightbox', {
-          anchor: this.options.cursor,
-          lightbox: this.element[0],
-          dialog: this.$viewer[0]
-        }, this._dialogResize);
+        .bind("resize.lightbox", data, function (event, ui) {
+          var _dialog, _lightbox, options, style;
+          _dialog = $(event.data.dialog).data('dialog');
+          _lightbox = $(event.data.lightbox).data('lightbox');
+          options = _lightbox.options;
+          style = $.extend({}, _lightbox._position({
+            width: _dialog.element.width(),
+            height: _dialog.element.height()
+          }, options.position));
+          _dialog.element.css(style);
+        })
+        .bind('resize.lightbox', data, this._windowResizeStop);
     },
 
     _position: function (size, pos) {
@@ -619,7 +634,7 @@
 
     },
 
-    _dialogResize: function (event, ui) {
+    _windowResizeStop: function (event, ui) {
       var _lightbox, _dialog, $anchor, $content, options, contentStyle, lightboxStyle;
 
 
@@ -639,9 +654,10 @@
       lightboxStyle = _lightbox._lightboxStyle(_dialog);
 
       $content
-        .animate(contentStyle);
+        .css(contentStyle);
 
       _dialog.uiDialog
+        .stop()
         .animate(lightboxStyle);
 
     },
