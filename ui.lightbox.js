@@ -671,7 +671,7 @@
     },
 
     _lightboxStyle: function (_dialog) {
-      var _lightbox, options, $container, $titlebar, size, margin, chrome, position, style;
+      var _lightbox, options, $container, $titlebar, size, chrome, position, style;
 
       _lightbox = this;
 
