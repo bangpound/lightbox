@@ -147,12 +147,14 @@
       buttonPane = $viewer.data('dialog').uiDialogButtonPane;
       data = {
         anchor: cursor,
-        lightbox: this.element
+        lightbox: this.element[0],
+        dialog: $viewer[0]
       };
 
-      $viewer.bind('dialogopen.lightbox', data,
-      this._dialogOpen).bind('dialogclose.lightbox', data,
-      this._dialogClose);
+      $viewer
+        .bind('dialogopen.lightbox', data, this._dialogOpen)
+        .bind('dialogclose.lightbox', data, this._dialogClose)
+        .bind('resize', data, this._windowResizeStop);
 
       if (this._anchors().length > 1 && this.options.buttons) {
         $viewer.dialog('option', 'buttons', this._buttons());
@@ -167,7 +169,7 @@
     },
 
     _display: function ($anchor) {
-      var content;
+      var content, data;
       content = $anchor.data('lightbox.content');
       this._setData('cursor', $anchor[0]);
       this.$viewer.append(content);
@@ -176,6 +178,26 @@
       if (this.spinner) {
         this.spinner.destroy();
       }
+
+      data = {
+        anchor: this.options.cursor,
+        lightbox: this.element[0],
+        dialog: this.$viewer[0]
+      };
+
+      $(window)
+        .bind("resize.lightbox", data, function (event, ui) {
+          var _dialog, _lightbox, options, style;
+          _dialog = $(event.data.dialog).data('dialog');
+          _lightbox = $(event.data.lightbox).data('lightbox');
+          options = _lightbox.options;
+          style = $.extend({}, _lightbox._position({
+            width: _dialog.element.width(),
+            height: _dialog.element.height()
+          }, options.position));
+          _dialog.element.css(style);
+        })
+        .bind('resize.lightbox', data, this._windowResizeStop);
     },
 
     _position: function (size, pos) {
@@ -543,12 +565,12 @@
 
       lightboxStyle = _lightbox._lightboxStyle(_dialog);
 
-      $content.css(anchorStyle);
+      $content
+        .css(anchorStyle)
+        .animate(contentStyle, options.duration);
 
       // todo: make the singleton tag an option.
       if ($children.length === 1 && $children[0].nodeName.match(/img/i)) {
-        $content
-          .animate(contentStyle, options.duration);
         $children.effect('size', {
           from: {
             width: anchorStyle.width,
@@ -560,9 +582,6 @@
           },
           scale: 'both'
         }, options.duration);
-      }
-      else {
-        $content.css(contentStyle);
       }
 
       _dialog.uiDialog
@@ -615,6 +634,34 @@
 
     },
 
+    _windowResizeStop: function (event, ui) {
+      var _lightbox, _dialog, $anchor, $content, options, contentStyle, lightboxStyle;
+
+
+      _lightbox = $(event.data.lightbox).data('lightbox');
+      _dialog = $(event.data.dialog || this).data('dialog');
+
+      $anchor = $(event.data.anchor);
+      $content = _dialog.element;
+
+      options = _lightbox.options;
+
+      contentStyle = _lightbox._contentStyle($content);
+
+      options.width = contentStyle.width;
+      options.height = contentStyle.height;
+
+      lightboxStyle = _lightbox._lightboxStyle(_dialog);
+
+      $content
+        .css(contentStyle);
+
+      _dialog.uiDialog
+        .stop()
+        .animate(lightboxStyle);
+
+    },
+
 /**
  * Style generators
  */
@@ -653,9 +700,11 @@
 
       if (options.constrain) {
         length = $(options.measure, $content).css(options.constrain);
-        size[options.constraint] = length;
+        // This is the only place where I'm manpiulating the DOM in a style function.
+        $content.css(options.constrain, length);
+        size[options.constrain] = length;
       }
-      if (size.width === 'auto' && size.height === 'auto') {
+      if (size.width === 'auto' || size.height === 'auto') {
         size = this._actualContentSize($content);
         size = this._idealContentSize(size);
       }
@@ -663,7 +712,7 @@
       // add the margins to the calculated dimensions of content.
       $.each(size, function (i, val) {
         if (parseInt(val, 10) > 0) {
-          size[i] += margin[i];
+          size[i] += (parseInt(margin[i], 10) || 0);
         }
       });
 
@@ -672,7 +721,7 @@
     },
 
     _lightboxStyle: function (_dialog) {
-      var _lightbox, options, $container, $titlebar, size, chrome, position, style;
+      var _lightbox, options, $container, $content, $titlebar, size, chrome, position, style;
 
       _lightbox = this;
 
@@ -680,20 +729,21 @@
 
       $container = _dialog.uiDialogContainer;
       $titlebar = _dialog.uiDialogTitlebar;
+      $content = _dialog.element;
 
       size = {
         width: options.width,
         height: options.height
       };
       chrome = {
-        height: $titlebar.outerHeight(),
-        width: 0
+        height: (parseInt($content.css('padding-top'), 10) || 0) + (parseInt($content.css('padding-bottom'), 10) || 0) + $titlebar.outerHeight(),
+        width: (parseInt($content.css('padding-left'), 10) || 0) + (parseInt($content.css('padding-right'), 10) || 0)
       };
 
       // add the padding of the dialog and buttons
       $.each(size, function (i, val) {
         if (parseInt(val, 10) > 0) {
-          size[i] += chrome[i];
+          size[i] += (parseInt(chrome[i], 10) || 0);
         }
       });
 
