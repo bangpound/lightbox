@@ -150,9 +150,9 @@
         lightbox: this.element
       };
 
-      $viewer.bind('dialogopen.lightbox', data,
-      this._dialogOpen).bind('dialogclose.lightbox', data,
-      this._dialogClose);
+      $viewer
+        .bind('dialogopen.lightbox', data, this._dialogOpen)
+        .bind('dialogclose.lightbox', data, this._dialogClose);
 
       if (this._anchors().length > 1 && this.options.buttons) {
         $viewer.dialog('option', 'buttons', this._buttons());
@@ -176,6 +176,13 @@
       if (this.spinner) {
         this.spinner.destroy();
       }
+
+      $(window)
+        .bind('resize.lightbox', {
+          anchor: this.options.cursor,
+          lightbox: this.element[0],
+          dialog: this.$viewer[0]
+        }, this._dialogResize);
     },
 
     _position: function (size, pos) {
@@ -612,6 +619,33 @@
           $.ui.lightbox.overlay.resize();
           _dialog.element.remove();
         });
+
+    },
+
+    _dialogResize: function (event, ui) {
+      var _lightbox, _dialog, $anchor, $content, options, contentStyle, lightboxStyle;
+
+
+      _lightbox = $(event.data.lightbox).data('lightbox');
+      _dialog = $(event.data.dialog || this).data('dialog');
+
+      $anchor = $(event.data.anchor);
+      $content = _dialog.element;
+
+      options = _lightbox.options;
+
+      contentStyle = _lightbox._contentStyle($content);
+
+      options.width = contentStyle.width;
+      options.height = contentStyle.height;
+
+      lightboxStyle = _lightbox._lightboxStyle(_dialog);
+
+      $content
+        .animate(contentStyle);
+
+      _dialog.uiDialog
+        .animate(lightboxStyle);
 
     },
 
