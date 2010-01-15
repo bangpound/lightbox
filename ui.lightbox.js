@@ -462,13 +462,14 @@
  */
 
     _rotateOpen: function (event, ui) {
-      var _lightbox, _dialog, $anchor, $content, direction, options, contentStyle, lightboxStyle; // this = dialog element.
+      var _lightbox, _dialog, $anchor, $content, $children, direction, options, contentStyle, lightboxStyle; // this = dialog element.
 
       _lightbox = $(event.data.lightbox).data('lightbox');
       _dialog = $(this).data('dialog');
 
       $anchor = $(event.data.anchor);
       $content = $(this);
+      $children = $(this).children();
 
       direction = {
         up: "down",
@@ -484,6 +485,13 @@
       options.height = contentStyle.height;
 
       lightboxStyle = _lightbox._lightboxStyle(_dialog);
+
+      $content.css(contentStyle);
+
+      // todo: make the singleton tag an option.
+      if ($children.length === 1 && $children[0].nodeName.match(/img/i)) {
+        $children.css(contentStyle);
+      }
 
       _dialog.uiDialog
         .css(lightboxStyle)
@@ -515,17 +523,19 @@
     },
 
     _dialogOpen: function (event, ui) {
-      var _lightbox, _dialog, $anchor, $content, options, anchorStyle, contentStyle, lightboxStyle;
+      var _lightbox, _dialog, $anchor, $content, $children, options, anchorStyle, contentStyle, lightboxStyle;
 
       _lightbox = $(event.data.lightbox).data('lightbox');
       _dialog = $(this).data('dialog');
 
       $anchor = $(event.data.anchor);
       $content = $(this);
+      $children = $(this).children();
 
       options = _lightbox.options;
 
       anchorStyle = _lightbox._anchorStyle($anchor);
+
       contentStyle = _lightbox._contentStyle($content);
 
       options.width = contentStyle.width;
@@ -533,30 +543,66 @@
 
       lightboxStyle = _lightbox._lightboxStyle(_dialog);
 
+      $content.css(anchorStyle);
+
+      // todo: make the singleton tag an option.
+      if ($children.length === 1 && $children[0].nodeName.match(/img/i)) {
+        $content
+          .animate(contentStyle, options.duration);
+        $children.effect('size', {
+          from: {
+            width: anchorStyle.width,
+            height: anchorStyle.height
+          },
+          to: {
+            width: contentStyle.width,
+            height: contentStyle.height
+          },
+          scale: 'both'
+        }, options.duration);
+      }
+      else {
+        $content.css(contentStyle);
+      }
+
       _dialog.uiDialog
         .css(anchorStyle)
         .animate(lightboxStyle, options.duration);
 
-      $content
-        .css(anchorStyle)
-        .animate(lightboxStyle, options.duration);
     },
 
     _dialogClose: function (event, ui) {
-      var _lightbox, _dialog, $content, $anchor, options, anchorStyle;
+      var _lightbox, _dialog, $content, $children, $anchor, options, anchorStyle;
 
       _lightbox = $(event.data.lightbox).data('lightbox');
       _dialog = $(this).data('dialog');
 
-      $content = $(this);
       $anchor = $(event.data.anchor);
+      $content = $(this);
+      $children = $(this).children();
 
       options = _lightbox.options;
 
       anchorStyle = _lightbox._anchorStyle($anchor);
 
-      $content
-        .animate(anchorStyle, options.duration);
+      // todo: make the singleton tag an option.
+      if ($children.length === 1 && $children[0].nodeName.match(/img/i)) {
+        $content
+          .animate(anchorStyle, options.duration);
+        $children.effect('size', {
+          to: {
+            width: anchorStyle.width,
+            height: anchorStyle.height
+          },
+          scale: 'both'
+        }, options.duration);
+      }
+      else {
+        $content
+          .show(options.show, {
+            to: anchorStyle
+          }, options.duration);
+      }
 
       _dialog.uiDialog
         .animate(anchorStyle, options.duration, function () {
@@ -626,7 +672,7 @@
     },
 
     _lightboxStyle: function (_dialog) {
-      var _lightbox, options, $container, $titlebar, size, margin, chrome, position, style;
+      var _lightbox, options, $container, $titlebar, size, chrome, position, style;
 
       _lightbox = this;
 
