@@ -687,9 +687,9 @@
 
       if (options.constrain) {
         length = $(options.measure, $content).css(options.constrain);
-        size[options.constraint] = length;
+        size[options.constrain] = length;
       }
-      if (size.width === 'auto' && size.height === 'auto') {
+      if (size.width === 'auto' || size.height === 'auto') {
         size = this._actualContentSize($content);
         size = this._idealContentSize(size);
       }
