@@ -535,6 +535,7 @@
       options = _lightbox.options;
 
       anchorStyle = _lightbox._anchorStyle($anchor);
+
       contentStyle = _lightbox._contentStyle($content);
 
       options.width = contentStyle.width;
