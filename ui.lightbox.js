@@ -550,12 +550,12 @@
 
       lightboxStyle = _lightbox._lightboxStyle(_dialog);
 
-      $content.css(anchorStyle);
+      $content
+        .css(anchorStyle)
+        .animate(contentStyle, options.duration);
 
       // todo: make the singleton tag an option.
       if ($children.length === 1 && $children[0].nodeName.match(/img/i)) {
-        $content
-          .animate(contentStyle, options.duration);
         $children.effect('size', {
           from: {
             width: anchorStyle.width,
@@ -567,9 +567,6 @@
           },
           scale: 'both'
         }, options.duration);
-      }
-      else {
-        $content.css(contentStyle);
       }
 
       _dialog.uiDialog
@@ -687,6 +684,8 @@
 
       if (options.constrain) {
         length = $(options.measure, $content).css(options.constrain);
+        // This is the only place where I'm manpiulating the DOM in a style function.
+        $content.css(options.constrain, length);
         size[options.constrain] = length;
       }
       if (size.width === 'auto' || size.height === 'auto') {
@@ -706,7 +705,7 @@
     },
 
     _lightboxStyle: function (_dialog) {
-      var _lightbox, options, $container, $titlebar, size, chrome, position, style;
+      var _lightbox, options, $container, $content, $titlebar, size, chrome, position, style;
 
       _lightbox = this;
 
@@ -714,20 +713,21 @@
 
       $container = _dialog.uiDialogContainer;
       $titlebar = _dialog.uiDialogTitlebar;
+      $content = _dialog.element;
 
       size = {
         width: options.width,
         height: options.height
       };
       chrome = {
-        height: $titlebar.outerHeight(),
-        width: 0
+        height: (parseInt($content.css('padding-top'), 10) || 0) + (parseInt($content.css('padding-bottom'), 10) || 0) + $titlebar.outerHeight(),
+        width: (parseInt($content.css('padding-left'), 10) || 0) + (parseInt($content.css('padding-right'), 10) || 0)
       };
 
       // add the padding of the dialog and buttons
       $.each(size, function (i, val) {
         if (parseInt(val, 10) > 0) {
-          size[i] += chrome[i];
+          size[i] += (parseInt(chrome[i], 10) || 0);
         }
       });
 
