@@ -123,9 +123,6 @@
         $(this.options.cursor).removeClass('active');
         $(value).addClass('active');
       }
-      else {
-        this.$viewer.dialog(key, value);
-      }
       $.widget.prototype._setData.apply(this, arguments);
     },
 
