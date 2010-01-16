@@ -38,6 +38,10 @@ Handling content size is tricky, especially with AJAX/AHAH loaded content. This 
       measure: 'img'
     });
 
+Individual anchors can be configured with the [jQuery Metadata][Metadata] plugin. This enables you to reliably mix content types in the same gallery.
+
+[Metadata]: http://plugins.jquery.com/project/metadata
+
 ### Drupal integration
 
 I wrote this for a Drupal site, and I've included the code that I use to load the script. The widget requires jQuery UI, but only *this* sample implementation has specific Drupal dependencies.
