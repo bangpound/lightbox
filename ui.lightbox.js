@@ -740,6 +740,13 @@
           lightbox.display(data);
         }
       });
+    },
+    oembed: function ($anchor) {
+      var lightbox, content;
+      lightbox = this;
+      content = $('<div/>').oembed($anchor.attr('href'), {}, function (container, oembed) {
+        lightbox.display(oembed.code);
+      });
     }
   });
 
