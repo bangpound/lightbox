@@ -355,7 +355,7 @@
       anchor = this.options.cursor;
 
       return function (effect) {
-        var _lightbox, _dialog, $anchor, $content, $children, options, contentStyle;
+        var _lightbox, _dialog, $anchor, $content, $children, $titlebar, options, chrome, contentStyle;
 
         _lightbox = $(lightbox).data('lightbox');
         _dialog = $viewer.data('dialog');
@@ -363,6 +363,7 @@
         $anchor = $(anchor);
         $content = $viewer;
         $children = $viewer.children();
+        $titlebar = _dialog.uiDialogTitlebar;
 
         direction = {
           up: "down",
@@ -374,8 +375,13 @@
 
         contentStyle = _lightbox._contentStyle($content);
 
-        $viewer.dialog('option', 'width', contentStyle.width);
-        $viewer.dialog('option', 'height', contentStyle.height);
+        chrome = {
+          height: (parseInt($content.css('padding-top'), 10) || 0) + (parseInt($content.css('padding-bottom'), 10) || 0) + $titlebar.outerHeight(),
+          width: (parseInt($content.css('padding-left'), 10) || 0) + (parseInt($content.css('padding-right'), 10) || 0)
+        };
+
+        $viewer.dialog('option', 'width', contentStyle.width + chrome.width);
+        $viewer.dialog('option', 'height', contentStyle.height + chrome.height);
 
         $content.css(contentStyle);
 
@@ -418,11 +424,11 @@
     },
 
     _dialogOpen: function ($viewer) {
-      var lightbox, anchor;
+      var lightbox, anchor, chrome;
       lightbox = this.element;
       anchor = this.options.cursor;
       return function (effect) {
-        var _lightbox, _dialog, $anchor, $content, $children, options, anchorStyle, contentStyle, lightboxStyle;
+        var _lightbox, _dialog, $anchor, $content, $children, $titlebar, options, anchorStyle, contentStyle, lightboxStyle;
 
         _lightbox = $(lightbox).data('lightbox');
         _dialog = $viewer.data('dialog');
@@ -430,6 +436,7 @@
         $anchor = $(anchor);
         $content = $viewer;
         $children = $viewer.children();
+        $titlebar = _dialog.uiDialogTitlebar;
 
         options = _lightbox.options;
 
@@ -437,8 +444,13 @@
 
         contentStyle = _lightbox._contentStyle($content);
 
-        $viewer.dialog('option', 'width', contentStyle.width);
-        $viewer.dialog('option', 'height', contentStyle.height);
+        chrome = {
+          height: (parseInt($content.css('padding-top'), 10) || 0) + (parseInt($content.css('padding-bottom'), 10) || 0) + $titlebar.outerHeight(),
+          width: (parseInt($content.css('padding-left'), 10) || 0) + (parseInt($content.css('padding-right'), 10) || 0)
+        };
+
+        $viewer.dialog('option', 'width', contentStyle.width + chrome.width);
+        $viewer.dialog('option', 'height', contentStyle.height + chrome.height);
 
         lightboxStyle = {
           height: 'show',
