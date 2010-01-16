@@ -60,7 +60,10 @@
         // TODO: Support overlay by implementing focus,dragstop,resizestop
       });
 
-      this.original_options = this.options;
+      // Store original options for anchors.
+      this.anchor_options = {
+        type: this.options.type
+      };
 
       // todo: consider event delegation to make this more dynamic
       $(this.options.selector, this.element).bind('click.lightbox', function (event) {
@@ -227,24 +230,20 @@
 
       // check if options are cached.
       options = $(target).data('lightbox');
-
       if (!options) {
         // set up options.
-        options = $.extend({}, this.original_options);
+        options = $.extend({}, this.anchor_options);
         if (!options.type) {
           options.type = this._deriveType(target);
         }
         $(target).data('lightbox', options);
       }
+      options.cursor = target;
 
-      this.options = options;
-
-      // load content.
-      this.options.cursor = target;
+      this.option(options);
       this.direction = direction;
 
       $.ui.lightbox.linker[options.type].apply(this, [ $(target) ]);
-
     },
 
     display: function (content) {
