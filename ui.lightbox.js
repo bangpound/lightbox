@@ -174,7 +174,9 @@
       content = $anchor.data('lightbox.content');
       this._setData('cursor', $anchor[0]);
       this.$viewer.append(content);
-      $(".ui-dialog-title", this.$viewer.data('dialog').uiDialogTitlebar).html(this.options.title);
+      if (!options.draggable) {
+        $(".ui-dialog-title", this.$viewer.data('dialog').uiDialogTitlebar).html(this.options.title);
+      }
       this.$viewer.dialog('open');
       if (this.spinner) {
         this.spinner.destroy();
