@@ -7,7 +7,8 @@
 	<link rel="stylesheet" href="../stylesheets/screen.css" type="text/css" />
 	<link rel="stylesheet" type="text/css" href="http://jquery-ui.googlecode.com/svn/tags/1.6/themes/default/ui.all.css" />
 	<link rel="stylesheet" href="../ui.lightbox.css" type="text/css" />
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.js" type="text/javascript"></script> <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.6/jquery-ui.js" type="text/javascript"></script> <script src="../ui.lightbox.js" type="text/javascript"></script> <script src="http://malsup.com/jquery/media/jquery.media.js?v.92" type="text/javascript"></script> <script type="text/javascript">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.js" type="text/javascript"></script> <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.6/jquery-ui.js" type="text/javascript"></script> <script src="../ui.lightbox.js" type="text/javascript"></script> <script src="http://malsup.com/jquery/media/jquery.media.js?v.92" type="text/javascript"></script> <script src="http://jquery-oembed.googlecode.com/svn/trunk/jquery.oembed.js " type="text/javascript"></script>
+<script type="text/javascript">
 // <![CDATA[
 (function ($) {
   $(document).ready(function () {
@@ -15,6 +16,7 @@
     $('#youtube').lightbox({ type: 'dom', selector: 'a', width: 425, height: 344 });
     $('#quicktime').lightbox({ selector: 'a', width: 480, height: 260 });
     $('#ahah').lightbox({ dialogClass: 'ui-lightbox kleenex', type: 'ajax', height: 'constrain', constraint: '.video' });
+    $('#oembed').lightbox({ type: 'oembed' });
   });
 })(jQuery);
 // ]]>
@@ -70,6 +72,12 @@
         <h2>AHAH</h2>
 			  <p class="usage">$('#ahah').lightbox({});</p><a href="ajax1.txt">
 			  <img src="http://img.youtube.com/vi/zY2nXUUvwg4/2.jpg" alt="Thumbnail from Pixar Birds" /></a>
+			</div>
+			<div id="oembed">
+        <h2>oEmbed</h2>
+			  <p class="usage">$('#oembed').lightbox({
+  type: 'oembed'});</p>
+				<a href="http://www.vimeo.com/6428069"><img src="http://ats.vimeo.com/241/717/24171751_100.jpg" alt="Thumbnail from Birds on the Wires" /></a>
 			</div>
 		</div>
 	</div>

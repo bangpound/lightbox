@@ -612,6 +612,10 @@
       if (size.width === 'auto' || size.height === 'auto') {
         size = this._actualContentSize($content);
         size = this._idealContentSize(size);
+        $("*[width]", $content).attr({
+          width: size.width,
+          height: size.height
+        });
       }
 
       // add the margins to the calculated dimensions of content.
@@ -739,6 +743,13 @@
         success: function (data, textStatus) {
           lightbox.display(data);
         }
+      });
+    },
+    oembed: function ($anchor) {
+      var lightbox, content;
+      lightbox = this;
+      content = $('<div/>').oembed($anchor.attr('href'), {}, function (container, oembed) {
+        lightbox.display(oembed.code);
       });
     }
   });
