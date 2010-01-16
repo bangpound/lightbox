@@ -172,62 +172,6 @@
       return $viewer;
     },
 
-    _position: function (size, pos) {
-      var wnd, doc, pTop, pLeft, minTop;
-      wnd = $(window);
-      doc = $(document);
-      pTop = doc.scrollTop();
-      pLeft = doc.scrollLeft();
-      minTop = pTop;
-      if ($.inArray(pos, ['center', 'top', 'right', 'bottom', 'left']) >= 0) {
-        pos = [
-          pos === 'right' || pos === 'left' ? pos : 'center', pos === 'top' || pos === 'bottom' ? pos : 'middle'
-        ];
-      }
-      if (pos.constructor !== Array) {
-        pos = ['center', 'middle'];
-      }
-      if (pos[0].constructor === Number) {
-        pLeft += pos[0];
-      } else {
-        switch (pos[0]) {
-        case 'left':
-          pLeft += 0;
-          break;
-        case 'right':
-          pLeft += wnd.width() - size.width;
-          break;
-        default:
-        case 'center':
-          pLeft += (wnd.width() - size.width) / 2;
-        }
-      }
-      if (pos[1].constructor === Number) {
-        pTop += pos[1];
-      } else {
-        switch (pos[1]) {
-        case 'top':
-          pTop += 0;
-          break;
-        case 'bottom':
-          // Opera check fixes #3564, can go away with jQuery 1.3
-          pTop += ($.browser.opera ? window.innerHeight : wnd.height()) - size.height;
-          break;
-        default:
-        case 'middle':
-          // Opera check fixes #3564, can go away with jQuery 1.3
-          pTop += (($.browser.opera ? window.innerHeight : wnd.height()) - size.height) / 2;
-        }
-      }
-      // prevent the dialog from being too high (make sure the titlebar
-      // is accessible)
-      pTop = Math.max(pTop, minTop);
-      return {
-        top: pTop,
-        left: pLeft
-      };
-    },
-
     _buttons: function () {
       var _lightbox;
       _lightbox = this;
@@ -424,7 +368,7 @@
       anchor = this.options.cursor;
 
       return function (effect) {
-        var _lightbox, _dialog, $anchor, $content, $children, options, contentStyle, lightboxStyle;
+        var _lightbox, _dialog, $anchor, $content, $children, options, contentStyle;
 
         _lightbox = $(lightbox).data('lightbox');
         _dialog = $viewer.data('dialog');
@@ -443,10 +387,8 @@
 
         contentStyle = _lightbox._contentStyle($content);
 
-        options.width = contentStyle.width;
-        options.height = contentStyle.height;
-
-        lightboxStyle = _lightbox._lightboxStyle(_dialog);
+        $viewer.dialog('option', 'width', contentStyle.width);
+        $viewer.dialog('option', 'height', contentStyle.height);
 
         $content.css(contentStyle);
 
@@ -455,8 +397,9 @@
           $children.css(contentStyle);
         }
 
+        _dialog._position(options.position);
+
         return this
-          .css(lightboxStyle)
           .effect(options.rotateIn, {
             direction: direction,
             mode: 'show'
@@ -507,10 +450,14 @@
 
         contentStyle = _lightbox._contentStyle($content);
 
-        options.width = contentStyle.width;
-        options.height = contentStyle.height;
+        $viewer.dialog('option', 'width', contentStyle.width);
+        $viewer.dialog('option', 'height', contentStyle.height);
 
-        lightboxStyle = _lightbox._lightboxStyle(_dialog);
+        lightboxStyle = {
+          height: 'show',
+          width: 'show',
+          opacity: 'show'
+        };
 
         $content
           .css(anchorStyle)
@@ -532,7 +479,9 @@
           }, options.duration);
         }
 
-        return this.css(anchorStyle)
+        _dialog._position(options.position);
+
+        return this
           .animate(lightboxStyle, options.duration);
       };
     },
@@ -638,7 +587,6 @@
         size.width = $tmp.outerWidth();
       });
       style = $.extend({
-        opacity: 0
       }, size, offset);
       return style;
     },
@@ -673,46 +621,7 @@
         }
       });
 
-      style = $.extend({ opacity: 1 }, size);
-      return style;
-    },
-
-    _lightboxStyle: function (_dialog) {
-      var _lightbox, options, $container, $content, $titlebar, size, chrome, position, style;
-
-      _lightbox = this;
-
-      options = _lightbox.options;
-
-      $container = _dialog.uiDialogContainer;
-      $titlebar = _dialog.uiDialogTitlebar;
-      $content = _dialog.element;
-
-      size = {
-        width: options.width,
-        height: options.height
-      };
-      chrome = {
-        height: (parseInt($content.css('padding-top'), 10) || 0) + (parseInt($content.css('padding-bottom'), 10) || 0) + $titlebar.outerHeight(),
-        width: (parseInt($content.css('padding-left'), 10) || 0) + (parseInt($content.css('padding-right'), 10) || 0)
-      };
-
-      // add the padding of the dialog and buttons
-      $.each(size, function (i, val) {
-        if (parseInt(val, 10) > 0) {
-          size[i] += (parseInt(chrome[i], 10) || 0);
-        }
-      });
-
-      position = this._position(size, options.position);
-
-      style = $.extend({
-          opacity: 1
-        },
-        size, position);
-      if (options.modal) {
-        style.position = 'fixed';
-      }
+      style = $.extend({}, size);
       return style;
     }
   });
