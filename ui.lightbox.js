@@ -120,7 +120,7 @@
 
     _setData: function (key, value) {
       if (key === 'cursor') {
-        $('.active', this).removeClass('active');
+        $(this.options.cursor).removeClass('active');
         $(value).addClass('active');
       }
       else {
@@ -632,6 +632,7 @@
     defaults: {
       loop: true,
       modal: true,
+      cursor: null,
       overlay: {},
       selector: "a[href]:has(img[src])",
       dialogClass: 'ui-lightbox',
