@@ -173,44 +173,6 @@
       return $viewer;
     },
 
-    select: function (target, direction) {
-      var options, current;
-
-      this.spinner = new $.ui.lightbox.spinner(this);
-
-      current = this.options.cursor;
-
-      if (this.$viewer && this.$viewer.dialog('isOpen')) {
-        if (direction) {
-          this.$viewer
-            .unbind('dialogclose.lightbox')
-            .bind('dialogclose.lightbox', this._rotateClose(direction));
-        }
-        this.$viewer.dialog('close');
-      }
-
-      // check if options are cached.
-      options = $(target).data('lightbox');
-
-      if (!options) {
-        // set up options.
-        options = $.extend({}, this.original_options);
-        if (!options.type) {
-          options.type = this._deriveType(target);
-        }
-        $(target).data('lightbox', options);
-      }
-
-      this.options = options;
-
-      // load content.
-      this.options.cursor = target;
-      this.direction = direction;
-
-      $.ui.lightbox.linker[options.type].apply(this, [ $(target) ]);
-
-    },
-
     _position: function (size, pos) {
       var wnd, doc, pTop, pLeft, minTop;
       wnd = $(window);
@@ -305,6 +267,44 @@
     open: function (anchor) {
       this.overlay = this.options.modal ? new $.ui.lightbox.overlay(this) : null;
       this.select(anchor);
+    },
+
+    select: function (target, direction) {
+      var options, current;
+
+      this.spinner = new $.ui.lightbox.spinner(this);
+
+      current = this.options.cursor;
+
+      if (this.$viewer && this.$viewer.dialog('isOpen')) {
+        if (direction) {
+          this.$viewer
+            .unbind('dialogclose.lightbox')
+            .bind('dialogclose.lightbox', this._rotateClose(direction));
+        }
+        this.$viewer.dialog('close');
+      }
+
+      // check if options are cached.
+      options = $(target).data('lightbox');
+
+      if (!options) {
+        // set up options.
+        options = $.extend({}, this.original_options);
+        if (!options.type) {
+          options.type = this._deriveType(target);
+        }
+        $(target).data('lightbox', options);
+      }
+
+      this.options = options;
+
+      // load content.
+      this.options.cursor = target;
+      this.direction = direction;
+
+      $.ui.lightbox.linker[options.type].apply(this, [ $(target) ]);
+
     },
 
     display: function (content) {
