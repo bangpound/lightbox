@@ -38,6 +38,27 @@ Handling content size is tricky, especially with AJAX/AHAH loaded content. This 
       measure: 'img'
     });
 
+### Drupal integration
+
+I wrote this for a Drupal site, and I've included the code that I use to load the script. The widget requires jQuery UI, but only *this* sample implementation has specific Drupal dependencies.
+
+* [jQuery UI](http://drupal.org/project/jquery_ui)
+* [jQ](http://drupal.org/project/jq)
+
+To add the script and options to your Drupal page, simply call
+
+    jq_add('lightbox', $target, $options);
+
+The $target is the container of your anchors. The $options is an associative array
+of options. For example, the third usage example above would be expressed as:
+
+    jq_add('lightbox', '#gallery', array(
+      'constrain' => 'width',
+      'measure' => 'img'
+    ));
+
+I'm calling `jq_add` from `HOOK_preprocess_views_view` to create a lightbox gallery from the output of a view, but there are also ways to use the script without Views.
+
 ## Credits
 
 While developing this widget, I referred to and used code from the open source licensed [jQuery UI Photoviewer][Photoviewer] widget (in development) and the [TopUp][TopUp] lightbox.
