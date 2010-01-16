@@ -453,7 +453,8 @@
         display: "block"
       },
       function () {
-        var $tmp = $(this);
+        var $tmp;
+        $tmp = $(this);
         width = $tmp.outerWidth();
         height = $tmp.outerHeight();
         $tmp.remove();
@@ -678,7 +679,8 @@
         display: 'block'
       },
       function () {
-        var $tmp = $(this);
+        var $tmp;
+        $tmp = $(this);
         offset = $tmp.offset();
         size.height = $tmp.outerHeight();
         size.width = $tmp.outerWidth();
