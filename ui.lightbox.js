@@ -117,7 +117,6 @@
 
     _setData: function (key, value) {
       if (key === 'cursor') {
-        this.options.cursor = value;
         $('.active', this).removeClass('active');
         $(value).addClass('active');
       }
