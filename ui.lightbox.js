@@ -120,7 +120,8 @@
         this.options.cursor = value;
         $('.active', this).removeClass('active');
         $(value).addClass('active');
-      } else {
+      }
+      else {
         this.$viewer.dialog(key, value);
       }
       $.widget.prototype._setData.apply(this, arguments);
