@@ -52,8 +52,6 @@
         closeOnEscape: this.options.closeOnEscape,
         modal: false,
         // $.effects.lightboxDialog blocks ui.dialog's hide/show behavior.
-        show: 'lightboxDialog',
-        hide: 'lightboxDialog',
         width: 'auto',
         height: 'auto',
         dialogClass: this.options.dialogClass,
@@ -144,7 +142,7 @@
  */
 
     _makeDialog: function (content) {
-      var $viewer, $content, buttonPane;
+      var $viewer, $content, _dialog, buttonPane;
 
       $content = $(content);
 
@@ -155,10 +153,11 @@
         $viewer = $('<div/>').append($content).dialog($.extend(this.dialogOptions));
       }
 
-      $viewer
-        .bind('dialogopen.lightbox', this.direction ? this._rotateOpen(this.direction) : this._dialogOpen())
-        .bind('dialogclose.lightbox', this._dialogClose())
-        .bind('resize', this._windowResizeStop($viewer));
+      _dialog = $viewer.data('dialog');
+
+      _dialog.uiDialog.show = this.direction ? this._rotateOpen($viewer, this.direction) : this._dialogOpen($viewer);
+      _dialog.uiDialog.hide = this._dialogClose($viewer);
+//        .bind('resize', this._windowResizeStop($viewer));
 
       if (this._anchors().length > 1 && this.options.buttons) {
         buttonPane = $viewer.data('dialog').uiDialogButtonPane;
@@ -278,9 +277,7 @@
 
       if (this.$viewer && this.$viewer.dialog('isOpen')) {
         if (direction) {
-          this.$viewer
-            .unbind('dialogclose.lightbox')
-            .bind('dialogclose.lightbox', this._rotateClose(direction));
+          this.$viewer.data('dialog').uiDialog.hide = this._rotateClose(this.$viewer, direction);
         }
         this.$viewer.dialog('close');
       }
@@ -421,20 +418,20 @@
  * Swappable dialog event handlers.
  */
 
-    _rotateOpen: function (direction) {
+    _rotateOpen: function ($viewer, direction) {
       var lightbox, anchor;
       lightbox = this.element;
       anchor = this.options.cursor;
 
-      return function (event, ui) {
-        var _lightbox, _dialog, $anchor, $content, $children, options, contentStyle, lightboxStyle; // this = dialog element.
+      return function (effect) {
+        var _lightbox, _dialog, $anchor, $content, $children, options, contentStyle, lightboxStyle;
 
         _lightbox = $(lightbox).data('lightbox');
-        _dialog = $(this).data('dialog');
+        _dialog = $viewer.data('dialog');
 
         $anchor = $(anchor);
-        $content = $(this);
-        $children = $(this).children();
+        $content = $viewer;
+        $children = $viewer.children();
 
         direction = {
           up: "down",
@@ -458,52 +455,51 @@
           $children.css(contentStyle);
         }
 
-        _dialog.uiDialog
+        return this
           .css(lightboxStyle)
-          .show(options.rotateIn, {
-            direction: direction
+          .effect(options.rotateIn, {
+            direction: direction,
+            mode: 'show'
           },
           options.duration);
 
       };
     },
 
-    _rotateClose: function (direction) {
+    _rotateClose: function ($viewer, direction) {
       var lightbox;
       lightbox = this.element;
-      return function (event, ui) {
-        var _lightbox, _dialog, $content, options;
+      return function (effect) {
+        var _lightbox, _dialog, options;
 
         _lightbox = $(lightbox).data('lightbox');
-        _dialog = $(this).data('dialog');
-
-        $content = $(this);
+        _dialog = $viewer.data('dialog');
 
         options = _lightbox.options;
 
-        _dialog.uiDialog
-          .hide(options.rotateOut, {
-            direction: direction
+        return this.effect(options.rotateOut, {
+            direction: direction,
+            mode: 'hide'
           }, options.duration, function () {
-            _dialog.element.remove();
+            $viewer.remove();
           });
 
       };
     },
 
-    _dialogOpen: function () {
+    _dialogOpen: function ($viewer) {
       var lightbox, anchor;
       lightbox = this.element;
       anchor = this.options.cursor;
-      return function (event, ui) {
+      return function (effect) {
         var _lightbox, _dialog, $anchor, $content, $children, options, anchorStyle, contentStyle, lightboxStyle;
 
         _lightbox = $(lightbox).data('lightbox');
-        _dialog = $(this).data('dialog');
+        _dialog = $viewer.data('dialog');
 
         $anchor = $(anchor);
-        $content = $(this);
-        $children = $(this).children();
+        $content = $viewer;
+        $children = $viewer.children();
 
         options = _lightbox.options;
 
@@ -536,26 +532,24 @@
           }, options.duration);
         }
 
-        _dialog.uiDialog
-          .css(anchorStyle)
+        return this.css(anchorStyle)
           .animate(lightboxStyle, options.duration);
-
       };
     },
 
-    _dialogClose: function () {
+    _dialogClose: function ($viewer) {
       var lightbox, anchor;
       lightbox = this.element;
       anchor = this.options.cursor;
-      return function (event, ui) {
+      return function (effect) {
         var _lightbox, _dialog, $content, $children, $anchor, options, anchorStyle;
 
         _lightbox = $(lightbox).data('lightbox');
-        _dialog = $(this).data('dialog');
+        _dialog = $viewer.data('dialog');
 
         $anchor = $(anchor);
-        $content = $(this);
-        $children = $(this).children();
+        $content = $viewer;
+        $children = $viewer.children();
 
         options = _lightbox.options;
 
@@ -581,13 +575,12 @@
             }, options.duration);
         }
 
-        _dialog.uiDialog
-          .animate(anchorStyle, options.duration, function () {
+        return this.animate(anchorStyle, options.duration, function () {
             if (_lightbox.overlay) {
               _lightbox.overlay.destroy();
             }
             $.ui.lightbox.overlay.resize();
-            _dialog.element.remove();
+            $viewer.remove();
           });
 
       };
@@ -932,15 +925,4 @@
       $.ui.lightbox.spinner.destroy(this.$el);
     }
   });
-
-/**
- * jQuery UI effect
- *
- * Nullifies any transition started by ui.dialog widgets.
- *
- */
-
-  $.effects.lightboxDialog = function (o) {
-    return $(this);
-  };
 }(jQuery));
