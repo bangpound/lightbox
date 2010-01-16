@@ -40,7 +40,7 @@ Handling content size is tricky, especially with AJAX/AHAH loaded content. This 
 
 ## Credits
 
-The code for this widget was developed the open source licensed [jQuery UI Photoviewer][Photoviewer] widget (in development) and the [TopUp][TopUp] lightbox.
+While developing this widget, I referred to and used code from the open source licensed [jQuery UI Photoviewer][Photoviewer] widget (in development) and the [TopUp][TopUp] lightbox.
 
 [Photoviewer]: http://wiki.jqueryui.com/Photoviewer
 [TopUp]: http://gettopup.com/
