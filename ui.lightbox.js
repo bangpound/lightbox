@@ -229,7 +229,7 @@
       options = $(target).data('lightbox');
       if (!options) {
         // set up options.
-        options = $.extend({}, this.anchor_options);
+        options = $.extend({}, this.anchor_options, $.metadata ? $(target).metadata() : {});
         if (!options.type) {
           options.type = this._deriveType(target);
         }
