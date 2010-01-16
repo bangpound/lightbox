@@ -60,7 +60,10 @@
         // TODO: Support overlay by implementing focus,dragstop,resizestop
       });
 
-      this.original_options = this.options;
+      // Store original options for anchors.
+      this.anchor_options = {
+        type: this.options.type
+      };
 
       // todo: consider event delegation to make this more dynamic
       $(this.options.selector, this.element).bind('click.lightbox', function (event) {
@@ -117,12 +120,8 @@
 
     _setData: function (key, value) {
       if (key === 'cursor') {
-        this.options.cursor = value;
-        $('.active', this).removeClass('active');
+        $(this.options.cursor).removeClass('active');
         $(value).addClass('active');
-      }
-      else {
-        this.$viewer.dialog(key, value);
       }
       $.widget.prototype._setData.apply(this, arguments);
     },
@@ -228,24 +227,20 @@
 
       // check if options are cached.
       options = $(target).data('lightbox');
-
       if (!options) {
         // set up options.
-        options = $.extend({}, this.original_options);
+        options = $.extend({}, this.anchor_options);
         if (!options.type) {
           options.type = this._deriveType(target);
         }
         $(target).data('lightbox', options);
       }
+      options.cursor = target;
 
-      this.options = options;
-
-      // load content.
-      this.options.cursor = target;
+      this.option(options);
       this.direction = direction;
 
       $.ui.lightbox.linker[options.type].apply(this, [ $(target) ]);
-
     },
 
     display: function (content) {
@@ -298,19 +293,7 @@
       if (reference.match(/\.(gif|jpg|jpeg|png)(\?[0123456789]+)?$/)) {
         return "image";
       }
-      if (reference.match(/\.(swf)(\?[0123456789]+)?$/)) {
-        return "media";
-      }
-      if (reference.match(/\.(flv)(\?[0123456789]+)?$/)) {
-        return "media";
-      }
-      if (reference.match(/\.(aif|aiff|aac|au|bmp|gsm|mov|mid|midi|mpg|mpeg|m4a|m4v|mp4|psd|qt|qtif|qif|qti|snd|tif|tiff|wav|3g2|3gp|wbmp)(\?[0123456789]+)?$/)) {
-        return "media";
-      }
-      if (reference.match(/\.(ra|ram|rm|rpm|rv|smi|smil)(\?[0123456789]+)?$/)) {
-        return "media";
-      }
-      if (reference.match(/\.(asf|avi|wma|wmv)(\?[0123456789]+)?$/)) {
+      if (reference.match(/\.(swf|flv|aif|aiff|aac|au|bmp|gsm|mov|mid|midi|mpg|mpeg|m4a|m4v|mp4|psd|qt|qtif|qif|qti|snd|tif|tiff|wav|3g2|3gp|wbmp|ra|ram|rm|rpm|rv|smi|smil|asf|avi|wma|wmv)(\?[0123456789]+)?$/)) {
         return "media";
       }
       return "ajax";
@@ -368,7 +351,7 @@
       anchor = this.options.cursor;
 
       return function (effect) {
-        var _lightbox, _dialog, $anchor, $content, $children, options, contentStyle;
+        var _lightbox, _dialog, $anchor, $content, $children, $titlebar, options, chrome, contentStyle;
 
         _lightbox = $(lightbox).data('lightbox');
         _dialog = $viewer.data('dialog');
@@ -376,6 +359,7 @@
         $anchor = $(anchor);
         $content = $viewer;
         $children = $viewer.children();
+        $titlebar = _dialog.uiDialogTitlebar;
 
         direction = {
           up: "down",
@@ -387,8 +371,13 @@
 
         contentStyle = _lightbox._contentStyle($content);
 
-        $viewer.dialog('option', 'width', contentStyle.width);
-        $viewer.dialog('option', 'height', contentStyle.height);
+        chrome = {
+          height: (parseInt($content.css('padding-top'), 10) || 0) + (parseInt($content.css('padding-bottom'), 10) || 0) + $titlebar.outerHeight(),
+          width: (parseInt($content.css('padding-left'), 10) || 0) + (parseInt($content.css('padding-right'), 10) || 0)
+        };
+
+        $viewer.dialog('option', 'width', contentStyle.width + chrome.width);
+        $viewer.dialog('option', 'height', contentStyle.height + chrome.height);
 
         $content.css(contentStyle);
 
@@ -431,11 +420,11 @@
     },
 
     _dialogOpen: function ($viewer) {
-      var lightbox, anchor;
+      var lightbox, anchor, chrome;
       lightbox = this.element;
       anchor = this.options.cursor;
       return function (effect) {
-        var _lightbox, _dialog, $anchor, $content, $children, options, anchorStyle, contentStyle, lightboxStyle;
+        var _lightbox, _dialog, $anchor, $content, $children, $titlebar, options, anchorStyle, contentStyle, lightboxStyle;
 
         _lightbox = $(lightbox).data('lightbox');
         _dialog = $viewer.data('dialog');
@@ -443,6 +432,7 @@
         $anchor = $(anchor);
         $content = $viewer;
         $children = $viewer.children();
+        $titlebar = _dialog.uiDialogTitlebar;
 
         options = _lightbox.options;
 
@@ -450,8 +440,13 @@
 
         contentStyle = _lightbox._contentStyle($content);
 
-        $viewer.dialog('option', 'width', contentStyle.width);
-        $viewer.dialog('option', 'height', contentStyle.height);
+        chrome = {
+          height: (parseInt($content.css('padding-top'), 10) || 0) + (parseInt($content.css('padding-bottom'), 10) || 0) + $titlebar.outerHeight(),
+          width: (parseInt($content.css('padding-left'), 10) || 0) + (parseInt($content.css('padding-right'), 10) || 0)
+        };
+
+        $viewer.dialog('option', 'width', contentStyle.width + chrome.width);
+        $viewer.dialog('option', 'height', contentStyle.height + chrome.height);
 
         lightboxStyle = {
           height: 'show',
@@ -634,6 +629,7 @@
     defaults: {
       loop: true,
       modal: true,
+      cursor: null,
       overlay: {},
       selector: "a[href]:has(img[src])",
       dialogClass: 'ui-lightbox',
