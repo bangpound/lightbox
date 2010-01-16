@@ -145,7 +145,6 @@
       var $viewer, buttonPane, data;
 
       $viewer = $('<div/>').dialog($.extend(this.dialogOptions));
-      buttonPane = $viewer.data('dialog').uiDialogButtonPane;
       data = {
         anchor: cursor,
         lightbox: this.element[0],
@@ -158,6 +157,7 @@
         .bind('resize', data, this._windowResizeStop);
 
       if (this._anchors().length > 1 && this.options.buttons) {
+        buttonPane = $viewer.data('dialog').uiDialogButtonPane;
         $viewer.dialog('option', 'buttons', this._buttons());
         $('button', buttonPane).each(function (index, button) {
           var value;
