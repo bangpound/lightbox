@@ -19,22 +19,24 @@ This widget was written for jQuery 1.2.6 and jQuery UI 1.6.
 
 The lightbox widget is applied to a DOM element that contains all of the anchors you want to render as lightboxes. The *selector* option targets the individual anchors within that container.
 
-`$('#gallery').lightbox();
+    $('#gallery').lightbox();
 
 Without any options, the lightbox widget will create a gallery of all anchors that contain images (thumbnails).
 
-`$('#gallery').lightbox({
-`  loop: true,  // Loops to the beginning of the gallery after paging past last element.
-`  modal: true, // creates a modal overlay.
-`  selector: "a[href]:has(img[src])" // Target the anchors that should create lightboxes.
-`});
+    $('#gallery').lightbox({
+      loop: true,                       // Loops to the beginning of the gallery
+                                        // after paging past last element.
+      modal: true,                      // creates a modal overlay.
+      selector: "a[href]:has(img[src])" // Target the anchors that should open
+                                        // as lightboxes.
+    });
 
 Handling content size is tricky, especially with AJAX/AHAH loaded content. This script tries its best to determine the size of the content before displaying it. This example works for loaded content that contains an image. The width of the lightbox is constrained to be the width of the image.
 
-`$('#gallery').lightbox({
-`  constrain: 'width',
-`  measure: 'img'
-`});
+    $('#gallery').lightbox({
+      constrain: 'width',
+      measure: 'img'
+    });
 
 ## Credits
 
