@@ -297,19 +297,7 @@
       if (reference.match(/\.(gif|jpg|jpeg|png)(\?[0123456789]+)?$/)) {
         return "image";
       }
-      if (reference.match(/\.(swf)(\?[0123456789]+)?$/)) {
-        return "media";
-      }
-      if (reference.match(/\.(flv)(\?[0123456789]+)?$/)) {
-        return "media";
-      }
-      if (reference.match(/\.(aif|aiff|aac|au|bmp|gsm|mov|mid|midi|mpg|mpeg|m4a|m4v|mp4|psd|qt|qtif|qif|qti|snd|tif|tiff|wav|3g2|3gp|wbmp)(\?[0123456789]+)?$/)) {
-        return "media";
-      }
-      if (reference.match(/\.(ra|ram|rm|rpm|rv|smi|smil)(\?[0123456789]+)?$/)) {
-        return "media";
-      }
-      if (reference.match(/\.(asf|avi|wma|wmv)(\?[0123456789]+)?$/)) {
+      if (reference.match(/\.(swf|flv|aif|aiff|aac|au|bmp|gsm|mov|mid|midi|mpg|mpeg|m4a|m4v|mp4|psd|qt|qtif|qif|qti|snd|tif|tiff|wav|3g2|3gp|wbmp|ra|ram|rm|rpm|rv|smi|smil|asf|avi|wma|wmv)(\?[0123456789]+)?$/)) {
         return "media";
       }
       return "ajax";
