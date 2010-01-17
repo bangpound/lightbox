@@ -707,7 +707,7 @@
     },
     dom: function ($anchor) {
       var content;
-      content = $($anchor.attr('href')).clone().show();
+      content = $($anchor.attr('href')).show()[0];
       this.display(content);
     },
     ajax: function ($anchor) {
