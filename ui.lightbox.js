@@ -424,7 +424,7 @@
       lightbox = this.element;
       anchor = this.options.cursor;
       return function (effect) {
-        var _lightbox, _dialog, $anchor, $content, $children, $titlebar, options, anchorStyle, contentStyle, lightboxStyle;
+        var _lightbox, _dialog, $anchor, $content, $children, $titlebar, options, anchorStyle, contentStyle;
 
         _lightbox = $(lightbox).data('lightbox');
         _dialog = $viewer.data('dialog');
@@ -448,36 +448,25 @@
         $viewer.dialog('option', 'width', contentStyle.width + chrome.width);
         $viewer.dialog('option', 'height', contentStyle.height + chrome.height);
 
-        lightboxStyle = {
-          height: 'show',
-          width: 'show',
-          opacity: 'show'
-        };
-
-        $content
-          .css(anchorStyle)
-          .animate(contentStyle, options.duration);
+        $titlebar.hide();
+        this.removeClass()._show();
 
         // todo: make the singleton tag an option.
         if ($children.length === 1 && $children[0].nodeName.match(/img/i)) {
-          $children.effect('size', {
-            from: {
-              width: anchorStyle.width,
-              height: anchorStyle.height
-            },
-            to: {
-              width: contentStyle.width,
-              height: contentStyle.height
-            },
-            origin: [ contentStyle.top, contentStyle.left ],
-            scale: 'both'
-          }, options.duration);
+          $children
+            .css(anchorStyle)
+            .animate(contentStyle, options.duration);
         }
 
         _dialog._position(options.position);
 
-        return this
-          .animate(lightboxStyle, options.duration);
+        return $content
+          .css(anchorStyle)
+          .animate(contentStyle, options.duration, function () {
+            _dialog.uiDialog
+              .addClass('ui-dialog ui-lightbox');
+            $titlebar.show();
+          });
       };
     },
 
@@ -503,14 +492,8 @@
         if ($children.length === 1 && $children[0].nodeName.match(/img/i)) {
           $content
             .animate(anchorStyle, options.duration);
-          $children.effect('size', {
-            to: {
-              width: anchorStyle.width,
-              height: anchorStyle.height
-            },
-            origin: [ anchorStyle.top, anchorStyle.left ],
-            scale: 'both'
-          }, options.duration);
+
+          $children.animate(anchorStyle, options.duration);
         }
         else {
           $content
