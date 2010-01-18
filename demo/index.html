@@ -15,7 +15,7 @@
     $('#gallery').lightbox({ });
     $('#dom').lightbox({ type: 'dom', selector: 'a', constrain: 'width', measure: 'img' });
     $('#quicktime').lightbox({ selector: 'a', width: 480, height: 260 });
-    $('#ahah').lightbox({ dialogClass: 'ui-lightbox kleenex', type: 'ajax', height: 'constrain', constraint: '.video' });
+    $('#ahah').lightbox({ dialogClass: 'ui-lightbox kleenex', type: 'ajax', constrain: 'height', measure: '.video' });
     $('#oembed').lightbox({ type: 'oembed' });
     $('#mixed').lightbox();
   });
