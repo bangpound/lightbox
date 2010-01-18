@@ -156,7 +156,7 @@ body { margin-top: 36px; margin-bottom: 36px; background-color: #eee; }
 
 #container { width: 590px; margin: 0 auto; overflow: hidden; display: inline-block; border-radius: 5px; -moz-border-radius: 5px; -webkit-border-radius: 5px; /* Webkit (Safari, Chrome) */ -webkit-box-shadow: #333333 1px 1px 5px; /* Gecko (Firefox, Camino) */ -moz-box-shadow: #333333 1px 1px 5px; /* CSS3 */ box-shadow: #333333 1px 1px 5px; background-color: white; padding: 18px; }
 #container { display: block; }
-#container .section { overflow: hidden; display: inline-block; background: url('../images/grid.png?1263683203'); }
+#container .section { overflow: hidden; display: inline-block; background: url('../images/grid.png?1263688803'); }
 #container .section { display: block; }
 
 h1 { display: inline; float: left; margin-right: 10px; width: 390px; font-size: 6em; line-height: 1.25em; height: 1.25em; margin-bottom: 0; }
@@ -187,21 +187,28 @@ hr { padding-right: 29px; margin-right: 30px; border-right: 1px solid #eeeeee; }
 
 .footer { text-align: center; padding-top: 36px; font-style: italic; }
 
-#gallery, #youtube, #quicktime, #ahah, #oembed, #mixed { display: inline; float: left; margin-right: 0; width: 390px; padding-left: 200px; margin-bottom: 1.5em; }
-* html #gallery, * html #youtube, * html #quicktime, * html #ahah, * html #oembed, * html #mixed { overflow-x: hidden; }
-#gallery h2, #gallery p.usage, #youtube h2, #youtube p.usage, #quicktime h2, #quicktime p.usage, #ahah h2, #ahah p.usage, #oembed h2, #oembed p.usage, #mixed h2, #mixed p.usage { display: inline; float: left; position: relative; margin-left: -200px; }
-#gallery h2, #youtube h2, #quicktime h2, #ahah h2, #oembed h2, #mixed h2 { margin-top: 18px; margin-bottom: 0; }
-#gallery p.usage, #youtube p.usage, #quicktime p.usage, #ahah p.usage, #oembed p.usage, #mixed p.usage { display: inline; float: left; margin-right: 10px; width: 190px; padding-top: 54px; margin-bottom: 0; }
-* html #gallery p.usage, * html #youtube p.usage, * html #quicktime p.usage, * html #ahah p.usage, * html #oembed p.usage, * html #mixed p.usage { overflow-x: hidden; }
-#gallery ul, #youtube ul, #quicktime ul, #ahah ul, #oembed ul, #mixed ul { margin: 0; padding: 0; border: 0; outline: 0; }
-#gallery ul li, #youtube ul li, #quicktime ul li, #ahah ul li, #oembed ul li, #mixed ul li { display: inline; float: left; margin-right: 10px; width: 90px; line-height: 90px; text-align: center; }
-* html #gallery ul li, * html #youtube ul li, * html #quicktime ul li, * html #ahah ul li, * html #oembed ul li, * html #mixed ul li { overflow-x: hidden; }
-#gallery ul li:nth-child(4n), #youtube ul li:nth-child(4n), #quicktime ul li:nth-child(4n), #ahah ul li:nth-child(4n), #oembed ul li:nth-child(4n), #mixed ul li:nth-child(4n) { margin-right: 0; }
-#gallery ul li img, #youtube ul li img, #quicktime ul li img, #ahah ul li img, #oembed ul li img, #mixed ul li img { vertical-align: middle; }
+#gallery, #dom, #quicktime, #ahah, #oembed, #mixed { display: inline; float: left; margin-right: 0; width: 390px; padding-left: 200px; margin-bottom: 1.5em; padding-bottom: 26px; margin-bottom: 9px; }
+* html #gallery, * html #dom, * html #quicktime, * html #ahah, * html #oembed, * html #mixed { overflow-x: hidden; }
+#gallery h2, #gallery p.usage, #dom h2, #dom p.usage, #quicktime h2, #quicktime p.usage, #ahah h2, #ahah p.usage, #oembed h2, #oembed p.usage, #mixed h2, #mixed p.usage { display: inline; float: left; position: relative; margin-left: -200px; }
+#gallery h2, #dom h2, #quicktime h2, #ahah h2, #oembed h2, #mixed h2 { margin-top: 54px; margin-bottom: 0; }
+#gallery p.usage, #dom p.usage, #quicktime p.usage, #ahah p.usage, #oembed p.usage, #mixed p.usage { display: inline; float: left; margin-right: 10px; width: 190px; font-family: monospace; font-size: 11px; line-height: 18px; padding-top: 108px; margin-bottom: 0; }
+* html #gallery p.usage, * html #dom p.usage, * html #quicktime p.usage, * html #ahah p.usage, * html #oembed p.usage, * html #mixed p.usage { overflow-x: hidden; }
+#gallery ul, #dom ul, #quicktime ul, #ahah ul, #oembed ul, #mixed ul { margin: 0; padding: 0; border: 0; outline: 0; }
+#gallery li, #dom li, #quicktime li, #ahah li, #oembed li, #mixed li { display: inline; float: left; margin-right: 10px; width: 90px; line-height: 90px; text-align: left; }
+* html #gallery li, * html #dom li, * html #quicktime li, * html #ahah li, * html #oembed li, * html #mixed li { overflow-x: hidden; }
+#gallery li:nth-child(4n), #dom li:nth-child(4n), #quicktime li:nth-child(4n), #ahah li:nth-child(4n), #oembed li:nth-child(4n), #mixed li:nth-child(4n) { margin-right: 0; }
+#gallery li img, #dom li img, #quicktime li img, #ahah li img, #oembed li img, #mixed li img { vertical-align: middle; /* Webkit (Safari, Chrome) */ -webkit-box-shadow: #cccccc 1px 1px 5px; /* Gecko (Firefox, Camino) */ -moz-box-shadow: #cccccc 1px 1px 5px; /* CSS3 */ box-shadow: #cccccc 1px 1px 5px; }
+#gallery li a, #dom li a, #quicktime li a, #ahah li a, #oembed li a, #mixed li a { background-color: rgba(255,255,255,0.25); display: block; }
 
-#youtube a, #quicktime a, #ahah a, #oembed a, #mixed a { display: inline; float: left; margin-right: 10px; width: 140px; line-height: 90px; text-align: center; }
-* html #youtube a, * html #quicktime a, * html #ahah a, * html #oembed a, * html #mixed a { overflow-x: hidden; }
-#youtube a img, #quicktime a img, #ahah a img, #oembed a img, #mixed a img { vertical-align: middle; }
+#dom li, #quicktime li, #ahah li, #oembed li { display: inline; float: left; margin-right: 10px; width: 140px; }
+* html #dom li, * html #quicktime li, * html #ahah li, * html #oembed li { overflow-x: hidden; }
+#dom a, #quicktime a, #ahah a, #oembed a { line-height: 90px; text-align: left; }
+#dom a img, #quicktime a img, #ahah a img, #oembed a img { vertical-align: middle; }
+
+#figure1 { overflow: hidden; display: inline-block; background-color: rgba(255,255,255,0.75); }
+#figure1 { display: block; }
+#figure1 img { width: 340px; height: auto; display: block; }
+#figure1 .legend { margin: 18px; font-size: 10px; line-height: 18px; }
 
 .kleenex { overflow: hidden; display: inline-block; }
 .kleenex { display: block; }
