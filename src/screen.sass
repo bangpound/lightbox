@@ -112,34 +112,46 @@ hr
   +column(8, true)
   +prepend(4)
   +append-bottom
+  padding:
+    bottom: 26px
+  margin:
+    bottom: 9px
   h2,p.usage
     +pull(4)
   h2
     margin:
-      top: 18px
+      top: 54px
       bottom: 0
   p.usage
     +column(4)
+    font-family: monospace
+    font-size: 11px
+    line-height: 18px
     padding:
-      top: 54px
+      top: 108px
     margin:
       bottom: 0
   ul
     +reset-box-model
-    li
-      +column(2)
-      line-height: 90px
-      text-align: center
-      &:nth-child(4n)
-        +last
-      img
-        vertical-align: middle
+  li
+    +column(2)
+    line-height: 90px
+    text-align: left
+    &:nth-child(4n)
+      +last
+    img
+      vertical-align: middle
+      +box-shadow(#ccc)
+    a
+      background-color: rgba(255,255,255,0.25)
+      display: block
 
 #dom,#quicktime,#ahah,#oembed
-  a
+  li
     +column(3)
+  a
     line-height: 90px
-    text-align: center
+    text-align: left
     img
       vertical-align: middle
 
@@ -167,6 +179,4 @@ hr
     font-size: 12px
     font-weight: bold
   p,h1
-    //width: 50%
-    //+float-left
 
