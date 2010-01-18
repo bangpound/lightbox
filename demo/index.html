@@ -13,7 +13,7 @@
   $(document).ready(function () {
     $.metadata.setType("attr", "data");
     $('#gallery').lightbox({ });
-    $('#youtube').lightbox({ type: 'dom', selector: 'a', width: 425, height: 344 });
+    $('#dom').lightbox({ type: 'dom', selector: 'a', constrain: 'width', measure: 'img' });
     $('#quicktime').lightbox({ selector: 'a', width: 480, height: 260 });
     $('#ahah').lightbox({ dialogClass: 'ui-lightbox kleenex', type: 'ajax', height: 'constrain', constraint: '.video' });
     $('#oembed').lightbox({ type: 'oembed' });
@@ -45,7 +45,7 @@
 					</li>
 				</ul>
 			</div>
-			<div id="youtube">
+			<div id="dom">
         <h2>DOM</h2>
 			  <p class="usage">$('#youtube').lightbox({
   type: 'dom', selector: 'a',
