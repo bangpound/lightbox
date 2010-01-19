@@ -719,9 +719,6 @@
       $.ajax($.extend({
         // change to use ajaxOptions like in ui.tabs.
         url: $anchor[0].href,
-        cache: true,
-        async: true,
-        dataType: "html",
         success: function (data, textStatus) {
           lightbox.display(data);
         }
