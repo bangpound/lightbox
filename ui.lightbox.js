@@ -590,6 +590,8 @@
       if (size.width === 'auto' || size.height === 'auto') {
         size = this._actualContentSize($content);
         size = this._idealContentSize(size);
+      }
+      if (options.shrink) {
         $("*[width]", $content).attr({
           width: size.width,
           height: size.height
@@ -633,6 +635,7 @@
       //  6px,1em, 50% = normal CSS style.
       width: 'auto',
       height: 'auto',
+      shrink: false,
 
       // Constrain the width or height of lightbox by the length of that
       // dimension on the measured element.
