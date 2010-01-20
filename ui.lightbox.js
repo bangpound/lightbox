@@ -590,6 +590,8 @@
       if (size.width === 'auto' || size.height === 'auto') {
         size = this._actualContentSize($content);
         size = this._idealContentSize(size);
+      }
+      if (options.shrink) {
         $("*[width]", $content).attr({
           width: size.width,
           height: size.height
@@ -633,6 +635,7 @@
       //  6px,1em, 50% = normal CSS style.
       width: 'auto',
       height: 'auto',
+      shrink: false,
 
       // Constrain the width or height of lightbox by the length of that
       // dimension on the measured element.
@@ -650,7 +653,10 @@
       show: 'scale',
       hide: 'scale',
       duration: 400,
-      margin: 100
+      margin: 100,
+
+      ajaxOptions: {
+      }
     },
     uuid: 0,
     overlay: function (_lightbox) {
@@ -713,16 +719,13 @@
     ajax: function ($anchor) {
       var lightbox;
       lightbox = this;
-      $.ajax({
+      $.ajax($.extend({
         // change to use ajaxOptions like in ui.tabs.
         url: $anchor[0].href,
-        cache: true,
-        async: true,
-        dataType: "html",
         success: function (data, textStatus) {
           lightbox.display(data);
         }
-      });
+      }, lightbox.options.ajaxOptions));
     },
     oembed: function ($anchor) {
       var lightbox, content;
