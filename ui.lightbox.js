@@ -581,15 +581,25 @@
         width: (parseInt($content.css('margin-left'), 10) || 0) + (parseInt($content.css('margin-right'), 10) || 0)
       };
 
+      // This is the only place where I'm manpiulating the DOM in a style function.
       if (options.constrain) {
         length = $(options.measure, $content).css(options.constrain);
-        // This is the only place where I'm manpiulating the DOM in a style function.
         $content.css(options.constrain, length);
         size[options.constrain] = length;
       }
-      if (size.width === 'auto' || size.height === 'auto') {
+      else {
+        $.each(size, function (i, val) {
+          if (parseInt(val, 10) > 0) {
+            $content[i](parseInt(val, 10));
+          }
+        });
+      }
+
+      if (options.width === 'auto' || options.height === 'auto') {
         size = this._actualContentSize($content);
-        size = this._idealContentSize(size);
+        if (options.width === 'auto' && options.height === 'auto') {
+          size = this._idealContentSize(size);
+        }
       }
       if (options.shrink) {
         $("*[width]", $content).attr({
