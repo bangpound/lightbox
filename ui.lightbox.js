@@ -55,6 +55,7 @@
         width: 'auto',
         height: 'auto',
         dialogClass: this.options.dialogClass,
+        open: this.options.open,
         resizable: this.options.resizable,
         draggable: this.options.draggable
         // TODO: Support overlay by implementing focus,dragstop,resizestop
