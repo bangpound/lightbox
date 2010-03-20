@@ -611,8 +611,8 @@
 
       // add the margins to the calculated dimensions of content.
       $.each(size, function (i, val) {
-        if (parseInt(val, 10) > 0) {
-          size[i] += (parseInt(margin[i], 10) || 0);
+        if ((parseInt(val, 10) > 0) && (parseInt(margin[i], 10) > 0)) {
+          size[i] = parseInt(size[i], 10) + parseInt(margin[i], 10);
         }
       });
 
